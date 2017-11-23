@@ -1,0 +1,5 @@
+{
+    "project-type" : "typescript",
+    "compileCommand" : "webpack",
+    "extraModules": []
+}

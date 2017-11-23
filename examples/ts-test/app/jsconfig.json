@@ -1,0 +1,11 @@
+{
+  "compilerOptions":{
+      "target": "ES2017",
+      "baseUrl": ".",
+      "paths": {
+          "wjs/*": ["../webjs_modules/*"],
+          "core": ["../webjs_modules/web.js"]
+      }
+  },
+  "include":["*"]
+}

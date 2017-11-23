@@ -1,0 +1,40 @@
+{
+  "name": "wjs-cli",
+  "bin": {
+    "wjs": "./bin/wjs.js"
+  },
+  "version": "0.0.4",
+  "description": "The customisable webapp compiler ",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "node bin/webpack-check.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "App",
+    "wjs",
+    "webjs",
+    "javascript",
+    "typescript",
+    "angular"
+  ],
+  "repository":{
+    "type": "git",
+    "url": "https://github.com/neutrino2211/webjs"
+  },
+  "author": "Tsowa Mainasara Al-amin",
+  "license": "ISC",
+  "dependencies": {
+    "fs-extra": "^4.0.1",
+    "@google-cloud/storage": "^1.4.0",
+    "adm-zip": "^0.4.7",
+    "firebase": "^4.5.1",
+    "ts-loader": "latest"
+  },
+  "devDependencies": {
+    "@google-cloud/storage": "^1.4.0",
+    "adm-zip": "^0.4.7",
+    "firebase": "^4.5.1",
+    "ts-loader": "latest"
+  }
+}
