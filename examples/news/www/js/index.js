@@ -276,7 +276,7 @@ this.loadBackend = function(path){
 
 function load(appClass){
     var application = new appClass();
-    application.main();
+    application.onViewLoad();
 }
 
 function title(title){
@@ -676,17 +676,17 @@ class LoginPage extends __WEBPACK_IMPORTED_MODULE_3__webjs_modules_definitions__
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (immutable) */ __webpack_exports__["d"] = icons;
 /* harmony export (immutable) */ __webpack_exports__["b"] = createElementClass;
 /* harmony export (immutable) */ __webpack_exports__["e"] = setElementClass;
 /* unused harmony export introduceElement */
 /* harmony export (immutable) */ __webpack_exports__["c"] = floatingActionButton;
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return icons; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return ui; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return colors; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
 
 
-function Iconize(name){
+function icons(name){
     var icon = document.createElement("i");
     icon.innerText = name;
     icon.className = "material-icons";
@@ -772,16 +772,6 @@ function floatingActionButton(obj) {
     return btn;
 }
 
-var icons = {
-    face: Iconize("face"),
-    add: Iconize("add"),
-    cloud: Iconize("cloud"),
-    reply: Iconize("reply"),
-    replyAll: Iconize("reply"),
-    send : Iconize("send"),
-    user : Iconize("user")
-};
-
 var ui = {
     card: function(){
         var d = document.createElement("div");
@@ -809,9 +799,7 @@ var ui = {
         })
     
         return rowDiv
-    },
-
-    divider : ()=>{var d = document.createElement("div");d.className = "divider";return d}
+    }
 }
 
 var colors = {

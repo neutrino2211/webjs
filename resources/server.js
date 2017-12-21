@@ -39,7 +39,7 @@ exports.Start  = function(port){
         //     responseText = fs.readFileSync(filename);
         //     console.log(`${chalk.magenta(`[${Date()}]`)}   ${chalk.yellow(`${status}: ${filename} served;`)}`)
         // }
-
+        // console.log(request.url)
         if(request.url == "/favicon.ico"){
             response.writeHead(200)
             response.write(fs.readFileSync(path.join(__dirname,"favicon.ico")),"binary")

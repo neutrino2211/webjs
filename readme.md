@@ -1,6 +1,6 @@
 # wjs-cli:
 
-## command line tool for making web apps
+## customisable webapp compiler
 
 # Under development.
 
@@ -24,11 +24,11 @@ For a typescript project first `npm init` the project directory then install `ts
 
 For a vue project just `npm install` the project directory. 
 
-###Note
+### Note
 
 Vue projects dont have modules yet.
 
-###Javascript
+### Javascript
 
 The default wjs hello world app entry point looks like this.
 
@@ -143,11 +143,11 @@ class Application{
 app.load(Application)
 ```
 
-###Typescript
+### Typescript
 
 A typescript app is not much different from a javascript app but special cases will be added soon.
 
-###Vue
+### Vue
 
 For vue apps just go ahead and read the docs at [the vue js site](https://vuejs.org/v2/guide/). But for development reasons the main.js file needs to import the `refresh.js` file given for browser hot-reload.
 
@@ -173,9 +173,9 @@ new Vue({
 
 But vue specific modules are not ready yet so follow the vue docs only.
 
-##Modules
+## Modules
 
-###app
+### app
 
 the app module has features like
 
@@ -189,7 +189,7 @@ the app module has features like
 
 * streams
 
-###streams, sockets and events
+### streams, sockets and events
 
 ```javascript
 //Declare imports here.
@@ -202,14 +202,15 @@ class Application{
             Socket demo
         */
         var socket = app.socket();
-        socket.connect("echo.websocket.org")
-        this._socket = socket;
+        this._socket = socket.connect("echo.websocket.org")
     }
     
     //Your apps entry point
     onViewLoad(){
         //Send message
-        this._socket.send("Echo this back");
+        this._socket.on("connection",()=>{
+            this._socket.send("Echo this back");
+        })
         //Load emit function and on listener to the element
         app.events.bind(document);
         //Listen for the event
@@ -233,7 +234,7 @@ class Application{
 app.load(Application)
 ```
 
-####load and JSX functions
+#### load and JSX functions
 
 ```javascript
 //Declare imports here.
@@ -264,7 +265,7 @@ class Application{
 app.load(Application)
 ```
 
-###core
+### core
 
 * print
 
@@ -272,13 +273,13 @@ app.load(Application)
 
 The core module is very light for now but will get buff soon
 
-####print function
+#### print function
 
 This just writes text to the screen
 
-####Jquery
+#### Jquery
 
-This is the familiar `$` variable from the core module
+This is the familiar `$` variable available the core module
 
 ```javascript
 //Declare imports here.
@@ -301,7 +302,7 @@ class Application{
 app.load(Application)
 ```
 
-###definittions
+### definittions
 
 the definitions module comes with 
 
@@ -309,7 +310,7 @@ the definitions module comes with
 
 * WJSModule function
 
-####WJSModule function
+#### WJSModule function
 
 ```javascript
 
@@ -335,7 +336,7 @@ class Application{
 
 ```
 
-####TemplateApplication class
+#### TemplateApplication class
 
 ```javascript
 //Declare imports here.
@@ -360,7 +361,7 @@ class Application extends TemplateApplication{
 app.load(Application)
 ```
 
-###material
+### material
 
 the material module has many features like
 
@@ -372,7 +373,7 @@ the material module has many features like
 
 * icons
 
-####createElementClass and setElementClass
+#### createElementClass and setElementClass
 
 This gives you the ability to add css classes in javascript!!! ikr
 
@@ -414,7 +415,7 @@ class Application{
 app.load(Application)
 ```
 
-####icons and colors
+#### icons and colors
 
 All material standard colors and icons are present and ready to use
 
@@ -454,7 +455,7 @@ class Application{
 
 app.load(Application)
 ```
-###TODO (More docs)
+### TODO (More docs)
 
 ## Changelog
 
@@ -488,6 +489,10 @@ app.load(Application)
 * Fixed errors in docs
 
 * Vue support
+
+#### wjs-cli@0.0.5
+
+* More bug fixes
 
 ### Coming soon
 

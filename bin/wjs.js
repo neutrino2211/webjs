@@ -321,10 +321,14 @@ function writePro(directory){
 function usage(name){
     var commands = {
         add: "Usage: wjs add <module>",
-        init: "Usage: wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript",
+        init: "Usage: wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
         install : "Usage: wjs install <module>"
     }
-
+    if(name == "*"){
+        Object.getOwnPropertyNames(commands).forEach((c)=>{
+            print(commands[c]);
+        })
+    }
     print(commands[name]);
 }
 
@@ -524,14 +528,6 @@ else if(operation == "run-dev" || operation == "development"){
     }
 }
 
-else if(operation == "build"){
-    var manifest = getManifest();
-
-    var t = manifest["project-type"];
-
-    if(t == "flame"){
-        buildFlame(process.cwd())
-    }else{
-        build(process.cwd())
-    }
+else if(operation == "-h" || operation == "--help" || operation == "help"){
+    usage("*")
 }

@@ -2,6 +2,7 @@ var path = require("path");
 
 module.exports = {
     typescript: {
+        root: "app",
         entry:"app/app.ts",
         modulesPath: path.join(__dirname,"../resources","Typescript"),
         serverRoot: "www",
@@ -52,6 +53,7 @@ resolve:{
     },
 
     angular: {
+        root: "app",
         entry:"app/app.ts",
         modulesPath: path.join(__dirname,"../resources","Typescript"),
         serverRoot: "www",
@@ -104,6 +106,7 @@ resolve:{
     },
 
     vue: {
+        root: "dist",
         entry:false,
         compileCommand: "webpack --config build/webpack.dev.conf.js",
         modulesPath: path.join(__dirname,"../resources","vue-modules"),
@@ -113,6 +116,7 @@ resolve:{
     },
 
     javascript: {
+        root: "app",
         entry: "app/app.js",
         modulesPath: path.join(__dirname,"../resources","WTS"),
         serverRoot: "www",

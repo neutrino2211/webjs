@@ -1,0 +1,6 @@
+{
+    "project-type" : "javascript",
+    "compileCommand" : "webpack",
+    "root": "www",
+    "extraModules": []
+}

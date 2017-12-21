@@ -1,0 +1,10 @@
+{
+	"project-type": "javascript",
+	"compileCommand": "webpack",
+    "root": "app",
+    "serverRoot": "app",
+	"extraModules": [
+		"material.js",
+		"app.js"
+	]
+}

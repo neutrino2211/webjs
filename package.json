@@ -3,7 +3,7 @@
   "bin": {
     "wjs": "./bin/wjs.js"
   },
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The customisable webapp compiler ",
   "main": "index.js",
   "scripts": {
@@ -16,20 +16,25 @@
     "webjs",
     "javascript",
     "typescript",
-    "angular"
+    "vue",
+    "vue js",
+    "web app"
   ],
-  "repository":{
+  "repository": {
     "type": "git",
     "url": "https://github.com/neutrino2211/webjs"
   },
   "author": "Tsowa Mainasara Al-amin",
   "license": "ISC",
   "dependencies": {
-    "fs-extra": "^4.0.1",
     "@google-cloud/storage": "^1.4.0",
     "adm-zip": "^0.4.7",
+    "chalk": "^2.3.0",
     "firebase": "^4.5.1",
-    "ts-loader": "latest"
+    "fs-extra": "^4.0.1",
+    "ts-loader": "latest",
+    "typescript": "^2.6.1",
+    "websocket": "^1.0.25"
   },
   "devDependencies": {
     "@google-cloud/storage": "^1.4.0",
