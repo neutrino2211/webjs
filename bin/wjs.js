@@ -16,7 +16,7 @@ function makeStringXML(){
         var n = arr[i].getAttribute("name");
     
         if(n == "app_name"){
-            console.log(arr[i].lastChild.data)
+            // console.log(arr[i].lastChild.data)
             arr[i].lastChild.data = getManifest().android.app_name;
         }
     }
@@ -231,6 +231,21 @@ function compile(c){
     })
 }
 
+function quietCompile(cb){
+    console.log("Compiling....")
+    getProjectDependencies(process.cwd())
+    var manifest = getManifest();
+    var compile = exec(manifest.compileCommand);
+    compile.stdout.on("end",() => {
+        cb()
+        compile.removeAllListeners()
+    })
+    compile.stderr.on("data",()=>{
+        console.log("Error compiling");
+        process.exit(2)
+    })
+}
+
 function getProjectDependencies(directory){
     if(fs.pathExistsSync(path.join(directory,"app","pages"))){
         fs.copySync(path.join(directory,"app","pages"),path.join(directory,"www","pages"))
@@ -286,10 +301,59 @@ function Install(operand){
     return self;
 }
 
-function build(directory){
-    fs.mkdirpSync(path.join(directory,"dist"));
+function build(){
+    var f = flags();
+    var cwd = process.cwd();
+    if(f.android){
+        console.log(chalk.green("Building for Android"));
+        makeStringXML()
+        makeColorsXML()
+        fs.copySync(path.join(cwd,getManifest().root),path.join(resourcesPath,"android/app/src/main/assets/www"))
+        var outputPath = path.join(resourcesPath,"android/app/build/outputs/apk/app-debug.apk");
+        process.chdir(path.join(resourcesPath,"android"));
+        var gradlew;
 
-    fs.copySync(path.join(directory,"www"),path.join(directory,"dist"));
+        switch (os.platform()) {
+            case "win32":
+                gradlew = "gradlew"
+                break;
+        
+            default:
+                gradlew = "./gradlew"
+                break;
+        }
+
+        var gradle = exec(`${gradlew} assembleDebug`);
+        var err;
+        if(f.verbose){
+            gradle.stdout.on("data",function(data){
+                process.stdout.write(data.toString())
+            })
+        }
+
+        gradle.stderr.on("data",function(data){
+            err += data;
+        })
+
+        function getApp(){
+            process.chdir(cwd);
+            // fs.moveSync(outputPath,path.join(cwd,path.dirname(cwd)+".apk"));
+            var p = cwd.split("\\");
+            fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
+        }
+
+        gradle.stdout.on("end",function(){
+            if(err){
+                console.log(chalk.red("Error:\n\n")+err)
+            }else{
+                getApp()
+                var p = cwd.split("\\");
+                console.log(chalk.green("App ready at "+path.join(cwd,p[p.length-1]+".apk")))
+            }
+        })
+    }else{
+        console.log(chalk.green("App static files ready at "+path.join(cwd,getManifest().root)))
+    }
 }
 
 function buildFlame(directory){
@@ -577,56 +641,7 @@ else if(operation == "run-dev" || operation == "development"){
 }
 
 else if(operation == "build"){
-    var f = flags();
-    var cwd = process.cwd();
-    if(f.android){
-        console.log(chalk.green("Building for Android"));
-        makeStringXML()
-        makeColorsXML()
-        fs.copySync(path.join(cwd,getManifest().root),path.join(resourcesPath,"android/app/src/main/assets/www"))
-        var outputPath = path.join(resourcesPath,"android/app/build/outputs/apk/app-debug.apk");
-        process.chdir(path.join(resourcesPath,"android"));
-        var gradlew;
-
-        switch (os.platform()) {
-            case "win32":
-                gradlew = "gradlew"
-                break;
-        
-            default:
-                gradlew = "./gradlew"
-                break;
-        }
-
-        var gradle = exec(`${gradlew} assembleDebug`);
-        var err;
-        if(f.verbose){
-            gradle.stdout.on("data",function(data){
-                process.stdout.write(data.toString())
-            })
-        }
-
-        gradle.stderr.on("data",function(data){
-            err += data;
-        })
-
-        function getApp(){
-            process.chdir(cwd);
-            // fs.moveSync(outputPath,path.join(cwd,path.dirname(cwd)+".apk"));
-            var p = cwd.split("\\");
-            fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
-        }
-
-        gradle.stdout.on("end",function(){
-            if(err){
-                console.log(chalk.red("Error:\n\n")+err)
-            }else{
-                 getApp()
-            }
-        })
-    }else{
-        console.log(chalk.green("App static files ready at "+path.join(cwd,getManifest().root)))
-    }
+    quietCompile(build);
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){

@@ -35,8 +35,6 @@ public class WebAppInterface {
         String s = "smsto:" + number;
         Intent smsto = new Intent(Intent.ACTION_SENDTO,Uri.parse(s));
         smsto.putExtra("sms_body",body);
-
-//        startActivity(smsto);
         c.startActivity(smsto);
     }
 }

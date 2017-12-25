@@ -6,9 +6,9 @@
     "android": {
         "app_name": "JS test",
         "color":{
-            "accent": "#44A3FF",
-            "primary": "#0000CC",
-            "primaryDark": "#FF32AE"
+            "accent": "#2196F3",
+            "primary": "#2196F3",
+            "primaryDark": "#2196F3"
         }
     }
 }

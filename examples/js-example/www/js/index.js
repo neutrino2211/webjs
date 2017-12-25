@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -423,53 +423,314 @@ function append (element) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* unused harmony export icons */
+/* unused harmony export createElementClass */
+/* unused harmony export setElementClass */
+/* unused harmony export introduceElement */
+/* unused harmony export floatingActionButton */
+/* unused harmony export ui */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return colors; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_app__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__ = __webpack_require__(3);
-//Declare imports here.
 
 
+function icons(name){
+    var icon = document.createElement("i");
+    icon.innerText = name;
+    icon.className = "material-icons";
+    icon.style.height = "100%";
 
+    return icon;
+}
 
+var materialClasses = {};
+
+/**
+ * 
+ * @param {String} name 
+ * @param {Object} rules 
+ */
+
+function createElementClass(name,rules){
+    materialClasses[name] = rules;
+}
+
+/**
+ * 
+ * @param {HTMLElement} element 
+ * @param {String} name 
+ */
+
+function setElementClass(element,name){
+    var rules = materialClasses[name];
+
+    Object.getOwnPropertyNames(rules).forEach((name)=>{
+        element.style[name] = rules[name];
+    })
+
+    return element
+}
+
+/**
+ * @param {HTMLElement} parent
+ * @param {HTMLElement} element 
+ */
+
+function introduceElement(element,parent){
+
+    var initialH = element.style.height;
+    var initialW = element.style.width;
+
+    element.style.width = "0px";
+    element.style.height = "0px";
+
+    if(parent){
+        parent.appendChild(element)
+    }else{
+        document.body.appendChild(element)
+    }
+
+    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element).animate({
+        height: initialH,
+        width : initialW
+    },400)
+}
+
+function floatingActionButton(obj) {
+    var btn = document.createElement("div");
+    btn.className = `fixed-action-btn ${obj.position ? obj.position : "right" } ${obj.type||""}`
+    var a = document.createElement("a");
+    a.className = `btn-floating btn-${obj.size} ${obj.color}`;
+    var i = obj.icon||document.createElement("i");
+    // i.innerText = obj.icon||"";
+    var ul = document.createElement("ul")
+    btn.appendChild(a);
+    a.appendChild(i);
+    if (!obj.fab) {
+        return btn;
+    }
+
+    obj.fab.forEach(function(fab) {
+        var li = document.createElement("li");
+        li.className = "waves-effect";
+        li.appendChild(fab)
+        ul.appendChild(li);
+    })
+    btn.appendChild(ul);
+    return btn;
+}
+
+var ui = {
+    card: function(){
+        var d = document.createElement("div");
+        d.className = "card";
+
+        return d
+    },
+    /**
+     * 
+     * @param {Array<HTMLElement>} elements 
+     * 
+     * @returns {HTMLDivElement}
+     */
+    row: function(elements){
+        var rowDiv = document.createElement("div");
+        // rowDiv.style.display = "inline-block";
+    
+        if(!elements){
+            elements = []
+        }
+    
+        elements.forEach((e)=>{
+            e.style.display = "inline-block";
+            rowDiv.appendChild(e)
+        })
+    
+        return rowDiv
+    }
+}
+
+var colors = {
+    red: "#f44336",
+    blue: "#2196F3",
+    pink: "#E91E63",
+    cyan: "#00BCD4",
+    teal: "#009688",
+    lime: "#CDDC39",
+    brown: "#795548",
+    amber: "#FFC107",
+    green: "#4CAF50",
+    orange: "#FF9800",
+    yellow: "#FFEB3B",
+    indigo: "#3F51B5",
+    violet: "#673AB7",
+    purple: "#9C27B0",
+    warning: "#FF5722",
+    blueAccent: "#03A9F4",
+    greenAccent: "#8BC34A",
+    random : function(){
+        var colorLength = Object.getOwnPropertyNames(colors).length;
+        var colorMap = [];
+        Object.getOwnPropertyNames(colors).forEach((name,index)=>{
+            colorMap[index] = name;
+        })
+
+        var i = Math.round(Math.random()*(colorLength-1));
+
+        console.log(colors[colorMap[i]])
+
+        return colors[colorMap[i]]||colors.red
+    }
+
+}
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wjs_app__ = __webpack_require__(1);
 
 class Reflex{
+    /**
+     * 
+     * @param {String} html 
+     */
     constructor(html){
         this.__html = html;
     }
 
     render(tag){
-        var b = Object(__WEBPACK_IMPORTED_MODULE_1_wjs_app__["b" /* parseHTML */])(this.__html).body.children;
-        var tags = document.getElementsByTagName(tag);
+        var self = this;
+        var tags = document.getElementsByTagName(tag);        
+        var d = this.__html.match(/{{(.*)}}/g);
+        // console.log(d);
+        d = d||[];
+        d.forEach(function(t){
+            var dd = t.slice(2,-2);
+            // console.log(dd)
+            var bb = tags;
+            for(var j=0;j<bb.length;bb++){
+                var e = bb[j];
+
+                self.__html = self.__html.replace(t,e.getAttribute("reflex-"+dd))
+                // console.log(e.getAttribute("reflex-"+dd),dd)
+                // for(var k=0;k<e.attributes.length;k++){
+                //     var a = e.attributes[k];
+                //     var f = a.split("reflex-")[1];
+
+                //     self.__html = self.__html.replace(t,obj[dd])
+                // }
+            }
+        })
+        var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])(this.__html).body.children;
 
         for(var i=0;i<tags.length;i++){
 
             for(var j=0;j<b.length;j++){
                 tags[i].appendChild(b[j]);
             }
+
         }
     }
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Reflex;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_app__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__webjs_modules_material__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__reflex_module__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reflex_component__ = __webpack_require__(6);
+//Declare imports here.
+
+
+
+
+
+
 
 class Application extends __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__["a" /* TemplateApplication */]{
     constructor(){
-        super()
-
-        this.myCustomTag = new Reflex(`
-            <div class="blue card" style="width:50%;height:50%;margin:25%;">
+        super();
+        this.myCustomTag = new __WEBPACK_IMPORTED_MODULE_4__reflex_module__["a" /* Reflex */](`
+            <div class="blue card">
                 <p>Hello</p>
             </div>
         `);
 
         this.template = `
-            <h1>Hello</h1>
-            <Reflex/>
+            <Nav reflex-title="SMS Page"/>
+            <!--<h1>Hello</h1>
+            <Reflex style="color:red;"/>-->
+            <input placeholder="Number" type="text" id="number-input" style="padding-top:30%;"/>
+            <input id="message-body" placeholder="Message"/>
+            <app-button id="callBtn"reflex-text="Send"/>
         `;
     }
     
     //Your apps entry point
     onTemplateLoad(){
+        // console.log(material.colors.blue)
+        function call(number){
+            if(typeof native !== "undefined"){
+                native.call(number);
+            }else{
+                console.error("Not deployed in android environment");
+            }
+        }
+
+        function sms(number, message){
+            if(typeof native !== "undefined"){
+                native.sms(number,message);
+            }else{
+                console.error("Not deployed in android environment");
+            }
+        }
+
+        function toast(message){
+            if(typeof native !== "undefined"){
+                native.toast(message);
+            }else{
+                console.error("Not deployed in android environment");
+            }
+        }
+        var callBtn = document.getElementById("callBtn");
+        callBtn.onclick = function(){
+            var err = false;
+            var num = __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").val();
+            var bod = __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").val();
+
+            if(num.trim() == ""){
+                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").css("border-color","red");
+                err = true;
+            }else{
+                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").css("border-color","green");
+            }
+
+            if(bod.trim() == ""){
+                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").css("border-color","red");
+                err = true;
+            }else{
+                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").css("border-color","green");
+            }
+
+            if(err){
+                return;
+            }
+
+            sms(num,bod);
+            toast("Sending message");
+        }
         this.myCustomTag.render("Reflex");
+        __WEBPACK_IMPORTED_MODULE_5__reflex_component__["a" /* Button */].render("app-button");
+        __WEBPACK_IMPORTED_MODULE_5__reflex_component__["b" /* Nav */].render("Nav");
     }
 }
 
@@ -477,7 +738,7 @@ __WEBPACK_IMPORTED_MODULE_1_wjs_app__["a" /* load */](Application)
         
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -537,6 +798,26 @@ class TemplateApplicationPage{
 }
 /* unused harmony export TemplateApplicationPage */
 
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Button; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Nav; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_module__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__ = __webpack_require__(2);
+
+
+
+var Button = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */](`
+    <button class="btn blue" style="color:white;margin-left:20%;width:60%;">{{text}}</button>
+`);
+
+var Nav = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */](`
+    <nav style="text-align:center;background-color:${__WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__["a" /* colors */].blue}"><p class"text center" style="font-family:monospace;">{{title}}</p></nav>
+`);
 
 /***/ })
 /******/ ]);
