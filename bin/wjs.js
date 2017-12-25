@@ -8,6 +8,53 @@ var print = console.log;
 // process.on("uncaughtException", (err) => {
 //     console.log(err)
 // })
+function makeStringXML(){
+    var dom = new xml.DOMParser();
+    var stringsDomContent = dom.parseFromString(fs.readFileSync(path.join(valuesPath,"strings.xml")).toString("utf-8"),"text/xml");
+    var arr = stringsDomContent.documentElement.getElementsByTagName("string");
+    for(var i = 0;i<arr.length; i++){
+        var n = arr[i].getAttribute("name");
+    
+        if(n == "app_name"){
+            console.log(arr[i].lastChild.data)
+            arr[i].lastChild.data = getManifest().android.app_name;
+        }
+    }
+    
+    var ser = new xml.XMLSerializer();
+    
+    var ts = ser.serializeToString(stringsDomContent);
+    
+    // console.log(ts)
+
+    fs.writeFileSync(path.join(valuesPath,"strings.xml"),ts);
+}
+
+function makeColorsXML(){
+    var dom = new xml.DOMParser();
+    var stringsDomContent = dom.parseFromString(fs.readFileSync(path.join(valuesPath,"colors.xml")).toString("utf-8"),"text/xml");
+    var arr = stringsDomContent.documentElement.getElementsByTagName("color");
+    for(var i = 0;i<arr.length; i++){
+        var n = arr[i].getAttribute("name");
+    
+        if(n == "colorPrimary"){
+            // console.log(arr[i].lastChild.data)
+            arr[i].lastChild.data = getManifest().android.color.primary;
+        }else if(n == "colorPrimaryDark"){
+            arr[i].lastChild.data = getManifest().android.color.primaryDark;
+        }else if(n == "colorAccent"){
+            arr[i].lastChild.data = getManifest().android.color.accent;
+        }
+    }
+    
+    var ser = new xml.XMLSerializer();
+    
+    var ts = ser.serializeToString(stringsDomContent);
+
+    // console.log(ts)
+
+    fs.writeFileSync(path.join(valuesPath,"colors.xml"),ts);
+}
 
 function flags(){
     var flags = [];
@@ -328,28 +375,29 @@ function usage(name){
         Object.getOwnPropertyNames(commands).forEach((c)=>{
             print(commands[c]);
         })
+    }else{
+        print(commands[name]);
     }
-    print(commands[name]);
 }
 
 //Declare variables
 var s;
 var c;
-var fs               = require("fs-extra");
-var cwd              = process.cwd();
-var path             = require("path");
-var http             = require("https");
-var args             = process.argv.slice(2,process.argv.length);
-var exec             = require("child_process").exec;
-var chalk            = require("chalk");
-var server           = require("../resources/server");
-var websocket        = require("websocket");
+var os                 = require("os");
+var fs                 = require("fs-extra");
+var xml                = require("xmldom");
+var cwd                = process.cwd();
+var path               = require("path");
+var http               = require("https");
+var args               = process.argv.slice(2,process.argv.length);
+var exec               = require("child_process").exec;
+var chalk              = require("chalk");
+var server             = require("../resources/server");
+var websocket          = require("websocket");
+var resourcesPath      = path.join(__dirname,"../resources");
+var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def")
-// var cordovaCLI       = require("cordova/src/cli");
-// var typescript       = require("typescript");
-// var cordovaAPIS      = require("cordova-lib");
-var refreshMode      = "initial";
-// var cordovaFunctions = require("cordova/cordova");
+var refreshMode        = "initial";
 //Specify argument types
 
 if(args.length > 0){
@@ -528,6 +576,63 @@ else if(operation == "run-dev" || operation == "development"){
     }
 }
 
+else if(operation == "build"){
+    var f = flags();
+    var cwd = process.cwd();
+    if(f.android){
+        console.log(chalk.green("Building for Android"));
+        makeStringXML()
+        makeColorsXML()
+        fs.copySync(path.join(cwd,getManifest().root),path.join(resourcesPath,"android/app/src/main/assets/www"))
+        var outputPath = path.join(resourcesPath,"android/app/build/outputs/apk/app-debug.apk");
+        process.chdir(path.join(resourcesPath,"android"));
+        var gradlew;
+
+        switch (os.platform()) {
+            case "win32":
+                gradlew = "gradlew"
+                break;
+        
+            default:
+                gradlew = "./gradlew"
+                break;
+        }
+
+        var gradle = exec(`${gradlew} assembleDebug`);
+        var err;
+        if(f.verbose){
+            gradle.stdout.on("data",function(data){
+                process.stdout.write(data.toString())
+            })
+        }
+
+        gradle.stderr.on("data",function(data){
+            err += data;
+        })
+
+        function getApp(){
+            process.chdir(cwd);
+            // fs.moveSync(outputPath,path.join(cwd,path.dirname(cwd)+".apk"));
+            var p = cwd.split("\\");
+            fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
+        }
+
+        gradle.stdout.on("end",function(){
+            if(err){
+                console.log(chalk.red("Error:\n\n")+err)
+            }else{
+                 getApp()
+            }
+        })
+    }else{
+        console.log(chalk.green("App static files ready at "+path.join(cwd,getManifest().root)))
+    }
+}
+
 else if(operation == "-h" || operation == "--help" || operation == "help"){
-    usage("*")
+    usage("*");
+}
+
+else {
+    usage("*");
 }

@@ -449,42 +449,39 @@ function socket(proto) {
     if (!proto) {
         console.warn('No protocol supplied for websocket instance');
     }
-    var sock = {};
-    this.connect = function(addr) {
+    var self = {};
+    self.connect = function(addr) {
         if (!addr) {
             throw new URIError('Address cannot be null');
         }
-        sock = new WebSocket(`${(addr.startsWith('ws://'))?addr:'ws://'+addr}`, proto);
-    }
-
-    function f(s, callback) {
-        var event = s.trim().toLowerCase();
-        if (event == 'message') {
-            sock.onmessage = callback;
-        } else if (event == 'connection') {
-            sock.onopen = callback;
-        } else if (event == 'close') {
-            sock.onclose = callback;
-        } else if (event == 'error') {
-            sock.onerror = callback;
-        } else {
-            sock.addEventListener(event, callback);
+        var socket = new WebSocket(`${(addr.startsWith('ws://'))?addr:'ws://'+addr}`, proto);
+        self = socket;
+        socket.on = self.on;
+        socket.emit = self.emit;
+        function f(s, callback) {
+            var event = s.trim().toLowerCase();
+            if (event == 'message') {
+                socket.onmessage = callback;
+            } else if (event == 'connection') {
+                socket.onopen = callback;
+            } else if (event == 'close') {
+                socket.onclose = callback;
+            } else if (event == 'error') {
+                socket.onerror = callback;
+            } else {
+                socket.addEventListener(event, callback);
+            }
         }
-    }
-    this.close = sock.close;
-    this.state = sock.readyState;
-    this.emit = function(eventName) {
-        var event = new Event(eventName);
-        sock.dispatchEvent(event);
-    }
-    this.on = function(str, cb) {
-        if (typeof str == 'string') {
-            f(str, cb);
-        } else {
-            throw new TypeError('Argument is not a string');
+        socket.emit = function(eventName) {
+            var event = new Event(eventName);
+            self.dispatchEvent(event);
         }
+        socket.on = function(str, cb) {
+            f(str,cb);
+        }
+        return socket;
     }
-    return this;
+    return self;
 }
 function layout (element) {
     bodyElement = element;

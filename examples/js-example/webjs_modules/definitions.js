@@ -15,8 +15,6 @@ export function WJSModule(options){
 }
 
 export class TemplateApplication{
-    template;
-    // onViewLoad;
     constructor(){
         console.log("Ready")
         document.addEventListener("__INIT__",()=>{

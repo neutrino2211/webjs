@@ -34,7 +34,8 @@
     "fs-extra": "^4.0.1",
     "ts-loader": "latest",
     "typescript": "^2.6.1",
-    "websocket": "^1.0.25"
+    "websocket": "^1.0.25",
+    "xmldom": "^0.1.27"
   },
   "devDependencies": {
     "@google-cloud/storage": "^1.4.0",

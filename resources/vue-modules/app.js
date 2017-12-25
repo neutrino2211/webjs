@@ -78,7 +78,7 @@ export function JSX(fu, ...args) {
 }
 export function stream (arr) {
     var s = {};
-    if (typeof arr == 'object' && arr[0] != undefined) {
+    if (Array.isArray(arr)) {
         s.pipe = function(dest) {
             arr.forEach(function(val) {
                 dest(val);
@@ -198,10 +198,4 @@ export function socket(proto) {
         }
     }
     return this;
-}
-export function globalObject(m) {
-    var properties = Object.getOwnPropertyNames(modules[m]);
-    properties.forEach(function(p) {
-        window[p] = modules[m][p];
-    })
 }
