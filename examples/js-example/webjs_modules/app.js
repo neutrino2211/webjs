@@ -174,14 +174,18 @@ export function add (str) {
             audio.controls = true;
             document.body.appendChild(audio);
             return audio;
+        } else if(st == "stylesheet"){
+            var link = document.createElement("link");
+            document.head.appendChild(link);
+            return link;
         } else {
             throw new Error(`${st} is not a valid app object`);
         }
     }
-    if (typeof str == 'string' && e.indexOf(str)) {
+    if (typeof str == 'string') {
         return elem(str);
     } else {
-        throw new Error('Argument must be of type string and must be included in available features \'app.elements\'')
+        throw new Error('Argument must be of type string .');
     }
 }
 export function jQ(e) {
@@ -231,6 +235,7 @@ export function socket(proto) {
 export function layout (element) {
     bodyElement = element;
 }
+
 export function openPage (page) {
     // $(bodyElement).html((page.endsWith(".js") ? page : page+'.js'));
     var co = document.createElement("div");

@@ -9,14 +9,12 @@ export function WJSModule(options){
         css.href = element;
         document.head.appendChild(css);
     }, this);
-    document.body.onload = ()=>{
+    $(document.body).ready(function(){
         p.onViewLoad();
-    }
+    })
 }
 
 export class TemplateApplication{
-    template;
-    // onViewLoad;
     constructor(){
         console.log("Ready")
         document.addEventListener("__INIT__",()=>{

@@ -14,9 +14,19 @@
         <link rel="stylesheet" href="css/font-awesome.min.css">
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/index.css">
+
+        <script>
+            $(document).ready(function($){
+                $("#index").appendTo("head");
+                $("#refresh").appendTo("head");
+            })
+        </script>
     </head>
     <body>
-        <script type="text/javascript" src="js/index.js"></script>
-        <script src="js/refresh.js"></script>
+        
     </body>
+    <main>
+        <script id="index" type="text/javascript" src="js/index.js"></script>
+        <script id="refresh" src="js/refresh.js"></script>
+    </main>
 </html>

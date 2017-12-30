@@ -8,6 +8,39 @@ var print = console.log;
 // process.on("uncaughtException", (err) => {
 //     console.log(err)
 // })
+function makeJavaSource(packageName){
+    var packageToPath = packageName.split(".").join("/");
+    var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",packageToPath);
+    fs.emptyDirSync(javaPath);
+    fs.mkdirpSync(javaPath);
+    fs.copySync(path.join(__dirname,"../resources/java"),javaPath);
+    var wai = path.join(javaPath,"WebAppInterface.java");
+    var maj = path.join(javaPath,"MainActivity.java");
+
+    fs.writeFileSync(wai,fs.readFileSync(wai).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName));
+    fs.writeFileSync(maj,fs.readFileSync(maj).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName))
+}
+function makeManifestXML/*package*/(packageName){
+    var dom = new xml.DOMParser();
+    var manifestPath = path.join(__dirname,"../resources/android/app/src/main/AndroidManifest.xml");
+    var stringsDomContent = dom.parseFromString(fs.readFileSync(manifestPath).toString("utf-8"),"text/xml");
+    var arr = stringsDomContent.documentElement.getElementsByTagName("manifest")._node.attributes;
+    
+    for(var m=0;m<arr.length;m++){
+        if(arr[m].name == "package"){
+            arr[m].value = packageName;
+        }
+    }
+
+    var ser = new xml.XMLSerializer();
+    
+    var ts = ser.serializeToString(stringsDomContent);
+    
+    // console.log(packageName)
+    // console.log(ts)
+
+    fs.writeFileSync(manifestPath,ts);
+}
 function makeStringXML(){
     var dom = new xml.DOMParser();
     var stringsDomContent = dom.parseFromString(fs.readFileSync(path.join(valuesPath,"strings.xml")).toString("utf-8"),"text/xml");
@@ -304,10 +337,14 @@ function Install(operand){
 function build(){
     var f = flags();
     var cwd = process.cwd();
+    var p = cwd.split("\\");
     if(f.android){
         console.log(chalk.green("Building for Android"));
-        makeStringXML()
-        makeColorsXML()
+        makeStringXML();
+        makeColorsXML();
+        makeJavaSource(getManifest().android.package);
+        makeManifestXML(getManifest().android.package);
+
         fs.copySync(path.join(cwd,getManifest().root),path.join(resourcesPath,"android/app/src/main/assets/www"))
         var outputPath = path.join(resourcesPath,"android/app/build/outputs/apk/app-debug.apk");
         process.chdir(path.join(resourcesPath,"android"));
@@ -332,7 +369,7 @@ function build(){
         }
 
         gradle.stderr.on("data",function(data){
-            err += data;
+            err += (data||"");
         })
 
         function getApp(){
@@ -348,8 +385,38 @@ function build(){
             }else{
                 getApp()
                 var p = cwd.split("\\");
-                console.log(chalk.green("App ready at "+path.join(cwd,p[p.length-1]+".apk")))
+                var appPath = path.join(cwd,p[p.length-1]+".apk");
+                console.log(chalk.green("App ready at "+appPath))
+                if(!f.release){
+                    console.log("\nTo make a release APK run "+chalk.grey("wjs build --android --release"))
+                }else{
+                    console.log(chalk.green("\nPackaging apk as release"));
+                    var pa;
+                    switch (os.platform()) {
+                        case "win32":
+                            pa = "C:/Program Files/Java/"
+                            break;
+                    
+                        default:
+                            break;
+                    }
+                    // var installs = fs.readdirSync(pa).sort();
+                    // var latestInstall = installs[installs.length -1]
+                    // var latestInstallPath = path.join(pa,latestInstall);
+                    // var keyToolPath = path.join(latestInstallPath,"bin/keytool.exe");
+                    var apkSignerPath = path.join(__dirname,"../resources/sign/sign.jar");
+
+                    var sign = exec(`java -jar ${apkSignerPath} ${appPath}`);
+
+                    sign.stdout.on("end",function(){
+                        console.log(chalk.green(`\n${appPath.slice(0,-4)+".s.apk"} ready for release !!!`))
+                    })
+
+                }
             }
+
+            var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",getManifest().android.package.split(".").join("/"));
+            fs.emptyDirSync(javaPath);
         })
     }else{
         console.log(chalk.green("App static files ready at "+path.join(cwd,getManifest().root)))

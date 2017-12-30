@@ -1,4 +1,4 @@
-package backend.wjs.com.webview;
+package {{PACKAGE_NAME}};
 
 import android.content.Context;
 import android.content.Intent;

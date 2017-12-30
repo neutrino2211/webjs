@@ -1,4 +1,4 @@
-package backend.wjs.com.webview;
+package {{PACKAGE_NAME}};
 
 /**
  * Created by ADMIN on 15/09/2017.
@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.os.Bundle;
-import backend.wjs.com.webview.WebAppInterface;
+import {{PACKAGE_NAME}}.WebAppInterface;
 
 public class MainActivity extends AppCompatActivity{
 

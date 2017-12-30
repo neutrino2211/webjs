@@ -1,41 +1,25 @@
 //Declare imports here.
 import * as wjs from "core"
 import * as app from "wjs/app"
-import { TemplateApplication } from "../webjs_modules/definitions";
+import { WJSModule } from "../webjs_modules/definitions";
 import * as material from "../webjs_modules/material";
+import Controller from "./pages/app.controller";
 import { Reflex } from "./reflex.module";
 import * as reflex from "./reflex.component";
 
-class Application extends TemplateApplication{
+class Application {
     constructor(){
-        super();
-        this.myCustomTag = new Reflex(`
+        this.myCustomTag = new Reflex.Component(`
             <div class="blue card">
                 <p>Hello</p>
             </div>
         `);
-
-        this.template = `
-            <Nav reflex-title="SMS Page"/>
-            <!--<h1>Hello</h1>
-            <Reflex style="color:red;"/>-->
-            <input placeholder="Number" type="text" id="number-input" style="padding-top:30%;"/>
-            <input id="message-body" placeholder="Message"/>
-            <app-button id="callBtn"reflex-text="Send"/>
-        `;
     }
     
     //Your apps entry point
-    onTemplateLoad(){
-        // console.log(material.colors.blue)
-        function call(number){
-            if(typeof native !== "undefined"){
-                native.call(number);
-            }else{
-                console.error("Not deployed in android environment");
-            }
-        }
-
+    onViewLoad(){
+        // document.body.style.backgroundColor = ""
+        wjs.$("head").append("<link rel='stylesheet' href='pages/page.css'/>")
         function sms(number, message){
             if(typeof native !== "undefined"){
                 native.sms(number,message);
@@ -43,44 +27,39 @@ class Application extends TemplateApplication{
                 console.error("Not deployed in android environment");
             }
         }
-
-        function toast(message){
-            if(typeof native !== "undefined"){
-                native.toast(message);
-            }else{
-                console.error("Not deployed in android environment");
+        // native.toast("Reflex")
+        var HomePage = new Reflex.HTMLRenderer("./pages/app.reflex.html");
+        
+        HomePage.render(
+            {
+                component: reflex.Button3,
+                tag: "app-button-3"
+            },
+            {
+                component: reflex.Button2,
+                tag: "app-button-2"
+            },
+            {
+                component: reflex.Button1,
+                tag: "app-button"
+            },
+            {
+                component: reflex.FloatingActionButton,
+                tag: "app-fab"
+            },
+            {
+                component: reflex.Input,
+                tag: "app-input"
+            },
+            {
+                component: reflex.Nav,
+                tag: "app-nav"
+            },
+            {
+                component: reflex.Divider,
+                tag: "app-divider"
             }
-        }
-        var callBtn = document.getElementById("callBtn");
-        callBtn.onclick = function(){
-            var err = false;
-            var num = wjs.$("#number-input").val();
-            var bod = wjs.$("#message-body").val();
-
-            if(num.trim() == ""){
-                wjs.$("#number-input").css("border-color","red");
-                err = true;
-            }else{
-                wjs.$("#number-input").css("border-color","green");
-            }
-
-            if(bod.trim() == ""){
-                wjs.$("#message-body").css("border-color","red");
-                err = true;
-            }else{
-                wjs.$("#message-body").css("border-color","green");
-            }
-
-            if(err){
-                return;
-            }
-
-            sms(num,bod);
-            toast("Sending message");
-        }
-        this.myCustomTag.render("Reflex");
-        reflex.Button.render("app-button");
-        reflex.Nav.render("Nav");
+        );
     }
 }
 

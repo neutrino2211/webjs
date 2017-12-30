@@ -4,7 +4,8 @@
     "root": "www",
     "extraModules": [],
     "android": {
-        "app_name": "JS test",
+        "package": "wjs.org.test.js_est",
+        "app_name": "JS test 2",
         "color":{
             "accent": "#2196F3",
             "primary": "#2196F3",

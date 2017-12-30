@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -423,6 +423,68 @@ function append (element) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* unused harmony export WJSModule */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+
+
+function WJSModule(options){
+    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(document.body).load(options.template.startsWith("/") ? options.template : "/"+options.template);
+    var p = new options.controller(document);
+    (options.styleSheets ? options.styleSheets : []).forEach(function(element) {
+        var css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = element;
+        document.head.appendChild(css);
+    }, this);
+    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(document.body).ready(function(){
+        p.onViewLoad();
+    })
+}
+
+class TemplateApplication{
+    constructor(){
+        console.log("Ready")
+        document.addEventListener("__INIT__",()=>{
+            this.onTemplateLoad();
+        });
+    }
+
+    onViewLoad(){
+        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("body").append(this.template)
+        document.dispatchEvent(new Event("__INIT__"))
+        // this.ovl();
+        // window.WJS_PAGE_STATE = 1;
+    }
+}
+/* unused harmony export TemplateApplication */
+
+
+class TemplateApplicationPage{
+    /**
+     * 
+     * @param {HTMLElement} element 
+     */
+    constructor(element){
+        this.element = element;
+        if(window.openPage){
+            window.openPage.close()
+        }
+        window.openPage = this;
+        console.log("page created")
+    }
+    close(){
+        this.isClosed = true;
+        this.element.innerHTML = ""
+    }
+}
+/* unused harmony export TemplateApplicationPage */
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* unused harmony export icons */
 /* unused harmony export createElementClass */
 /* unused harmony export setElementClass */
@@ -584,70 +646,263 @@ var colors = {
 }
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wjs_app__ = __webpack_require__(1);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Button3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Button2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Button1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return Nav; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return Input; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return FloatingActionButton; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_module__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__ = __webpack_require__(3);
 
-class Reflex{
+
+
+var Button3 = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+<button class="btn {{color}}" style="color:white;margin-top:10px;margin-left:8%;width:22%;display:inline-block;">{{name}}</button>
+`);
+
+var Button2 = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+<button class="btn {{color}}" style="color:white;margin-top:10px;margin-left:9.5%;width:35%;display:inline-block;">{{name}}</button>
+`);
+
+var Button1 = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+<button class="btn {{color}}" style="color:white;margin-top:10px;margin-left:20%;width:60%;display:inline-block;">{{name}}</button>
+`);
+
+var Nav = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <nav class="{{color}}"style="text-align:center;background-color:${__WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__["a" /* colors */].blue}"><p class"text center" style="font-family:monospace;color:{{text-color}}">{{title}}</p></nav>
+`);
+
+var Input = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <input placeholder="{{placeholder}}" type="{{type}}" id="{{id}}" style="{{style}};width:90%;margin-left:5%;"></input>
+`)
+
+var FloatingActionButton = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <div class="fixed-action-btn {{position}} {{type}}"><a class="btn-floating btn-{{size}} {{color}}"><i class="material-icons">{{icon}}</i></a></div>
+`)
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Reflex; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wjs_app__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_core__ = __webpack_require__(0);
+
+
+
+class component {
     /**
      * 
      * @param {String} html 
      */
     constructor(html){
+        var self = this;
         this.__html = html;
+        this.__parse = "";
     }
 
     render(tag){
+        this.__tag = tag;
         var self = this;
         var tags = document.getElementsByTagName(tag);        
-        var d = this.__html.match(/{{(.*)}}/g);
+        var d = this.__html.match(/{{([^}]+)}}/g);
         // console.log(d);
         d = d||[];
-        d.forEach(function(t){
-            var dd = t.slice(2,-2);
-            // console.log(dd)
-            var bb = tags;
-            for(var j=0;j<bb.length;bb++){
-                var e = bb[j];
+        // console.log(tags)
+        // console.log(tags.length);
+        for(var i=0;i<tags.length;i++){
+            // console.log(i)
+            // tags[i].innerHTML = "";
+            d.forEach(function(t,l){
+                var dd = t.slice(2,-2).trim();
+                // if(dd.startsWith("?") && tags[i].getAttribute("@"+dd.slice(1))==null){
+                //     if(l == 0){
+                //         self.__parse = self.__html.replace(t,(tags[i].getAttribute("@"+dd)||""))
+                //     }else{
+                //         self.__parse = self.__parse.replace(t,(tags[i].getAttribute("@"+dd)||""))
+                //     }
+                // }
+                // console.log(dd,tags[i].getAttribute("@"+dd))
+                // if(tags[i].getAttribute("@"+dd) == null){
+                //     var attrs = tags[i].attributes;
 
-                self.__html = self.__html.replace(t,e.getAttribute("reflex-"+dd))
+                //     for(var m=0;m<attrs.length;m++){
+                //         if(attrs[m] == t){
+                //             if(l == 0){
+                //                 self.__parse = self.__html.replace(t,(tags[i].getAttribute("@"+dd)||""))
+                //             }else{
+                //                 self.__parse = self.__parse.replace(t,(tags[i].getAttribute("@"+dd)||""))
+                //             }
+                //         }
+                //     }
+                // }
+                if(l == 0){
+                    self.__parse = self.__html.replace(t,(tags[i].getAttribute("@"+dd)))
+                }else{
+                    self.__parse = self.__parse.replace(t,(tags[i].getAttribute("@"+dd)))
+                }
                 // console.log(e.getAttribute("reflex-"+dd),dd)
                 // for(var k=0;k<e.attributes.length;k++){
                 //     var a = e.attributes[k];
                 //     var f = a.split("reflex-")[1];
-
+    
                 //     self.__html = self.__html.replace(t,obj[dd])
                 // }
-            }
-        })
-        var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])(this.__html).body.children;
-
-        for(var i=0;i<tags.length;i++){
-
+            })
+            // console.log(tags[i])
+            var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])(self.__parse).body.children;
+            // console.log(b)
             for(var j=0;j<b.length;j++){
-                tags[i].appendChild(b[j]);
-            }
+                // console.log(self.__parse);
+                var attrs = b[j].attributes;
+                // console.log(attrs.length)
+                for(var m=0;m<attrs.length;m++){
+                    // console.log(attrs[m].name)
+                    if(attrs[m].nodeValue == "null"){
+                        b[j].removeAttribute(attrs[m].name);
+                    }
+                }
 
+                // $(tags[i]).append(b[j]);
+                // tags[i].innerHTML = "";
+                tags[i].appendChild(b[j])
+                // tags[i] = tags[i+1]||tags[i]
+                // return;
+                // console.log(b[j])
+            }
+            if(tags[i].getAttribute("@href")){
+                var t = tags[i];
+                tags[i].onclick = function(){
+                    var r = new HTMLRenderer(t.getAttribute("@href"));
+                    // console.log(window.__renderers)
+                    r.render(window.__renderers);
+                }
+            }else if(tags[i].getAttribute("@href-to")){
+                var t = tags[i];
+                tags[i].onclick = function(){
+                    var r = new HTMLRenderer(t.getAttribute("@href-to"));
+                    // console.log(window.__renderers)
+                    r.render(document.getElementById(tags[i].getAttribute("@target")),window.__renderers);
+                }
+            }
+            // console.log(tags[i])
+            // document.body.appendChild(tags[i]);
         }
+        // self.__parse = "";
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = Reflex;
 
+class HTMLRenderer {
+    
+    /**
+     * @private this.__component_tag_list
+     * @param {String} page 
+     */
+
+    constructor(page){
+        this.__page = page;
+        if(typeof native != "undefined"){
+            this.__page = (page.startsWith("./")||page.startsWith("/"))?"file:///android_asset/"+page.split("/").slice(1).join(""):"file:///android_assets/"+page;
+        }
+        this.__component_tag_list = [];
+        this.__component_list = [];
+    }
+
+    /**
+     * 
+     * @param {component} component 
+     * @param {String} tag 
+     */
+
+    addComponentRenderer(component, tag){
+        this.__component_tag_list.push(tag);
+        this.__component_list.push(component);
+    }
+
+    render(...renderers){
+        var self = this;
+        window.__renderers = renderers;
+        // window.__renderers = window.__renderers[0];
+        console.log(renderers)
+        if(Array.isArray(renderers[0])){
+            renderers = renderers[0];
+        }
+        __WEBPACK_IMPORTED_MODULE_1_core__["a" /* $ */].get(this.__page,function(html){
+            // console.log(html)
+            // var doc = parseHTML(html);
+            // console.log(doc);
+            // document.body = doc.body;
+            document.body.innerHTML = html;
+            // self.__component_list.forEach(function(comp,i){
+            //     console.log(self.__component_tag_list[i]);
+            //     // var c = new component(comp.__html);
+            //     comp.render(self.__component_tag_list[i]);
+            //     // var tags = doc.getElementsByTagName(self.__component_tag_list[i])
+            //     // comp.render(self.__component_tag_list[i]);
+            // })
+            // console.log(Array.from(window.__renderers));
+            renderers.forEach(function(map){
+                // console.log(map.component)
+                map.component.render(map.tag);
+            })
+        });
+    }
+
+    renderTo(el,...renderers){
+        var self = this;
+        window.__renderers = renderers;
+        // window.__renderers = window.__renderers[0];
+        console.log(renderers)
+        if(Array.isArray(renderers[0])){
+            renderers = renderers[0];
+        }
+        __WEBPACK_IMPORTED_MODULE_1_core__["a" /* $ */].get(this.__page,function(html){
+            // console.log(html)
+            // var doc = parseHTML(html);
+            // console.log(doc);
+            // document.body = doc.body;
+            el.innerHTML = html;
+            // self.__component_list.forEach(function(comp,i){
+            //     console.log(self.__component_tag_list[i]);
+            //     // var c = new component(comp.__html);
+            //     comp.render(self.__component_tag_list[i]);
+            //     // var tags = doc.getElementsByTagName(self.__component_tag_list[i])
+            //     // comp.render(self.__component_tag_list[i]);
+            // })
+            // console.log(Array.from(window.__renderers));
+            renderers.forEach(function(map){
+                // console.log(map.component)
+                map.component.render(map.tag);
+            })
+        });
+    }
+}
+
+var Reflex = {
+    Component: component,
+
+    HTMLRenderer: HTMLRenderer
+}
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_app__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__webjs_modules_material__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__reflex_module__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reflex_component__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__webjs_modules_material__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_app_controller__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reflex_module__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__reflex_component__ = __webpack_require__(4);
 //Declare imports here.
 
 
@@ -656,36 +911,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-class Application extends __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__["a" /* TemplateApplication */]{
+
+class Application {
     constructor(){
-        super();
-        this.myCustomTag = new __WEBPACK_IMPORTED_MODULE_4__reflex_module__["a" /* Reflex */](`
+        this.myCustomTag = new __WEBPACK_IMPORTED_MODULE_5__reflex_module__["a" /* Reflex */].Component(`
             <div class="blue card">
                 <p>Hello</p>
             </div>
         `);
-
-        this.template = `
-            <Nav reflex-title="SMS Page"/>
-            <!--<h1>Hello</h1>
-            <Reflex style="color:red;"/>-->
-            <input placeholder="Number" type="text" id="number-input" style="padding-top:30%;"/>
-            <input id="message-body" placeholder="Message"/>
-            <app-button id="callBtn"reflex-text="Send"/>
-        `;
     }
     
     //Your apps entry point
-    onTemplateLoad(){
-        // console.log(material.colors.blue)
-        function call(number){
-            if(typeof native !== "undefined"){
-                native.call(number);
-            }else{
-                console.error("Not deployed in android environment");
-            }
-        }
-
+    onViewLoad(){
+        // document.body.style.backgroundColor = ""
         function sms(number, message){
             if(typeof native !== "undefined"){
                 native.sms(number,message);
@@ -693,44 +931,35 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions
                 console.error("Not deployed in android environment");
             }
         }
-
-        function toast(message){
-            if(typeof native !== "undefined"){
-                native.toast(message);
-            }else{
-                console.error("Not deployed in android environment");
+        native.toast("Reflex")
+        var app = new __WEBPACK_IMPORTED_MODULE_5__reflex_module__["a" /* Reflex */].HTMLRenderer("./pages/app.reflex.html");
+        
+        app.render(
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["c" /* Button3 */],
+                tag: "app-button-3"
+            },
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["b" /* Button2 */],
+                tag: "app-button-2"
+            },
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["a" /* Button1 */],
+                tag: "app-button"
+            },
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["d" /* FloatingActionButton */],
+                tag: "app-fab"
+            },
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["e" /* Input */],
+                tag: "app-input"
+            },
+            {
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["f" /* Nav */],
+                tag: "app-nav"
             }
-        }
-        var callBtn = document.getElementById("callBtn");
-        callBtn.onclick = function(){
-            var err = false;
-            var num = __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").val();
-            var bod = __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").val();
-
-            if(num.trim() == ""){
-                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").css("border-color","red");
-                err = true;
-            }else{
-                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#number-input").css("border-color","green");
-            }
-
-            if(bod.trim() == ""){
-                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").css("border-color","red");
-                err = true;
-            }else{
-                __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("#message-body").css("border-color","green");
-            }
-
-            if(err){
-                return;
-            }
-
-            sms(num,bod);
-            toast("Sending message");
-        }
-        this.myCustomTag.render("Reflex");
-        __WEBPACK_IMPORTED_MODULE_5__reflex_component__["a" /* Button */].render("app-button");
-        __WEBPACK_IMPORTED_MODULE_5__reflex_component__["b" /* Nav */].render("Nav");
+        );
     }
 }
 
@@ -738,86 +967,37 @@ __WEBPACK_IMPORTED_MODULE_1_wjs_app__["a" /* load */](Application)
         
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* unused harmony export WJSModule */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_component__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_definitions__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_core__ = __webpack_require__(0);
 
 
-function WJSModule(options){
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(document.body).load(options.template.startsWith("/") ? options.template : "/"+options.template);
-    var p = new options.controller(document);
-    (options.styleSheets ? options.styleSheets : []).forEach(function(element) {
-        var css = document.createElement("link");
-        css.rel = "stylesheet";
-        css.href = element;
-        document.head.appendChild(css);
-    }, this);
-    document.body.onload = ()=>{
-        p.onViewLoad();
-    }
-}
 
-class TemplateApplication{
-    constructor(){
-        console.log("Ready")
-        document.addEventListener("__INIT__",()=>{
-            this.onTemplateLoad();
-        });
+
+class Controller{
+    /**
+     * 
+     * @param {HTMLDocument} doc 
+     */
+    constructor(doc){
+        console.log("Ready");
+        this.doc = doc;
     }
 
     onViewLoad(){
-        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("body").append(this.template)
-        document.dispatchEvent(new Event("__INIT__"))
-        // this.ovl();
-        // window.WJS_PAGE_STATE = 1;
+        alert("Loaded");
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["d" /* FloatingActionButton */].render("app-fab",this.doc);
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["c" /* Button3 */].render("app-button-3",this.doc);
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["e" /* Input */].render("app-input",this.doc);
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["f" /* Nav */].render("app-nav",this.doc);
     }
 }
-/* harmony export (immutable) */ __webpack_exports__["a"] = TemplateApplication;
+/* unused harmony export default */
 
-
-class TemplateApplicationPage{
-    /**
-     * 
-     * @param {HTMLElement} element 
-     */
-    constructor(element){
-        this.element = element;
-        if(window.openPage){
-            window.openPage.close()
-        }
-        window.openPage = this;
-        console.log("page created")
-    }
-    close(){
-        this.isClosed = true;
-        this.element.innerHTML = ""
-    }
-}
-/* unused harmony export TemplateApplicationPage */
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Button; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Nav; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_module__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__ = __webpack_require__(2);
-
-
-
-var Button = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */](`
-    <button class="btn blue" style="color:white;margin-left:20%;width:60%;">{{text}}</button>
-`);
-
-var Nav = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */](`
-    <nav style="text-align:center;background-color:${__WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__["a" /* colors */].blue}"><p class"text center" style="font-family:monospace;">{{title}}</p></nav>
-`);
 
 /***/ })
 /******/ ]);

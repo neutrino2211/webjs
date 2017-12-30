@@ -174,14 +174,18 @@ export function add (str) {
             audio.controls = true;
             document.body.appendChild(audio);
             return audio;
+        } else if(st == "stylesheet"){
+            var link = document.createElement("link");
+            document.head.appendChild(link);
+            return link;
         } else {
             throw new Error(`${st} is not a valid app object`);
         }
     }
-    if (typeof str == 'string' && e.indexOf(str)) {
+    if (typeof str == 'string') {
         return elem(str);
     } else {
-        throw new Error('Argument must be of type string and must be included in available features \'app.elements\'')
+        throw new Error('Argument must be of type string .');
     }
 }
 export function jQ(e) {
@@ -191,43 +195,47 @@ export function socket(proto) {
     if (!proto) {
         console.warn('No protocol supplied for websocket instance');
     }
-    var self = {};
-    self.connect = function(addr) {
+    var sock = {};
+    this.connect = function(addr) {
         if (!addr) {
             throw new URIError('Address cannot be null');
         }
-        var socket = new WebSocket(`${(addr.startsWith('ws://'))?addr:'ws://'+addr}`, proto);
-        self = socket;
-        socket.on = self.on;
-        socket.emit = self.emit;
-        function f(s, callback) {
-            var event = s.trim().toLowerCase();
-            if (event == 'message') {
-                socket.onmessage = callback;
-            } else if (event == 'connection') {
-                socket.onopen = callback;
-            } else if (event == 'close') {
-                socket.onclose = callback;
-            } else if (event == 'error') {
-                socket.onerror = callback;
-            } else {
-                socket.addEventListener(event, callback);
-            }
-        }
-        socket.emit = function(eventName) {
-            var event = new Event(eventName);
-            self.dispatchEvent(event);
-        }
-        socket.on = function(str, cb) {
-            f(str,cb);
-        }
-        return socket;
+        sock = new WebSocket(`${(addr.startsWith('ws://'))?addr:'ws://'+addr}`, proto);
     }
-    return self;
+
+    function f(s, callback) {
+        var event = s.trim().toLowerCase();
+        if (event == 'message') {
+            sock.onmessage = callback;
+        } else if (event == 'connection') {
+            sock.onopen = callback;
+        } else if (event == 'close') {
+            sock.onclose = callback;
+        } else if (event == 'error') {
+            sock.onerror = callback;
+        } else {
+            sock.addEventListener(event, callback);
+        }
+    }
+    this.close = sock.close;
+    this.state = sock.readyState;
+    this.emit = function(eventName) {
+        var event = new Event(eventName);
+        sock.dispatchEvent(event);
+    }
+    this.on = function(str, cb) {
+        if (typeof str == 'string') {
+            f(str, cb);
+        } else {
+            throw new TypeError('Argument is not a string');
+        }
+    }
+    return this;
 }
 export function layout (element) {
     bodyElement = element;
 }
+
 export function openPage (page) {
     // $(bodyElement).html((page.endsWith(".js") ? page : page+'.js'));
     var co = document.createElement("div");
