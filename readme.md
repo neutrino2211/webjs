@@ -1,6 +1,6 @@
 # wjs-cli:
 
-## customisable webapp compiler
+## CLI for making web and android apps with HTML , CSS and JS (ES7)
 
 # Under development.
 
@@ -12,7 +12,7 @@
 
 * Run `wjs -v` to confirm installation
 
-* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` , `--angular`(coming soon) ,`--vue` , `--react`(coming soon) , `--javascript` or leave app type out to initialize a javascript project
+* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`(coming soon)  or leave app type out to initialize a javascript project
 
 * Run `cd <app-name> && wjs development` to start the development server
 
@@ -20,9 +20,12 @@
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
 
+* To build the app run `wjs build` and use `wjs build --android` to build the android app.
+
 For a typescript project first `npm init` the project directory then install `ts-loader` and `typescript` with `npm install typescript ts-loader`.
 
 For a vue project just `npm install` the project directory. 
+
 
 ### Note
 
@@ -121,6 +124,8 @@ export class PageName{
 }
 ```
 
+A page controller can also be a page if you use `app.load(PAGE_NAME);`
+
 Using pages as modules is as easy as adding the new keyword to invoke the class e.g
 
 ```javascript
@@ -136,7 +141,8 @@ class Application{
     
     //Your apps entry point
     onViewLoad(){
-        new PageName();
+        var page = new PageName();
+        page.onViewLoad()
     }
 }
 
@@ -279,7 +285,7 @@ This just writes text to the screen
 
 #### Jquery
 
-This is the familiar `$` variable available the core module
+This is the familiar `$` variable available from the core module
 
 ```javascript
 //Declare imports here.
@@ -455,6 +461,48 @@ class Application{
 
 app.load(Application)
 ```
+#### Android
+
+Android functions are available as `native` and that syntax is planned to be maintained in the future on other operating systems.
+
+``` javascript
+//Declare imports here.
+import * as wjs from "core"
+import * as app from "wjs/app"
+
+class Application{
+    constructor(){
+        
+    }
+    
+    //Your apps entry point
+    onViewLoad(){
+        /**
+         * NOTE: native does not work on the web because of obvious reasons like the browser not running Android OS
+         **/
+
+
+        //Toast
+
+        native.toast("Hello android!");
+
+        //Call activity
+
+        native.call("555-XXX");
+
+        //Sms activity
+
+        native.sms("555-XXX","Hello");
+
+        //Exit app
+
+        native.exit();
+    }
+}
+
+app.load(Application)
+```
+
 ### TODO (More docs)
 
 ## Changelog
@@ -494,6 +542,10 @@ app.load(Application)
 
 * More bug fixes
 
+### wjs-cli@0.0.6
+
+* Added android build
+
 ### Coming soon
 
 * More typescript modules.
@@ -502,9 +554,9 @@ app.load(Application)
 
 * Complete docs (including module docs)
 
-* Android native build
+* More android features, use `wjs check-update` check for version updates and bug fixes.
 
-### **Deprecated**
+### **Deprecated** to be removed at 1.0.0
 
 * run-dev command
 

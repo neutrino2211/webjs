@@ -24,7 +24,7 @@ export function load(appClass){
 export function title(title){
     var t = document.createElement("title")
 
-    t.title = title
+    t.innerText = title
 
     document.head.appendChild(t)
 }

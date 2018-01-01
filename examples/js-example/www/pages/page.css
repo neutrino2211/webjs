@@ -8,12 +8,41 @@
     }
 } */
 
-.app-hover-emphasis:hover { transform: scale(1.2); background-color: #536DFE; }
+
+::-webkit-scrollbar-thumb{
+    width: 5px;
+    background: grey;
+}
+
+::-webkit-scrollbar-track{
+    width: 5px;
+    background: lightslategray;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to{
+        transform: rotate(180deg);
+    }
+}
+
+*{
+    font-family: monospace, Roboto;
+}
+
+a{
+    color: #FFFFFF;
+}
+
+.app-hover-emphasis:hover { transform: scale(1.1); background-color: #536DFE; }
 .dark-primary-color       { background: #00796B; }
-.default-primary-color    { background: #009688 !important; }
+.default-primary-color    { background: linear-gradient(#536DFE,#0097A7) !important; }
 .light-primary-color      { background: #B2DFDB; }
 .text-primary-color       { color: #FFFFFF; }
-.accent-color             { background: #536DFE; }
+.accent-color             { background: #0097A7; }
 .primary-text-color       { color: #212121; }
 .secondary-text-color     { color: #757575; }
-.divider-color            { border-color: #BDBDBD; }
+.divider-color            { border-color: #536DFE; }

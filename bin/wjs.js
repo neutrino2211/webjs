@@ -8,6 +8,83 @@ var print = console.log;
 // process.on("uncaughtException", (err) => {
 //     console.log(err)
 // })
+function makeGradleBuild(packageName){
+    var gradle_build_path = path.join(__dirname,"../resources/android/app/build.gradle");
+    var resource_gradle_build_path = path.join(__dirname,"../resources/java/build.gradle");
+    fs.writeFileSync(gradle_build_path,fs.readFileSync(resource_gradle_build_path).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName));
+}
+function makeApplicationIcons(androidManifest){
+    var normalImagePath;
+    var circularImagePath;
+
+    if(!androidManifest.icons){
+        console.log(chalk.yellow("Warning: no image files specified for "+androidManifest.app_name));
+        // process.exit(8);
+        normalImagePath = path.join(__dirname,"../resources/java/ic_launcher.png");
+        circularImagePath = path.join(__dirname,"../resources/java/ic_launcher_round.png");
+    }else{
+        normalImagePath = path.join(process.cwd(),androidManifest.icons.normal);
+        circularImagePath = path.join(process.cwd(),androidManifest.icons.circular);
+    }
+
+    var launchers_path = path.join(__dirname,"../resources/android/app/src/main/res"); 
+    var launcher_types = ["h","m","xh","xxh","xxxh"];
+    var launcher_resolutions = {
+        "0": {
+            width: 72,
+            height: 72
+        },
+        "1": {
+            width: 48,
+            height: 48
+        },
+        "2": {
+            width: 96,
+            height: 96
+        },
+        "3": {
+            width: 144,
+            height: 144
+        },
+        "4": {
+            width: 192,
+            height: 192
+        }
+    };
+
+    launcher_types.forEach(function(type,index){
+        var resolution = launcher_resolutions[index.toString()];
+
+        resize_image(new Buffer(fs.readFileSync(normalImagePath)),resolution).then(function(buffer){
+            fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"dpi","ic_launcher.png"),buffer);
+        }).catch(function(err){
+            console.log(chalk.red(" "+err));
+        });
+
+        resize_image(new Buffer(fs.readFileSync(circularImagePath)),resolution).then(function(buffer){
+            fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"dpi","ic_launcher_round.png"),buffer);
+        }).catch(function(err){
+            console.log(chalk.red(" "+err));
+        });
+    })    
+
+    // normalImage.onload = function(){
+    //     launcher_types.forEach(function(type,index){
+    //         var resolution = auncher_resolutions[index.toString()];
+    //         var resized = resize_image.resize(normalImage,resolution.width,resolution.height,resize_image.PNG);
+    //         fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"hdpi","ic_launcher.png"),resized);
+    //     })
+    // }
+
+    // circularImage.onload = function(){
+    //     launcher_types.forEach(function(type,index){
+    //         var resolution = auncher_resolutions[index.toString()];
+    //         var resized = resize_image.resize(circularImage,resolution.width,resolution.height,resize_image.PNG);
+    //         fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"hdpi","ic_launcher_round.png"),resized);
+    //     })
+    // }
+
+}
 function makeJavaSource(packageName){
     var packageToPath = packageName.split(".").join("/");
     var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",packageToPath);
@@ -343,7 +420,9 @@ function build(){
         makeStringXML();
         makeColorsXML();
         makeJavaSource(getManifest().android.package);
+        makeGradleBuild(getManifest().android.package);
         makeManifestXML(getManifest().android.package);
+        makeApplicationIcons(getManifest().android);
 
         fs.copySync(path.join(cwd,getManifest().root),path.join(resourcesPath,"android/app/src/main/assets/www"))
         var outputPath = path.join(resourcesPath,"android/app/build/outputs/apk/app-debug.apk");
@@ -359,7 +438,7 @@ function build(){
                 gradlew = "./gradlew"
                 break;
         }
-
+        var p = cwd.split("\\");
         var gradle = exec(`${gradlew} assembleDebug`);
         var err;
         if(f.verbose){
@@ -382,39 +461,57 @@ function build(){
         gradle.stdout.on("end",function(){
             if(err){
                 console.log(chalk.red("Error:\n\n")+err)
+                process.chdir(cwd);
             }else{
                 getApp()
                 var p = cwd.split("\\");
                 var appPath = path.join(cwd,p[p.length-1]+".apk");
                 console.log(chalk.green("App ready at "+appPath))
-                if(!f.release){
-                    console.log("\nTo make a release APK run "+chalk.grey("wjs build --android --release"))
-                }else{
-                    console.log(chalk.green("\nPackaging apk as release"));
-                    var pa;
-                    switch (os.platform()) {
-                        case "win32":
-                            pa = "C:/Program Files/Java/"
-                            break;
+                // if(!f.release){
+                //     console.log("\nTo make a release APK run "+chalk.grey("wjs build --android --release"))
+                // }else{
+                //     console.log(chalk.green("\nPackaging apk as release"));
+                //     var pa = "keytool";
+                //     var js = "jarsigner";
                     
-                        default:
-                            break;
-                    }
-                    // var installs = fs.readdirSync(pa).sort();
-                    // var latestInstall = installs[installs.length -1]
-                    // var latestInstallPath = path.join(pa,latestInstall);
-                    // var keyToolPath = path.join(latestInstallPath,"bin/keytool.exe");
-                    var apkSignerPath = path.join(__dirname,"../resources/sign/sign.jar");
+                //     if(os.platform() == "win32"){
+                //         pa = "C:/Program Files/Java"
+                //         var installs = fs.readdirSync(pa).sort();
+                //         var latestInstall = installs[installs.length -1]
+                //         var latestInstallPath = path.join(pa,latestInstall);
+                //         var pa = path.join(latestInstallPath,"bin/keytool.exe");
 
-                    var sign = exec(`java -jar ${apkSignerPath} ${appPath}`);
+                //         var jdks = installs.filter(function(v){
+                //             if(v.startsWith("jdk")){
+                //                 return v;
+                //             }
+                //         }).sort();
 
-                    sign.stdout.on("end",function(){
-                        console.log(chalk.green(`\n${appPath.slice(0,-4)+".s.apk"} ready for release !!!`))
-                    })
+                //         var latestJDKInstall = jdks[jdks.length-1];
+                //         // console.log(jdks);
+                //         js = path.join("C:/Program Files/Java",latestJDKInstall,"bin/jarsigner.exe");
+                //     }
+                
+                //     // console.log(pa);
 
-                }
+                //     var androidManifest = getManifest().android;
+
+                //     if(fs.existsSync(path.join(process.cwd(),androidManifest.app_name+".keystore"))){
+                //         fs.removeSync(path.join(process.cwd(),androidManifest.app_name+".keystore"));
+                //     }
+
+                //     // var p = process.cwd().split("\\");
+
+                //     var sign_apk_path = path.join(__dirname,"../resources/sign/dist/sign.jar");
+
+                //     var $exec = require("child_process");
+
+                //     var $process = $exec.execSync("java -jar "+sign_apk_path+" \""+path.join(process.cwd(),p[p.length-1])+".apk\" --override");
+
+                //     console.log($process.toString("utf-8"))
+                // }
             }
-
+            // console.log(process.cwd())
             var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",getManifest().android.package.split(".").join("/"));
             fs.emptyDirSync(javaPath);
         })
@@ -498,16 +595,17 @@ function writePro(directory){
 
 function usage(name){
     var commands = {
-        add: "Usage: wjs add <module>",
-        init: "Usage: wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
-        install : "Usage: wjs install <module>"
+        add: "wjs add <module>",
+        init: "wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
+        install : "wjs install <module>"
     }
     if(name == "*"){
+        print("Usage:")
         Object.getOwnPropertyNames(commands).forEach((c)=>{
             print(commands[c]);
         })
     }else{
-        print(commands[name]);
+        print("Usage:\n"+commands[name]);
     }
 }
 
@@ -524,7 +622,11 @@ var args               = process.argv.slice(2,process.argv.length);
 var exec               = require("child_process").exec;
 var chalk              = require("chalk");
 var server             = require("../resources/server");
+var Keytool            = require("node-keytool");
+var firebase           = require("firebase");
 var websocket          = require("websocket");
+var resize_image       = require("resize-img");
+var android_sign       = require("android-sign");
 var resourcesPath      = path.join(__dirname,"../resources");
 var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def")
@@ -653,7 +755,7 @@ else if(operation == "add"){
     else{
         Install(operand).Then = (err,path)=>{
             if(err){
-                console.log(err);
+                console.log(" "+err);
                 console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
                 process.exit(3);
             }else{
@@ -705,6 +807,49 @@ else if(operation == "run-dev" || operation == "development"){
             // c.send("refresh")
         })
     }
+}
+
+else if(operation == "check-update"){
+    var config = {
+        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+        authDomain: "webjs-f76df.firebaseapp.com",
+        databaseURL: "https://webjs-f76df.firebaseio.com",
+        projectId: "webjs-f76df",
+        storageBucket: "webjs-f76df.appspot.com",
+        messagingSenderId: "404258524081"
+    };
+    var app = firebase.initializeApp(config);
+    var databaseRef = app.database().ref();
+    var latestVersion = databaseRef.child("current-version");
+    // console.log(latestVersion.);
+    latestVersion.on("value",function(snapshot){
+        var ver = snapshot.val();
+        // console.log(snapshot.val())
+        // process.exit()
+        var package = require(path.join(__dirname,"../package.json"));
+
+        var sorted = [package.version,ver].sort();
+        // print(sorted)
+        if(sorted[0] == package.version){
+            console.log(chalk.green("Installing update "+ver));
+            var update = databaseRef.child("update");
+            update.on("value",function(snapshot){
+                Install(snapshot.val()).Then = function(err,path){
+                    if(err){
+                        console.log(" "+err);
+                        console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+                        process.exit(3);
+                    }else{
+                        console.log(`Update complete`)
+                    }
+                    process.exit()
+                }
+            })
+        }else{
+            console.log(chalk.green("wjs is up to date"));
+            process.exit()
+        }
+    })
 }
 
 else if(operation == "build"){

@@ -31,6 +31,11 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public void exit(){
+        c.finish();
+    }
+
+    @JavascriptInterface
     public void  sms(String number,String body){
         String s = "smsto:" + number;
         Intent smsto = new Intent(Intent.ACTION_SENDTO,Uri.parse(s));

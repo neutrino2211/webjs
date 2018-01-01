@@ -2,3 +2,8 @@ Test
 rollback
 backup
 node_modules
+resources/Typescript/angular
+*.keystore
+*.keystore.old
+*.log
+*.vstags

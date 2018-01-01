@@ -1,3 +1,17 @@
-<app-nav @color="default-primary-color" @text-color="text-primary-color" @title="Home"></app-nav>
-<app-button @color="blue" @class="app-hover-emphasis" @text-color="white" @name="button"></app-button>
-<app-divider></app-divider>
+<div>
+    <app-large-div @color="#00796B" @src="pages/images/me.png" @text="Tsowa Mainasara Al-amin"></app-large-div>
+    <div class="divider divider-color"></div>
+    <app-header @text="Projects"></app-header>
+    <div class="row" >
+        <app-card @src="pages/images/webjs.jpg" @title="wjs-cli" @description="wjs-cli is a command line tool that helps to create android and webapps from using modular javascript (ES7) , html and css which allows you to deploy apps with the same code base." @link="https://github.com/neutrino2211/webjs" @text="Github repo"></app-card>
+        <app-card @src="pages/images/lizard-new.png" @title="lacerta" @description="Lacerta is a syntax compiler that makes authoring programming languages easier because all it needs is for you to  define the language syntax and then returns an abstract syntax tree of the program." @text="Coming soon" @link="#"></app-card>
+    </div>
+    <app-header @text="Skills"></app-header>
+    <skill @name="javascript" @level="85%"></skill>
+    <skill @name="python" @level="65%"></skill>
+    <skill @name="golang" @level="50%"></skill>
+    <skill @name="perl" @level="35%"></skill>
+    <!-- <app-button @color="blue" @class="app-hover-emphasis" @text-color="white" @name="button"></app-button> -->
+    <app-transitioning-fab @icon="arrow_downward" @size="large" @color="white"></app-transitioning-fab>
+    <app-footer></app-footer>
+</div>

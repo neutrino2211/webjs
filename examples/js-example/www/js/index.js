@@ -112,7 +112,7 @@ function entry(func){
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = load;
-/* unused harmony export title */
+/* harmony export (immutable) */ __webpack_exports__["c"] = title;
 /* unused harmony export events */
 /* harmony export (immutable) */ __webpack_exports__["b"] = parseHTML;
 /* unused harmony export createPageRoot */
@@ -153,7 +153,7 @@ function load(appClass){
 function title(title){
     var t = document.createElement("title")
 
-    t.title = title
+    t.innerText = title
 
     document.head.appendChild(t)
 }
@@ -655,13 +655,20 @@ var colors = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Divider; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Button3; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return Button2; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Button1; });
+/* unused harmony export Divider */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Button3; });
+/* unused harmony export Button2 */
+/* unused harmony export Button1 */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return Nav; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return Input; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return FloatingActionButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Footer; });
+/* unused harmony export LargeDiv */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Test; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return Skill; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return InfoCard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Header; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return FloatingActionButton; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return TransitioningFloatingActionButton; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_module__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_material__ = __webpack_require__(3);
 
@@ -691,8 +698,81 @@ var Input = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].C
     <input placeholder="{{placeholder}}" type="{{type}}" id="{{id}}" style="{{style}};width:90%;margin-left:5%;"></input>
 `)
 
+var Footer = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <footer class="page-footer accent-color">
+        <div class="container">
+            <div class="row">
+                <div class="col l6 s12">
+                    <h5 class="white-text">About me</h5>
+                    <p class="grey-text text-lighten-4">
+                        I am a Cyber Security student at Federal University of Technology,Minna (Nigeria)<br/>
+                        i deal mostly with network systems like servers and sockets using (nodejs , python , golang)
+                    </p>
+                </div>
+                <div class="col l4 offset-l2 s12">
+                    <h5 class="white-text">Social</h5>
+                    <ul>
+                        <li><a class="grey-text text-lighten-3" target="blank_" href="https://www.instagram.com/neutrino2211_/"><i class="fa fa-instagram" style="padding:5px;"></i>Instagram</a></li>
+                        <li><a class="grey-text text-lighten-3" target="blank_" href="https://twitter.com/wjsCli_official"><i class="fa fa-twitter" style="padding:5px;"></i>Twitter (wjs)</a></li>
+                        <li><a class="grey-text text-lighten-3" target="blank_" href="https://twitter.com/neutrino2211"><i class="fa fa-twitter" style="padding:5px;"></i>Twitter (personal)</a></li>
+                        <li><a class="grey-text text-lighten-3" target="blank_" href="https://www.facebook.com/tsowa.mainasara"><i class="fa fa-facebook" style="padding:5px;"></i>Facebook</a></li>
+                    </ul>
+                </div>
+                <div>Lacerta icon made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container">
+                &copy; 2018
+            </div>
+        </div>
+    </footer>
+`);
+
+var LargeDiv = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <div style="width:100%;height:100%;background-color:{{color}}">
+        <img  class="circle" src="{{img-src}}" alt="Image" style="width:100px"></img>
+    </div>
+`);
+
+var Test = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <div class="default-primary-color"style="width:100%;height:100%;text-align:center;">
+        <img src="{{src}}" width="180px" alt="Image" style="margin-top:19%;" class="circle app-hover-emphasis"></img>
+        <p class="text-primary-color scale-transition scale-out header" id="my-name" style="font-size:25px">{{text}}</p>
+    </div>
+`)
+
+var Skill = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <div class="progress" style="width:50%;margin-left:25%;color:#ffffff;">
+        <div class="determinate" style="width: {{level}}"><p style="text-align:center;">{{name}}</p></div>
+    </div>
+`)
+
+var InfoCard = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+<div class="col s12 m6" style="text-align:center;">
+<img src="{{src}}" alt="{{title}}"></img>
+<div class="card divider-color darken-1">
+  <div class="card-content" style="color:#0097A7;">
+    <span class="card-title">{{title}}</span>
+    <p>{{description}}</p>
+  </div>
+  <div class="card-action">
+    <a href="{{link}}" target="_blank">{{text}}</a>
+  </div>
+</div>
+</div>
+`)
+
+var Header = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+    <h2 class="text header center" id="header" style="color:#00796B;">{{text}}</h2>
+`)
+
 var FloatingActionButton = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
     <div class="fixed-action-btn {{position}} {{type}}"><a class="btn-floating btn-{{size}} {{color}}"><i class="material-icons">{{icon}}</i></a></div>
+`)
+
+var TransitioningFloatingActionButton = new __WEBPACK_IMPORTED_MODULE_0__reflex_module__["a" /* Reflex */].Component(`
+<div class="fixed-action-btn scale-transition scale-out {{type}}"><a class="btn-floating btn-{{size}} {{position}} {{color}}"><i class="material-icons" style="color:#0097A7;">{{icon}}</i></a></div>
 `)
 
 /***/ }),
@@ -717,7 +797,7 @@ class component {
         this.__parse = "";
     }
 
-    render(tag){
+    render(tag,callback){
         this.__tag = tag;
         var self = this;
         var tags = document.getElementsByTagName(tag);        
@@ -766,8 +846,8 @@ class component {
                 // }
             })
             // console.log(tags[i])
-            var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])(self.__parse).body.children;
-            // console.log(b)
+            var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])((self.__parse != "")?self.__parse:self.__html).body.children;
+            console.log()
             for(var j=0;j<b.length;j++){
                 // console.log(self.__parse);
                 var attrs = b[j].attributes;
@@ -798,8 +878,12 @@ class component {
                 tags[i].onclick = function(){
                     var r = new HTMLRenderer(t.getAttribute("@href-to"));
                     // console.log(window.__renderers)
-                    r.render(document.getElementById(tags[i].getAttribute("@target")),window.__renderers);
+                    r.renderTo(document.getElementById(t.getAttribute("@target")),window.__renderers);
                 }
+            }
+
+            if(callback){
+                callback(tags[i].children);
             }
             // console.log(tags[i])
             // document.body.appendChild(tags[i]);
@@ -839,9 +923,10 @@ class HTMLRenderer {
         var self = this;
         window.__renderers = renderers;
         // window.__renderers = window.__renderers[0];
-        console.log(renderers)
+        // console.log(renderers)
         if(Array.isArray(renderers[0])){
             renderers = renderers[0];
+            window.__renderers = renderers;
         }
         __WEBPACK_IMPORTED_MODULE_1_core__["a" /* $ */].get(this.__page,function(html){
             // console.log(html)
@@ -859,7 +944,8 @@ class HTMLRenderer {
             // console.log(Array.from(window.__renderers));
             renderers.forEach(function(map){
                 // console.log(map.component)
-                map.component.render(map.tag);
+                // map.tag.do = map.onRender
+                map.component.render(map.tag,map.onRender);
             })
         });
     }
@@ -933,8 +1019,11 @@ class Application {
     
     //Your apps entry point
     onViewLoad(){
-        // document.body.style.backgroundColor = ""
-        __WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */]("head").append("<link rel='stylesheet' href='pages/page.css'/>")
+        // document.body.style.background = "linear-gradient(#009688)";
+        __WEBPACK_IMPORTED_MODULE_1_wjs_app__["c" /* title */]("Tsowa Mainasara Al-amin")
+        document.body.style.overflowX = "hidden";
+        // document.body.style.overflowY = "scroll";
+        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("head").append("<link rel='stylesheet' href='pages/page.css'/>")
         function sms(number, message){
             if(typeof native !== "undefined"){
                 native.sms(number,message);
@@ -942,37 +1031,105 @@ class Application {
                 console.error("Not deployed in android environment");
             }
         }
-        // native.toast("Reflex")
+
+        function AnimateRotate(e,angle) {
+            // caching the object for performance reasons
+            var $elem = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(e);
+        
+            // we use a pseudo object for the animation
+            // (starts from `0` to `angle`), you can name it as you want
+            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])({deg: 0}).animate({deg: angle}, {
+                duration: 200,
+                step: function(now) {
+                    // in the step-callback (that is fired each step of the animation),
+                    // you can use the `now` paramter which contains the current
+                    // animation-position (`0` up to `angle`)
+                    $elem.css({
+                        transform: 'rotate(' + now + 'deg)'
+                    });
+                }
+            });
+        }
+
         var HomePage = new __WEBPACK_IMPORTED_MODULE_5__reflex_module__["a" /* Reflex */].HTMLRenderer("./pages/app.reflex.html");
         
         HomePage.render(
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["c" /* Button3 */],
-                tag: "app-button-3"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["c" /* Footer */],
+                tag: "app-footer"
             },
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["b" /* Button2 */],
-                tag: "app-button-2"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["h" /* Skill */],
+                tag: "skill",
+                onRender(elements){
+                    var animated = true;
+                    var l = elements[0].children[0].style.width;
+                    elements[0].children[0].style.width = "0%";
+                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scroll(function(){
+                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scrollTop()+innerHeight;
+
+                        // console.log($pos,$(elements[0]).offset().top)
+
+                        if($pos > Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0]).offset().top && animated){
+                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0].children[0]).animate({
+                                width: l
+                            },400);
+                            animated = false;
+                        }
+                    })
+                }
             },
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["a" /* Button1 */],
-                tag: "app-button"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["j" /* TransitioningFloatingActionButton */],
+                tag: "app-transitioning-fab",
+                onRender(element){
+                    var deg = 0;
+                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scroll(function(ev){
+                        // console.log($(window).scrollTop())
+                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scrollTop();
+                        // console.log($pos,$("#header").offset().top)
+                        if($pos < Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#my-name").offset().top && deg != 0){
+                            AnimateRotate(element[0],0);
+                            deg = 0;
+                        }else if($pos > Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#my-name").offset().top && deg != 180){
+                            AnimateRotate(element[0],180);
+                            deg = 180;
+                        }
+                    })
+
+                    // console.log(element)
+                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element[0]).click(function(){
+                        deg = (deg == 180)?0:180;
+                        AnimateRotate(element[0],deg);
+                        if(deg != 0){
+                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])('html,body').animate({ scrollTop: Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#header").offset().top }, 'slow');
+                        }else{
+                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])('html,body').animate({ scrollTop: 0 }, 'slow');
+                        }
+                        return false;
+                    })
+                    setTimeout(function(){
+                        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element[0]).removeClass("scale-out");
+                    },500)
+                }
             },
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["e" /* FloatingActionButton */],
-                tag: "app-fab"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["i" /* Test */],
+                tag: "app-large-div",
+                onRender(elements){
+                    // $(elements[0]).carousel();
+                    setTimeout(function(){
+                        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0].children[1]).removeClass("scale-out").addClass("scale-in");
+                    },500);
+                }
             },
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["f" /* Input */],
-                tag: "app-input"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["d" /* Header */],
+                tag: "app-header"
             },
             {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["g" /* Nav */],
-                tag: "app-nav"
-            },
-            {
-                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["d" /* Divider */],
-                tag: "app-divider"
+                component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["e" /* InfoCard */],
+                tag: "app-card"
             }
         );
     }
@@ -1005,8 +1162,8 @@ class Controller{
 
     onViewLoad(){
         alert("Loaded");
-        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["e" /* FloatingActionButton */].render("app-fab",this.doc);
-        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["c" /* Button3 */].render("app-button-3",this.doc);
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["b" /* FloatingActionButton */].render("app-fab",this.doc);
+        __WEBPACK_IMPORTED_MODULE_0__reflex_component__["a" /* Button3 */].render("app-button-3",this.doc);
         __WEBPACK_IMPORTED_MODULE_0__reflex_component__["f" /* Input */].render("app-input",this.doc);
         __WEBPACK_IMPORTED_MODULE_0__reflex_component__["g" /* Nav */].render("app-nav",this.doc);
     }

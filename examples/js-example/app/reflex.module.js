@@ -12,7 +12,7 @@ class component {
         this.__parse = "";
     }
 
-    render(tag){
+    render(tag,callback){
         this.__tag = tag;
         var self = this;
         var tags = document.getElementsByTagName(tag);        
@@ -61,8 +61,8 @@ class component {
                 // }
             })
             // console.log(tags[i])
-            var b = parseHTML(self.__parse).body.children;
-            // console.log(b)
+            var b = parseHTML((self.__parse != "")?self.__parse:self.__html).body.children;
+            console.log()
             for(var j=0;j<b.length;j++){
                 // console.log(self.__parse);
                 var attrs = b[j].attributes;
@@ -93,8 +93,12 @@ class component {
                 tags[i].onclick = function(){
                     var r = new HTMLRenderer(t.getAttribute("@href-to"));
                     // console.log(window.__renderers)
-                    r.render(document.getElementById(tags[i].getAttribute("@target")),window.__renderers);
+                    r.renderTo(document.getElementById(t.getAttribute("@target")),window.__renderers);
                 }
+            }
+
+            if(callback){
+                callback(tags[i].children);
             }
             // console.log(tags[i])
             // document.body.appendChild(tags[i]);
@@ -134,9 +138,10 @@ class HTMLRenderer {
         var self = this;
         window.__renderers = renderers;
         // window.__renderers = window.__renderers[0];
-        console.log(renderers)
+        // console.log(renderers)
         if(Array.isArray(renderers[0])){
             renderers = renderers[0];
+            window.__renderers = renderers;
         }
         $.get(this.__page,function(html){
             // console.log(html)
@@ -154,7 +159,8 @@ class HTMLRenderer {
             // console.log(Array.from(window.__renderers));
             renderers.forEach(function(map){
                 // console.log(map.component)
-                map.component.render(map.tag);
+                // map.tag.do = map.onRender
+                map.component.render(map.tag,map.onRender);
             })
         });
     }
