@@ -244,7 +244,7 @@ function init(directory){
     var flag = flags();
     var type = mode(flag);
     var config = projectDefinitions[type].config;
-
+    fs.mkdirSync(directory);
     var wjsManifest = `{
     "project-type" : "${type}",
     "compileCommand" : "${projectDefinitions[type].compileCommand?projectDefinitions[type].compileCommand:"webpack"}",
@@ -406,6 +406,8 @@ function Install(operand){
             console.log("Successfully installed "+operand)
             self.Then(undefined,modulePath);
         }
+
+        fs.emptyDirSync(modulesPath);
     })
 
     return self;
@@ -417,6 +419,10 @@ function build(){
     var p = cwd.split("\\");
     if(f.android){
         console.log(chalk.green("Building for Android"));
+        if(typeof getManifest().android === "undefined"){
+            console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
+            process.exit(9);
+        }
         makeStringXML();
         makeColorsXML();
         makeJavaSource(getManifest().android.package);
@@ -622,11 +628,9 @@ var args               = process.argv.slice(2,process.argv.length);
 var exec               = require("child_process").exec;
 var chalk              = require("chalk");
 var server             = require("../resources/server");
-var Keytool            = require("node-keytool");
 var firebase           = require("firebase");
 var websocket          = require("websocket");
 var resize_image       = require("resize-img");
-var android_sign       = require("android-sign");
 var resourcesPath      = path.join(__dirname,"../resources");
 var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def")
@@ -640,10 +644,9 @@ if(args.length > 0){
 
 //
 
-process.env.RESOURCES_PATH = path.join(__dirname,"../resources");
-process.RESOURCES_PATH = path.join(process.env.RESOURCES_PATH,"WTS");
-process.env.unpackResource = function(file,dirname){
-    fs.renameSync(path.join(dirname,file),path.join(process.RESOURCES_PATH,file))
+process.RESOURCES_PATH = path.join(__dirname,"../resources");
+process.unpackResource = function(from,to){
+    fs.renameSync(from,path.join(process.RESOURCES_PATH,to))
 }
 
 // init argument block
@@ -680,32 +683,44 @@ if (operation == "init"){
 
 else if (operation == "update"){
 
-    var adm_zip = require("adm-zip");
-
-    var updatePath = path.join(__dirname,"../resources/update.zip");
-    var resourcePath = path.join(__dirname,"../resources")
-    var gcs = require('@google-cloud/storage');
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../gcloud.json');
-    var storage = gcs({
-        projectId: 'webjs-f76df',
-        keyFileName: path.join(__dirname,'../gcloud.json')
-    });
-
-
-    var bucket = storage.bucket("webjs-f76df.appspot.com");
-    console.log("Downloading...")
-    bucket.file("resources.zip").download({
-        destination: updatePath
-    },(err)=>{
-        if (err){
-            console.log(err.Error)
+    var config = {
+        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+        authDomain: "webjs-f76df.firebaseapp.com",
+        databaseURL: "https://webjs-f76df.firebaseio.com",
+        projectId: "webjs-f76df",
+        storageBucket: "webjs-f76df.appspot.com",
+        messagingSenderId: "404258524081"
+    };
+    var app = firebase.initializeApp(config);
+    var databaseRef = app.database().ref();
+    var package = require(path.join(__dirname,"../package.json"));
+    var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
+    // console.log(latestVersion.);
+    latestVersion.on("value",function(snapshot){
+        var ver = snapshot.val();
+        // console.log(snapshot.val())
+        // process.exit()
+        var lastUpdate = package["last-update"].replace(/\./g,"-")
+        var sorted = [package["last-update"],ver].sort();
+        // print(sorted)
+        if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
+            console.log(chalk.green("Installing update "+ver));
+            Install(ver).Then = function(err,p){
+                if(err){
+                    console.log(""+err);
+                    console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+                    process.exit(3);
+                }else{
+                    console.log(`Update complete`)
+                    console.log(package);
+                    package["last-update"] = ver;
+                    fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
+                }
+                process.exit()
+            }
         }else{
-            console.log("Download complete")
-            // fs.emptyDirSync(resourcePath)
-            var zip = new adm_zip(updatePath);
-            console.log("Unpacking...")
-            zip.extractAllTo(path.join(__dirname,"../"),true)
-            console.log("Update complete")
+            console.log(chalk.green("wjs is up to date"));
+            process.exit()
         }
     })
 }
@@ -820,35 +835,23 @@ else if(operation == "check-update"){
     };
     var app = firebase.initializeApp(config);
     var databaseRef = app.database().ref();
-    var latestVersion = databaseRef.child("current-version");
+    var package = require(path.join(__dirname,"../package.json"));
+    var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
     // console.log(latestVersion.);
     latestVersion.on("value",function(snapshot){
         var ver = snapshot.val();
         // console.log(snapshot.val())
         // process.exit()
-        var package = require(path.join(__dirname,"../package.json"));
-
-        var sorted = [package.version,ver].sort();
-        // print(sorted)
-        if(sorted[0] == package.version){
-            console.log(chalk.green("Installing update "+ver));
-            var update = databaseRef.child("update");
-            update.on("value",function(snapshot){
-                Install(snapshot.val()).Then = function(err,path){
-                    if(err){
-                        console.log(" "+err);
-                        console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-                        process.exit(3);
-                    }else{
-                        console.log(`Update complete`)
-                    }
-                    process.exit()
-                }
-            })
+        var lastUpdate = package["last-update"].replace(/\./g,"-")
+        var sorted = [package["last-update"],ver].sort();
+        // print(sorted[0],package["last-update"],sorted)
+        if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
+            console.log(chalk.green("FOUND UPDATE "+ver));
+            console.log("Run "+chalk.grey("wjs update ")+"to update")
         }else{
             console.log(chalk.green("wjs is up to date"));
-            process.exit()
         }
+        process.exit()
     })
 }
 

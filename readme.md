@@ -20,11 +20,13 @@
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
 
-* To build the app run `wjs build` and use `wjs build --android` to build the android app.
+* To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 
 For a typescript project first `npm init` the project directory then install `ts-loader` and `typescript` with `npm install typescript ts-loader`.
 
 For a vue project just `npm install` the project directory. 
+
+To check for updates run `wjs check-update` and install any updates with `wjs update`
 
 
 ### Note
@@ -463,6 +465,27 @@ app.load(Application)
 ```
 #### Android
 
+First of all you need to make android project definitions in your `wjs-config.json` like this
+
+```json
+{
+    /*Default config options*/
+    "android": {
+        "icons": {
+            "normal": "relative/path/to/image/png",
+            "circular": "relative/path/to/image/png"
+        },
+        "package": "<package-name>"/*e.g com.mypackage.org*/,
+        "app_name": "<app-name>",
+        "color": {
+            "primary": "<hex-color>",
+            "primaryDark": "<hex-color>",
+            "accent": "<hex-color>"
+        }
+    }
+}
+```
+
 Android functions are available as `native` and that syntax is planned to be maintained in the future on other operating systems.
 
 ``` javascript
@@ -546,20 +569,34 @@ app.load(Application)
 
 * Added android build
 
+### wjs-cli@0.0.7
+
+* Critical bug fix
+
+### wjs-cli@0.0.8
+
+* Critical bug fix
+
+### wjs-cli@0.0.9
+
+* Fix typos
+
 ### Coming soon
 
 * More typescript modules.
 
 * Vue specific modules.
 
-* Complete docs (including module docs)
+* Complete docs (including module docs).
 
-* More android features, use `wjs check-update` check for version updates and bug fixes.
+* More android features.
 
 ### **Deprecated** to be removed at 1.0.0
 
 * run-dev command
 
 * device module
+
+Use `wjs check-update` to check for version updates and bug fixes
 
 Feel free to open an issue at [the github repo](https://github.com/neutrino2211/webjs/issues)

@@ -32,7 +32,10 @@ public class WebAppInterface {
 
     @JavascriptInterface
     public void exit(){
-        c.finish();
+        Intent _EXIT = new Intent(Intent.ACTION_MAIN);
+        _EXIT.addCategory(Intent.CATEGORY_HOME);
+        _EXIT.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        c.startActivity(_EXIT);
     }
 
     @JavascriptInterface

@@ -97,8 +97,8 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2_wjs_definitions__["a" /* T
                 <p style="font-size:36px;text-align:center;font-family:cursive;">Echo</hp>
             </nav>
             <div class="tap-target green" data-activates="button">
-                <div class="tap-target-content white-text" style="font-size:17px;font-family:monospace;">
-                    <h3>Input</h3>
+                <div class="tap-target-content white-text" style="font-size:9px;font-family:monospace;">
+                    <h5>Click to send</h5>
                     <p>Enter your message in the input above and press this button to send</p>
                 </div>
             </div>
@@ -112,7 +112,6 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2_wjs_definitions__["a" /* T
         `;
     }
     onTemplateLoad() {
-        __WEBPACK_IMPORTED_MODULE_1_wjs_app__["c" /* stream */]([1, 2, 3]).pipe(console.log);
         var socket = __WEBPACK_IMPORTED_MODULE_1_wjs_app__["b" /* socket */]().connect("echo.websocket.org");
         Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(".tap-target").tapTarget("open");
         socket.on("connection", function () {
@@ -121,6 +120,11 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2_wjs_definitions__["a" /* T
                 socket.send(Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#input").val());
             });
         });
+        setTimeout(function () {
+            if (window.native) {
+                native.exit();
+            }
+        }, 6000);
         socket.on("message", function (message) {
             if (window.native) {
                 native.toast("Reply : " + message.data);
@@ -129,12 +133,12 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2_wjs_definitions__["a" /* T
                 alert("Reply : " + message.data);
             }
         });
-        socket.on("error", function () {
+        socket.on("error", function (err) {
             if (window.native) {
-                native.toast("Unknown error");
+                native.toast("Error can't connect to " + err.target.url);
             }
             else {
-                alert("Unknown error");
+                alert("Error can't connect to " + err.target.url);
             }
         });
     }
@@ -152,7 +156,7 @@ __WEBPACK_IMPORTED_MODULE_1_wjs_app__["a" /* load */](Application);
 /* unused harmony export events */
 /* unused harmony export parseHTML */
 /* unused harmony export JSX */
-/* harmony export (immutable) */ __webpack_exports__["c"] = stream;
+/* unused harmony export stream */
 /* harmony export (immutable) */ __webpack_exports__["b"] = socket;
 class WJSWebSocket extends WebSocket {
     constructor(addr, proto) {
