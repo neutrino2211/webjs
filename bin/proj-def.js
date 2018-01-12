@@ -102,7 +102,7 @@ resolve:{
 }
 }
         `,
-        defaultModules: ["app.ts","web.ts","angular/core","angular/animations"]
+        defaultModules: ["app.ts","web.ts"]
     },
 
     vue: {
@@ -112,7 +112,17 @@ resolve:{
         modulesPath: path.join(__dirname,"../resources","vue-modules"),
         config: false,
         serverRoot: "dist",
-        defaultModules: ["app.js","web.js"]
+        defaultModules: ["app.js","definitions.js"]
+    },
+
+    react: {
+        root: "build",
+        entry:false,
+        compileCommand: path.join(__dirname,"../node_modules/.bin/react-scripts")+" build",
+        modulesPath: path.join(__dirname,"../resources","vue-modules"),
+        config: false,
+        serverRoot: "build",
+        defaultModules: ["app.js","definitions.js"]
     },
 
     javascript: {

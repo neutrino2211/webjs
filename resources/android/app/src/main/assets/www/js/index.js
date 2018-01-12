@@ -120,11 +120,6 @@ class Application extends __WEBPACK_IMPORTED_MODULE_2_wjs_definitions__["a" /* T
                 socket.send(Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#input").val());
             });
         });
-        setTimeout(function () {
-            if (window.native) {
-                native.exit();
-            }
-        }, 6000);
         socket.on("message", function (message) {
             if (window.native) {
                 native.toast("Reply : " + message.data);

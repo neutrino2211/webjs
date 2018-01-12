@@ -244,6 +244,7 @@ function init(directory){
     var flag = flags();
     var type = mode(flag);
     var config = projectDefinitions[type].config;
+    if(fs.existsSync(directory))fs.removeSync(directory);
     fs.mkdirSync(directory);
     var wjsManifest = `{
     "project-type" : "${type}",
@@ -254,7 +255,6 @@ function init(directory){
     var wjsDefaultModules = projectDefinitions[type].defaultModules;
 
     // fs.writeFileSync(path.join(directory,"wjs-config.json"),wjsManifest);
-    // if(fs.existsSync(directory))fs.removeSync(directory);
     if(flag.typescript || flag.angular){
         fs.writeFileSync(path.join(directory,"tsconfig.json"),`{
             "compilerOptions":{
@@ -287,15 +287,19 @@ function init(directory){
     wjsDefaultModules.forEach((m)=>{
         fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
     })
-    if(!flag.vue){
+    if(flag.vue){
+        fs.copySync(path.join(__dirname,"../resources","vue"),path.join(directory))
+    }else if(flag.react){
+        console.log(chalk.yellow("This might take a while"))
+        fs.copySync(path.join(__dirname,"../resources","wjs-react"),path.join(directory))
+        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"src/refresh.js"))
+    }else{
         fs.copySync(path.join(__dirname,"../resources","jsconfig.rsrc.json"),path.join(directory,"app","jsconfig.json"))
         var customHtml = fs.readFileSync(path.join(__dirname,"../resources","dev-index.html")).toString("utf-8")
         fs.writeFileSync(path.join(directory,"www","index.html"),customHtml);
         fs.copySync(path.join(__dirname,"../resources","js"),path.join(directory,"www","js"))
         fs.copySync(path.join(__dirname,"../resources","styles"),path.join(directory,"www","css"))
         fs.copySync(path.join(__dirname,"../resources","fonts"),path.join(directory,"www","fonts"))
-    }else{
-        fs.copySync(path.join(__dirname,"../resources","vue"),path.join(directory))
     }
     fs.writeFileSync(path.join(directory,"wjs-config.json"),wjsManifest);
     // if(process.platform == "win32"){
@@ -400,17 +404,46 @@ function Install(operand){
             console.log("Unpacking...")
             zip.extractAllTo(modulesPath,true)
             console.log("Installing...")
+            if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"module.conf"))){
+                var conf = parseConf(path.join(modulesPath,operand.split(".")[1],"module.conf"));
+                var package = require(path.join(__dirname,"../package.json"));
+                // console.log(package)
+                if(package["last-update"] != conf.requires){
+                    var updateVersion = "update-"+package.version.replace(/\./g,"-");
+                    console.log(chalk.red("Error : This feature update requires "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
+                    process.exit(9);
+                }
+            }
             require(path.join(modulesPath,operand.split(".")[1],"install.js"))
             console.log("Cleaning Up...");
             fs.removeSync(modulePath);
             console.log("Successfully installed "+operand)
             self.Then(undefined,modulePath);
+            fs.emptyDir(path.join(__dirname,"../modules"));
         }
 
         fs.emptyDirSync(modulesPath);
     })
 
     return self;
+}
+
+function parseConf(file){
+    var contents = fs.readFileSync(file).toString("utf-8");
+
+    /*kvm means Key-Value-Map*/
+    var kvm = {};
+
+    var a = contents.split("\n");
+    a.forEach(function(kv){
+        /*kva means Key-Value-Array*/
+        var kva = kv.split("=");
+        var key = kva[0].trim();
+        var value = kva[1].trim();
+        kvm[key] = value;
+    })
+
+    return kvm;
 }
 
 function build(){
@@ -453,14 +486,19 @@ function build(){
             })
         }
 
-        gradle.stderr.on("data",function(data){
-            err += (data||"");
+        gradle.stderr.once("error",function(data){
+            print(chalk.red("Error initializing gradle"))
+            process.exit(10);
         })
 
         function getApp(){
             process.chdir(cwd);
             // fs.moveSync(outputPath,path.join(cwd,path.dirname(cwd)+".apk"));
             var p = cwd.split("\\");
+            if(!fs.existsSync(outputPath)){
+                print(chalk.red("Error initializing gradle"))
+                process.exit(10);
+            }
             fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
         }
 
@@ -603,6 +641,8 @@ function usage(name){
     var commands = {
         add: "wjs add <module>",
         init: "wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
+        update: "wjs update <version?>\nIf you need to install a specific version, run \n wjs update --version=<update-version>",
+        "check-update": "wjs check-update",
         install : "wjs install <module>"
     }
     if(name == "*"){
@@ -628,6 +668,7 @@ var args               = process.argv.slice(2,process.argv.length);
 var exec               = require("child_process").exec;
 var chalk              = require("chalk");
 var server             = require("../resources/server");
+var package            = require("../package.json");
 var firebase           = require("firebase");
 var websocket          = require("websocket");
 var resize_image       = require("resize-img");
@@ -642,11 +683,15 @@ if(args.length > 0){
     var operand   = args[1];
 }
 
-//
 
-process.RESOURCES_PATH = path.join(__dirname,"../resources");
-process.unpackResource = function(from,to){
-    fs.renameSync(from,path.join(process.RESOURCES_PATH,to))
+global.RESOURCES_PATH = path.join(__dirname,"../resources");
+global.unpackResource = function(from,to){
+    fs.emptyDirSync(path.join(global.RESOURCES_PATH,to));
+    fs.copySync(from,path.join(global.RESOURCES_PATH,to))
+}
+
+global.unpackTo = function(from,to){
+    fs.copySync(from,path.join(__dirname,"../",to))
 }
 
 // init argument block
@@ -694,17 +739,24 @@ else if (operation == "update"){
     var app = firebase.initializeApp(config);
     var databaseRef = app.database().ref();
     var package = require(path.join(__dirname,"../package.json"));
-    var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
+    // console.log(flags().update.slice(-4))
+    var updateVersion = "update-"+package.version.replace(/\./g,"-");
+    var latestVersion = databaseRef.child(updateVersion);
     // console.log(latestVersion.);
     latestVersion.on("value",function(snapshot){
-        var ver = snapshot.val();
+        var ver;
+        if(flags().version){
+            ver = "updates."+updateVersion+"_"+flags().version.split(".").join("");
+        }else{
+            ver = snapshot.val();
+        }
         // console.log(snapshot.val())
         // process.exit()
         var lastUpdate = package["last-update"].replace(/\./g,"-")
         var sorted = [package["last-update"],ver].sort();
         // print(sorted)
         if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
-            console.log(chalk.green("Installing update "+ver));
+            console.log(chalk.green("Installing feature update "+ver.split("updates."+updateVersion+"_")[1].split("").join(".")));
             Install(ver).Then = function(err,p){
                 if(err){
                     console.log(""+err);
@@ -712,7 +764,7 @@ else if (operation == "update"){
                     process.exit(3);
                 }else{
                     console.log(`Update complete`)
-                    console.log(package);
+                    // console.log(package);
                     package["last-update"] = ver;
                     fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
                 }
@@ -746,9 +798,13 @@ else if(operation == "install"){
 else if(operation == "-v"){
     var json = fs.readFileSync(path.join(__dirname,"../","package.json")).toString();
 
-    var version = JSON.parse(json).version;
+    var pack = JSON.parse(json);
 
-    console.log(version);
+    var updateVersion = "update-"+pack.version.replace(/\./g,"-");
+
+    // console.log(pack["last-update"],"updates."+updateVersion+"_");
+
+    console.log("Version : "+pack.version+"\nCurrent update : "+pack["last-update"].split("updates."+updateVersion+"_")[1].split("").join("."));
 }
 
 //Add app dependency
@@ -810,6 +866,16 @@ else if(operation == "run-dev" || operation == "development"){
             // refresh(c)
             // c.send("refresh")
         })
+    }else if(manifest["project-type"] == "react"){
+        server.Source = path.join(process.cwd(),"build");
+        compile(c)
+        fs.watch(path.join(process.cwd(),"src"),{
+            recursive: true
+        }, ()=>{
+            compile(c)
+            // refresh(c)
+            // c.send("refresh")
+        })
     }else{
         writeDev(process.cwd())
         server.Source = path.join(process.cwd(),"www");
@@ -836,23 +902,118 @@ else if(operation == "check-update"){
     var app = firebase.initializeApp(config);
     var databaseRef = app.database().ref();
     var package = require(path.join(__dirname,"../package.json"));
+    var updateVersion = "update-"+package.version.replace(/\./g,"-");
     var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
     // console.log(latestVersion.);
     latestVersion.on("value",function(snapshot){
         var ver = snapshot.val();
         // console.log(snapshot.val())
         // process.exit()
+        // console.log(b)
         var lastUpdate = package["last-update"].replace(/\./g,"-")
         var sorted = [package["last-update"],ver].sort();
         // print(sorted[0],package["last-update"],sorted)
         if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
-            console.log(chalk.green("FOUND UPDATE "+ver));
+            console.log(chalk.green("FOUND UPDATE "+ver.split("updates."+updateVersion+"_")[1].split("").join(".")));
+            // console.log("Available updates\n"+chalk.green(b.join("\n")))
             console.log("Run "+chalk.grey("wjs update ")+"to update")
         }else{
             console.log(chalk.green("wjs is up to date"));
         }
         process.exit()
     })
+}
+
+else if(operation == "publish"){
+    var Zip = require("adm-zip");
+    var zip = new Zip();
+
+    var destinationZip = path.join(process.cwd(),operand+".zip");
+
+    zip.addLocalFolder(path.join(process.cwd(),operand));
+    
+    zip.writeZip(destinationZip);
+
+    // var config = {
+    //     apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+    //     authDomain: "webjs-f76df.firebaseapp.com",
+    //     databaseURL: "https://webjs-f76df.firebaseio.com",
+    //     projectId: "webjs-f76df",
+    //     storageBucket: "webjs-f76df.appspot.com",
+    //     messagingSenderId: "404258524081"
+    // };
+    // var app = firebase.initializeApp(config);
+    var term = require("terminal-kit").terminal;
+    var gcs = require('@google-cloud/storage');
+    // print("Publishing "+chalk.green(operand))
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../gcloud.json');
+    var storage = gcs({
+        projectId: 'webjs-f76df',
+        keyFileName: path.join(__dirname,'../gcloud.json')
+    });
+
+    var Progress = term.progressBar({
+        width: 80,
+        title: "Publishing module",
+        eta: true,
+        percent: true
+    });
+
+    var bucket = storage.bucket("webjs-f76df.appspot.com");
+    var upload = bucket.upload(destinationZip,{destination: "updates/"+operand},function(e,f){
+        // console.log(f)
+        if(e){
+            print(chalk.red(""+e))
+            term("\n")
+            process.exit(11);
+        }else{
+            Progress.update(100)
+            print(chalk.green("Published "+operand))
+        }
+    })
+
+    // var file = bucket.file("updates/"+operand);
+
+    // fs.createReadStream(destinationZip)
+    // .pipe(file.createWriteStream())
+    // .on("data",function(data){
+    //     console.log(data);
+    // })
+    // .on("finish",function(){
+    //     Progress.update(100);
+    //     print(chalk.green("Published "+operand))
+    //     process.exit(0)
+    // })
+    // .on("error",function(err){
+    //     print(chalk.red(""+err))
+    //     process.exit(11)
+    // })
+
+    // print(upload)
+    
+    // var stream = bucket.file("updates/"+operand+".zip").createWriteStream({
+    //     metadata:{
+    //         contentType: "application/x-zip-compressed"
+    //     }
+    // });
+
+    // stream.end(buf);
+
+    Progress.update(0);
+
+    // // var task = storageRef.put(buf,{
+    // //     contentType: "application/x-zip-compressed"
+    // // })
+
+    // stream.on("state_changed",function(snapshot){
+    //     var progress = (snapshot.bytesTrasferred / snapshot.totalBytes) * 100;
+    //     Progress.update(progress);
+    // }, function(err){
+    //     print(chalk.red(""+err))
+    // },function(){
+    //     print(chalk.grren("Published "+operand))
+    //     process.exit()
+    // })
 }
 
 else if(operation == "build"){

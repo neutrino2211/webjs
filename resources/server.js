@@ -47,9 +47,11 @@ exports.Start  = function(port){
         } else {
             try{
                 response.writeHead(status);
-                responseText = fs.readFileSync(filename);
+                var responseType = 'binary';
+                if(filename.endsWith(".svg")) responseType = undefined;
+                responseText = new Buffer (fs.readFileSync(filename));
                 console.log(`${chalk.magenta(`[${Date()}]`)}   ${chalk.yellow(`${status}: ${filename} served;`)}`)
-                response.write(responseText,'binary');
+                response.write(responseText,responseType);
                 response.end();
             }catch(e){
                 response.writeHead(404)

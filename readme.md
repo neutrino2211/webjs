@@ -19,6 +19,7 @@
 * Open http://localhost:3100 in your browser to view the app
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
+Check out [how to make a module](docs/Modules/introduction.md)
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 
@@ -580,6 +581,24 @@ app.load(Application)
 ### wjs-cli@0.0.9
 
 * Fix typos
+
+### wjs-cli@0.1.0
+
+* Bug fix
+
+### wjs-cli@0.1.1
+
+* Added update feature
+
+* Bug fix
+
+### wjs-cli@0.1.2
+
+* Support for Android ^5.0.0
+
+* Added module publishinng
+
+* Added [documentation for module creations](docs/Modules/introduction.md)
 
 ### Coming soon
 
