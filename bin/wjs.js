@@ -765,8 +765,10 @@ else if (operation == "update"){
                 }else{
                     console.log(`Update complete`)
                     // console.log(package);
-                    package["last-update"] = ver;
-                    fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
+                    if(flags().version == undefined){
+                        package["last-update"] = ver;
+                        fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
+                    }
                 }
                 process.exit()
             }
@@ -927,6 +929,11 @@ else if(operation == "check-update"){
 else if(operation == "publish"){
     var Zip = require("adm-zip");
     var zip = new Zip();
+
+    if(!fs.existsSync(path.join(process.cwd(),operand))){
+        print(chalk.red("Error : folder '"+chalk.yellow(operand)+"' not found"))
+        process.exit()
+    }
 
     var destinationZip = path.join(process.cwd(),operand+".zip");
 
