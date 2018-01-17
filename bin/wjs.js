@@ -410,13 +410,14 @@ function Install(operand){
                 // console.log(package)
                 if(package["last-update"] != conf.requires){
                     var updateVersion = "update-"+package.version.replace(/\./g,"-");
-                    console.log(chalk.red("Error : This feature update requires "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
+                    console.log(chalk.red("Error : This download requires "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
                     process.exit(9);
                 }
             }
-            require(path.join(modulesPath,operand.split(".")[1],"install.js"))
+            if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"install.js")))
+                require(path.join(modulesPath,operand.split(".")[1],"install.js"));
             console.log("Cleaning Up...");
-            fs.removeSync(modulePath);
+            fs.removeSync(modulesPath);
             console.log("Successfully installed "+operand)
             self.Then(undefined,modulePath);
             fs.emptyDir(path.join(__dirname,"../modules"));
@@ -790,7 +791,35 @@ else if(operation == "install"){
         process.exit()
     }
 
-    Install(operand);
+    var config = {
+        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+        authDomain: "webjs-f76df.firebaseapp.com",
+        databaseURL: "https://webjs-f76df.firebaseio.com",
+        projectId: "webjs-f76df",
+        storageBucket: "webjs-f76df.appspot.com",
+        messagingSenderId: "404258524081"
+    };
+    var app = firebase.initializeApp(config);
+    var databaseRef = app.database().ref();
+    var package = require(path.join(__dirname,"../package.json"));
+    // console.log(flags().update.slice(-4))
+    var updateVersion = "update-"+package.version.replace(/\./g,"-");
+    var latestVersion = databaseRef.child(updateVersion);
+    // console.log(latestVersion.);
+    latestVersion.on("value",function(snapshot){
+        var ver = "updates."+updateVersion+"_"+operand.split(".").join("");
+        console.log(chalk.green("Installing  "+operand));
+        Install(ver).Then = function(err,p){
+            if(err){
+                console.log(""+err);
+                console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+                process.exit(3);
+            }else{
+                console.log(`Update complete`)
+            }
+            process.exit()
+        }
+    })
     
 }
 
@@ -941,18 +970,10 @@ else if(operation == "publish"){
     
     zip.writeZip(destinationZip);
 
-    // var config = {
-    //     apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
-    //     authDomain: "webjs-f76df.firebaseapp.com",
-    //     databaseURL: "https://webjs-f76df.firebaseio.com",
-    //     projectId: "webjs-f76df",
-    //     storageBucket: "webjs-f76df.appspot.com",
-    //     messagingSenderId: "404258524081"
-    // };
-    // var app = firebase.initializeApp(config);
     var term = require("terminal-kit").terminal;
+
     var gcs = require('@google-cloud/storage');
-    // print("Publishing "+chalk.green(operand))
+
     process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../gcloud.json');
     var storage = gcs({
         projectId: 'webjs-f76df',
@@ -978,49 +999,7 @@ else if(operation == "publish"){
             print(chalk.green("Published "+operand))
         }
     })
-
-    // var file = bucket.file("updates/"+operand);
-
-    // fs.createReadStream(destinationZip)
-    // .pipe(file.createWriteStream())
-    // .on("data",function(data){
-    //     console.log(data);
-    // })
-    // .on("finish",function(){
-    //     Progress.update(100);
-    //     print(chalk.green("Published "+operand))
-    //     process.exit(0)
-    // })
-    // .on("error",function(err){
-    //     print(chalk.red(""+err))
-    //     process.exit(11)
-    // })
-
-    // print(upload)
-    
-    // var stream = bucket.file("updates/"+operand+".zip").createWriteStream({
-    //     metadata:{
-    //         contentType: "application/x-zip-compressed"
-    //     }
-    // });
-
-    // stream.end(buf);
-
     Progress.update(0);
-
-    // // var task = storageRef.put(buf,{
-    // //     contentType: "application/x-zip-compressed"
-    // // })
-
-    // stream.on("state_changed",function(snapshot){
-    //     var progress = (snapshot.bytesTrasferred / snapshot.totalBytes) * 100;
-    //     Progress.update(progress);
-    // }, function(err){
-    //     print(chalk.red(""+err))
-    // },function(){
-    //     print(chalk.grren("Published "+operand))
-    //     process.exit()
-    // })
 }
 
 else if(operation == "build"){

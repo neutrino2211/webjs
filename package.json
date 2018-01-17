@@ -4,6 +4,7 @@
     "wjs": "./bin/wjs.js"
   },
   "last-update": "updates.update-0-1-3_000",
+  "wjs:installedModules": {},
   "version": "0.1.3",
   "description": "An app creator ",
   "main": "index.js",
