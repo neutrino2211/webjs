@@ -492,6 +492,10 @@ function build(){
             process.exit(10);
         })
 
+        gradle.stderr.on("data",function(data){
+            process.stderr.write(data)
+        })
+
         function getApp(){
             process.chdir(cwd);
             // fs.moveSync(outputPath,path.join(cwd,path.dirname(cwd)+".apk"));
