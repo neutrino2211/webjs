@@ -264,10 +264,10 @@ exports.makeApplicationIcons = function(androidManifest){
  * @argument {String} packageName
  */
 
-exports.makeJavaSource = function(packageName){
+exports.makeJavaSource = function(packageName,local,p){
     var androidProjectDirectory = path.join(resourcesPath,"android");
 
-    if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
+    if(local === true)androidProjectDirectory = path.join((p?p:process.cwd()),"android");
 
     var packageToPath = packageName.split(".").join("/");
     var javaPath = path.join(androidProjectDirectory,"app/src/main/java",packageToPath);
@@ -375,7 +375,7 @@ exports.init = function(directory){
     "project-type" : "${type}",
     "compileCommand" : "${projectDefinitions[type].compileCommand?projectDefinitions[type].compileCommand:"webpack"}",
     "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"www"}",
-    "local": "${flag.local?true:false}",
+    "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}
     "extraModules": []
 }`;
     var wjsDefaultModules = projectDefinitions[type].defaultModules;
@@ -424,6 +424,11 @@ exports.init = function(directory){
     }
 
     if(flag.local === true){
+        if(flag.package){
+            exports.makeJavaSource(flag.package,true,directory);
+            exports.makeGradleBuild(flag.package);
+            exports.makeManifestXML(flag.package);
+        }
         fs.copySync(path.join(__dirname,"../resources","android"),path.join(directory,"android"));
     }
     fs.writeFileSync(path.join(directory,"wjs-config.json"),wjsManifest);
@@ -515,7 +520,7 @@ exports.build = function(){
         exports.makeStringXML();
         exports.makeColorsXML();
         if(exports.getManifest().custom == "undefined"){
-            exports.makeJavaSource(exports.getManifest().android.package);
+            exports.makeJavaSource(exports.getManifest().android.package,exports.getManifest().local);
             console.log("Customized source code "+chalk.yellow("(inactive)"))
         }else{
             console.log("Customized source code "+chalk.green("(active)"))

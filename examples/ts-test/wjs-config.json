@@ -1,17 +1,17 @@
 {
-	"project-type": "typescript",
-	"compileCommand": "webpack",
-	"root": "www",
-	"extraModules": [],
+    "project-type" : "typescript",
+    "compileCommand" : "webpack",
+    "root": "www",
     "local": true,
-    "custom": true,
-	"android": {
-		"app_name": "TS test",
-		"package": "com.wjs.test.tstest",
-		"color": {
-			"accent": "#eeeeee",
-			"primary": "#eeeeee",
-			"primaryDark": "#eeeeee"
-		}
-	}
+	"custom" : true,
+    "extraModules": [],
+    "android": {
+        "app_name": "TS test",
+        "package": "com.wjs.test.tstest",
+        "color": {
+            "accent": "#eeeeee",
+            "primary": "#eeeeee",
+            "primaryDark": "#eeeeee"
+        }
+    }
 }
