@@ -11,6 +11,7 @@ class Application{
     //Your apps entry point
     onViewLoad(){
         wjs.print("main")
+        native.toast("Hello")
     }
 }
 

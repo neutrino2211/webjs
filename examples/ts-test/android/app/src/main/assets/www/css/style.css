@@ -1,0 +1,105 @@
+/* .close {
+    background: #ff5c5c;
+    font-size: 9pt;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #e33e41;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.minimize {
+    background: #ffbd4c;
+    font-size: 9pt;
+    line-height: 11px;
+    margin-left: 4px;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #e09e3e;
+    border-radius: 50%;
+    display: inline-block;
+} */
+
+/* Page styling */
+
+html{
+    background-attachment: fixed;
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none; /*IE 10+*/
+    user-select: none;
+    overflow: hidden;
+}
+
+body{
+    background-attachment: fixed;
+}
+
+/* Engine rendering options */
+.active-program{
+    /* filter: blur(2px); */
+    z-index: 11;
+    opacity: 1;
+    position: absolute;
+}
+
+.main-window{
+    z-index: 9999;
+    position: relative;
+}
+
+.inactive-program{
+    z-index: 10;
+    position: absolute;
+    /*opacity: 0.5;*/
+}
+
+.blur{
+    background-blend-mode: color-dodge;
+}
+
+.zoom {
+    background: #00ca56;
+    font-size: 9pt;
+    margin: 5px;
+    margin-right: 2.5px;
+    line-height: 11px;
+    margin-left: 6px;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #14ae46;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.exit {
+    background: #F83504;
+    font-size: 9pt;
+    margin: 5px;
+    margin-left: 2.5px;
+    line-height: 11px;
+    margin-left: 6px;
+    width: 11px;
+    height: 11px;
+    border: 1px solid #EB5B08;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.resizer { 
+    width: 10px; height: 10px; background: blue; position:absolute; right: 0; bottom: 0; cursor: se-resize; 
+}
+
+::-webkit-scrollbar{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track{
+    background-color: gray;
+    width: 6px;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: rgba(53, 53, 53, 0.5)
+}

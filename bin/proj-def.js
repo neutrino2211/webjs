@@ -106,7 +106,7 @@ resolve:{
     },
 
     vue: {
-        root: "dist",
+        root: "src",
         entry:false,
         compileCommand: "webpack --config build/webpack.dev.conf.js",
         modulesPath: path.join(__dirname,"../resources","vue-modules"),
@@ -116,12 +116,12 @@ resolve:{
     },
 
     react: {
-        root: "build",
+        root: "app",
         entry:false,
-        compileCommand: path.join(__dirname,"../node_modules/.bin/react-scripts")+" build",
+        compileCommand: "webpack",
         modulesPath: path.join(__dirname,"../resources","vue-modules"),
         config: false,
-        serverRoot: "build",
+        serverRoot: "dist",
         defaultModules: ["app.js","definitions.js"]
     },
 

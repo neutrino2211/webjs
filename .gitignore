@@ -2,7 +2,9 @@ gcloud.json
 Test
 rollback
 node_modules
+*/node_modules
+resources/android
 backup
-resources/Typescript/angular
 modules/*
 resources/update-*
+.gitignore

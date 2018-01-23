@@ -1,5 +1,35 @@
 import { $ } from "./web";
 
+class WJSWebSocket extends WebSocket{
+    constructor(addr,proto: string | string[]){
+        super(addr,proto);
+    }
+
+    private f(s, callback) {
+        var event = s.trim().toLowerCase();
+        if (event == 'message') {
+            this.onmessage = callback;
+        } else if (event == 'connection') {
+            this.onopen = callback;
+        } else if (event == 'close') {
+            this.onclose = callback;
+        } else if (event == 'error') {
+            this.onerror = callback;
+        } else {
+            this.addEventListener(event, callback);
+        }
+    }
+
+    on(str, cb) {
+        this.f(str,cb);
+    }
+
+    emit(eventName) {
+        var event = new Event(eventName);
+        this.dispatchEvent(event);
+    }
+}
+
 export function load(appClass){
     var application = new appClass();
     application.onViewLoad();
@@ -8,7 +38,7 @@ export function load(appClass){
 export function title(title: string){
     var t = document.createElement("title")
 
-    t.title = title
+    t.innerText = title
 
     document.head.appendChild(t)
 }
@@ -22,7 +52,7 @@ export var events = {
             if (!ev) {
                 throw new TypeError('Argument supplied cannot be of type "null"')
             }
-            element.addEventListener(ev, cb);
+            element.addEventListener(ev,cb);
         }
         element.emit = function(ev: string) {
             if (!ev) {
@@ -78,45 +108,13 @@ export function stream (arr: any) {
     return s;
 }
 
-export function socket(proto) {
+export function socket(proto? : string) {
     if (!proto) {
         console.warn('No protocol supplied for websocket instance');
     }
-    // var sock = {};
-    var sock : WebSocket;
-    this.connect = function(addr) {
-        if (!addr) {
-            throw new URIError('Address cannot be null');
+    return {
+        connect: function(address){
+            return new WJSWebSocket((address.startsWith('ws://'))?address:'ws://'+address,proto);
         }
-        sock = new WebSocket(`${(addr.startsWith('ws://'))?addr:'ws://'+addr}`, proto);
-    }
-
-    function f(s, callback) {
-        var event = s.trim().toLowerCase();
-        if (event == 'message') {
-            sock.onmessage = callback;
-        } else if (event == 'connection') {
-            sock.onopen = callback;
-        } else if (event == 'close') {
-            sock.onclose = callback;
-        } else if (event == 'error') {
-            sock.onerror = callback;
-        } else {
-            sock.addEventListener(event, callback);
-        }
-    }
-    this.close = sock.close;
-    this.state = sock.readyState;
-    this.emit = function(eventName) {
-        var event = new Event(eventName);
-        sock.dispatchEvent(event);
-    }
-    this.on = function(str, cb) {
-        if (typeof str == 'string') {
-            f(str, cb);
-        } else {
-            throw new TypeError('Argument is not a string');
-        }
-    }
-    return this;
+    };
 }

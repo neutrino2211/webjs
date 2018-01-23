@@ -292,7 +292,7 @@ function init(directory){
     }else if(flag.react){
         console.log(chalk.yellow("This might take a while"))
         fs.copySync(path.join(__dirname,"../resources","wjs-react"),path.join(directory))
-        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"src/refresh.js"))
+        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"app/refresh.js"))
     }else{
         fs.copySync(path.join(__dirname,"../resources","jsconfig.rsrc.json"),path.join(directory,"app","jsconfig.json"))
         var customHtml = fs.readFileSync(path.join(__dirname,"../resources","dev-index.html")).toString("utf-8")
@@ -372,63 +372,6 @@ function getProjectDependencies(directory){
     })
 }
 
-function Install(operand){
-    var self = {};
-    var wjsModule = operand.split(".").join("/")
-    
-    var adm_zip = require("adm-zip");
-
-    var modulesPath = path.join(__dirname,"../modules")
-    var modulePath = path.join(modulesPath,operand+".zip")
-    var gcs = require('@google-cloud/storage');
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../gcloud.json');
-    var storage = gcs({
-        projectId: 'webjs-f76df',
-        keyFileName: path.join(__dirname,'../gcloud.json')
-    });
-
-
-    var bucket = storage.bucket("webjs-f76df.appspot.com");
-    console.log("Downloading...")
-    bucket.file(wjsModule+".zip").download({
-        destination: modulePath
-    },(err)=>{
-        if (err){
-            // console.log(err)
-            fs.removeSync(modulePath);
-            self.Then(err,undefined)
-        }else{
-            console.log("Download complete")
-            // fs.emptyDirSync(resourcePath)
-            var zip = new adm_zip(modulePath);
-            console.log("Unpacking...")
-            zip.extractAllTo(modulesPath,true)
-            console.log("Installing...")
-            if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"module.conf"))){
-                var conf = parseConf(path.join(modulesPath,operand.split(".")[1],"module.conf"));
-                var package = require(path.join(__dirname,"../package.json"));
-                // console.log(package)
-                if(package["last-update"] != conf.requires){
-                    var updateVersion = "update-"+package.version.replace(/\./g,"-");
-                    console.log(chalk.red("Error : This download requires "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
-                    process.exit(9);
-                }
-            }
-            if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"install.js")))
-                require(path.join(modulesPath,operand.split(".")[1],"install.js"));
-            console.log("Cleaning Up...");
-            fs.removeSync(modulesPath);
-            console.log("Successfully installed "+operand)
-            self.Then(undefined,modulePath);
-            fs.emptyDir(path.join(__dirname,"../modules"));
-        }
-
-        fs.emptyDirSync(modulesPath);
-    })
-
-    return self;
-}
-
 function parseConf(file){
     var contents = fs.readFileSync(file).toString("utf-8");
 
@@ -457,6 +400,8 @@ function build(){
             console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
             process.exit(9);
         }
+        // fs.copySync(path.join(resourcesPath,"android"),path.join(resourcesPath,"build/android"));
+
         makeStringXML();
         makeColorsXML();
         makeJavaSource(getManifest().android.package);
@@ -516,65 +461,14 @@ function build(){
                 var p = cwd.split("\\");
                 var appPath = path.join(cwd,p[p.length-1]+".apk");
                 console.log(chalk.green("App ready at "+appPath))
-                // if(!f.release){
-                //     console.log("\nTo make a release APK run "+chalk.grey("wjs build --android --release"))
-                // }else{
-                //     console.log(chalk.green("\nPackaging apk as release"));
-                //     var pa = "keytool";
-                //     var js = "jarsigner";
-                    
-                //     if(os.platform() == "win32"){
-                //         pa = "C:/Program Files/Java"
-                //         var installs = fs.readdirSync(pa).sort();
-                //         var latestInstall = installs[installs.length -1]
-                //         var latestInstallPath = path.join(pa,latestInstall);
-                //         var pa = path.join(latestInstallPath,"bin/keytool.exe");
-
-                //         var jdks = installs.filter(function(v){
-                //             if(v.startsWith("jdk")){
-                //                 return v;
-                //             }
-                //         }).sort();
-
-                //         var latestJDKInstall = jdks[jdks.length-1];
-                //         // console.log(jdks);
-                //         js = path.join("C:/Program Files/Java",latestJDKInstall,"bin/jarsigner.exe");
-                //     }
-                
-                //     // console.log(pa);
-
-                //     var androidManifest = getManifest().android;
-
-                //     if(fs.existsSync(path.join(process.cwd(),androidManifest.app_name+".keystore"))){
-                //         fs.removeSync(path.join(process.cwd(),androidManifest.app_name+".keystore"));
-                //     }
-
-                //     // var p = process.cwd().split("\\");
-
-                //     var sign_apk_path = path.join(__dirname,"../resources/sign/dist/sign.jar");
-
-                //     var $exec = require("child_process");
-
-                //     var $process = $exec.execSync("java -jar "+sign_apk_path+" \""+path.join(process.cwd(),p[p.length-1])+".apk\" --override");
-
-                //     console.log($process.toString("utf-8"))
-                // }
+                fs.removeSync(path.join(resourcesPath,"build/android"));
             }
-            // console.log(process.cwd())
             var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",getManifest().android.package.split(".").join("/"));
             fs.emptyDirSync(javaPath);
         })
     }else{
         console.log(chalk.green("App static files ready at "+path.join(cwd,getManifest().root)))
     }
-}
-
-function buildFlame(directory){
-    build(directory);
-
-    fs.removeSync(path.join(directory,"dist","www","index.html"));
-
-    fs.renameSync(path.join(directory,"dist","www","entry.html"),path.join(directory,"dist","www","index.html"));
 }
 
 /**
@@ -642,24 +536,6 @@ function writePro(directory){
     fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(__dirname,"../resources","index.html")).toString("utf-8"))
 }
 
-function usage(name){
-    var commands = {
-        add: "wjs add <module>",
-        init: "wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
-        update: "wjs update <version?>\nIf you need to install a specific version, run \n wjs update --version=<update-version>",
-        "check-update": "wjs check-update",
-        install : "wjs install <module>"
-    }
-    if(name == "*"){
-        print("Usage:")
-        Object.getOwnPropertyNames(commands).forEach((c)=>{
-            print(commands[c]);
-        })
-    }else{
-        print("Usage:\n"+commands[name]);
-    }
-}
-
 //Declare variables
 var s;
 var c;
@@ -671,9 +547,11 @@ var path               = require("path");
 var http               = require("https");
 var args               = process.argv.slice(2,process.argv.length);
 var exec               = require("child_process").exec;
+var utils              = require('./utils');
 var chalk              = require("chalk");
 var server             = require("../resources/server");
 var package            = require("../package.json");
+var Install            = require("./install");
 var firebase           = require("firebase");
 var websocket          = require("websocket");
 var resize_image       = require("resize-img");
@@ -703,11 +581,11 @@ global.unpackTo = function(from,to){
 
 if (operation == "init"){
     try{
-        checkArg(1)
+        utils.checkArg(1)
         // checkArg(2)
 
     }catch(e){
-        usage("init");
+        utils.usage("init");
         process.exit(1)
     }
     // changeDir("Test")
@@ -715,7 +593,7 @@ if (operation == "init"){
     // var cmd = exec(`cordova create ${operand} ${args[2]} ${operand}`)
     // changeDir(operand)
     // print("Cordova\n\n")
-    init(path.join(process.cwd(),operand))
+    utils.init(path.join(process.cwd(),operand))
     // cmd.stdout.on("data",function(chunk){
     //     print(chunk)
     // })
@@ -750,8 +628,8 @@ else if (operation == "update"){
     // console.log(latestVersion.);
     latestVersion.on("value",function(snapshot){
         var ver;
-        if(flags().version){
-            ver = "updates."+updateVersion+"_"+flags().version.split(".").join("");
+        if(utils.flags().version){
+            ver = "updates."+updateVersion+"_"+utils.flags().version.split(".").join("");
         }else{
             ver = snapshot.val();
         }
@@ -770,7 +648,7 @@ else if (operation == "update"){
                 }else{
                     console.log(`Update complete`)
                     // console.log(package);
-                    if(flags().version == undefined){
+                    if(utils.flags().version == undefined){
                         package["last-update"] = ver;
                         fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
                     }
@@ -789,9 +667,9 @@ else if (operation == "update"){
 
 else if(operation == "install"){
     try {
-        checkArg(1)
+        utils.checkArg(1)
     } catch (error) {
-        usage("install")
+        utils.usage("install")
         process.exit()
     }
 
@@ -844,8 +722,8 @@ else if(operation == "-v"){
 
 //Add app dependency
 else if(operation == "add"){
-    var manifest = getManifest();
-    var ext = extensions(manifest["project-type"]);
+    var manifest = utils.getManifest();
+    var ext = utils.extensions(manifest["project-type"]);
     var type = manifest["project-type"];
     // operand = operand.endsWith(ext) ? operand :operand+ext;
     if(fs.existsSync(path.join(projectDefinitions[type].modulesPath,operand)) && manifest.extraModules.indexOf(operand) == -1){
@@ -871,15 +749,15 @@ else if(operation == "add"){
         }
     }
 
-    makeManifest(manifest);
+    utils.makeManifest(manifest);
 }
 
 //Development
 
 else if(operation == "run-dev" || operation == "development"){
     console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
-    var manifest = getManifest();
-    s = server.Start(3100)
+    var manifest = utils.getManifest();
+    s = server.Start(3100);
     //declare websocket for refreshing web page.
     var ws = new websocket.server({
         httpServer: s
@@ -890,39 +768,21 @@ else if(operation == "run-dev" || operation == "development"){
         // connection.send("refresh")
         c = connection;
     })
-    
-    if(manifest["project-type"] == "vue"){
-        server.Source = path.join(process.cwd(),"dist");
-        compile(c)
-        fs.watch(path.join(process.cwd(),"src"),{
-            recursive: true
-        }, ()=>{
-            compile(c)
-            // refresh(c)
-            // c.send("refresh")
-        })
-    }else if(manifest["project-type"] == "react"){
-        server.Source = path.join(process.cwd(),"build");
-        compile(c)
-        fs.watch(path.join(process.cwd(),"src"),{
-            recursive: true
-        }, ()=>{
-            compile(c)
-            // refresh(c)
-            // c.send("refresh")
-        })
-    }else{
-        writeDev(process.cwd())
-        server.Source = path.join(process.cwd(),"www");
-        compile(c)
-        fs.watch(path.join(process.cwd(),"app"),{
-            recursive: true
-        }, ()=>{
-            compile(c)
-            // refresh(c)
-            // c.send("refresh")
-        })
+
+    var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;
+    var AR /*app root */    = projectDefinitions[manifest["project-type"]].root;
+    var PT /*project type*/ = manifest["project-type"];
+    if(PT == "javascript" || PT == "typescript"){
+        utils.writeDev(process.cwd());
     }
+    // console.log(path.join(process.cwd(),AR))
+    server.Source = path.join(process.cwd(),SR);
+    utils.compile(c)
+    fs.watch(path.join(process.cwd(),AR),{
+        recursive: true
+    }, ()=>{
+        utils.compile(c)
+    })
 }
 
 else if(operation == "check-update"){
@@ -1007,13 +867,13 @@ else if(operation == "publish"){
 }
 
 else if(operation == "build"){
-    quietCompile(build);
+    utils.quietCompile(utils.build);
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){
-    usage("*");
+    utils.usage("*");
 }
 
 else {
-    usage("*");
+    utils.usage("*");
 }

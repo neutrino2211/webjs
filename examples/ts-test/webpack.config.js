@@ -9,7 +9,7 @@ module: {
     rules:[
         {
             test: /.ts?$/,
-            use: "C:/Users/ADMIN/Desktop/WebJS/node_modules/ts-loader"
+            use: "ts-loader"
         }
     ]
 },
