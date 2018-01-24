@@ -610,7 +610,7 @@ app.load(Application)
 
 * Added module publishinng
 
-* Added [documentation for module creations](docs/Modules/introduction.md)
+* Added [documentation for module creation](docs/Modules/introduction.md)
 
 ### wjs-cli@0.1.4
 
