@@ -6,7 +6,7 @@
 	"last-update": "updates.update-0-1-4_000",
 	"wjs:installedModules": {},
 	"version": "0.1.4",
-	"description": "An app creator ",
+	"description": "An Android and Web App creation tool",
 	"main": "index.js",
 	"scripts": {
 		"postinstall": "node bin/webpack-check.js",

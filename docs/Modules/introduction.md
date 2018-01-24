@@ -193,4 +193,4 @@ module.exports = function(cwd,args){
 
 ## Package and publish
 
-Run `wjs publish <name>` where name is the folder the module code is in
+Run `wjs publish <name> --type=<type>` where name is the folder the module code is in and type is the type of module (`taskEngine` for task and `module` for a module)
