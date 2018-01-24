@@ -289,7 +289,7 @@ else if(operation == "publish"){
 
     var destinationZip = path.join(process.cwd(),operand+".zip");
 
-    zip.addLocalFolder(path.join(process.cwd(),operand));
+    zip.addLocalFolder(operand);
 
     Progress.update(10);
     
@@ -308,7 +308,7 @@ else if(operation == "publish"){
     var TYPE = utils.flags().type||"updates";
     // console.log(type);
     var bucket = storage.bucket("webjs-f76df.appspot.com");
-    var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand},function(e,f){
+    var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
         // console.log(f)
         if(e){
             print(chalk.red(""+e))
