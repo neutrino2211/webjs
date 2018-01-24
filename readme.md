@@ -12,7 +12,7 @@
 
 * Run `wjs -v` to confirm installation
 
-* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`(coming soon)  or leave app type out to initialize a javascript project
+* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`  or leave app type out to initialize a javascript project
 
 * Run `cd <app-name> && wjs development` to start the development server
 
@@ -20,6 +20,14 @@
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
 Check out [how to make a module](docs/Modules/introduction.md)
+
+* Use `wjs install <package-name>` to install a package, which is either a module or task runner 
+
+* To create an app with an android project in its directory use `wjs init <app-name> <app-type> --local` which makes a native project directory in your app folder, and to allow editing the android source code use `wjs init <app-name> <app-type> --local --package=<app-package-name>` which generates the default wjs android source
+
+* Use `wjs tasks` to see installed task runners
+
+* Use `wjs run <task-alias>` to run the task
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 
@@ -588,17 +596,33 @@ app.load(Application)
 
 ### wjs-cli@0.1.1
 
+* Bug fix
+
+### wjs-cli@0.1.2
+
 * Added update feature
 
 * Bug fix
 
-### wjs-cli@0.1.2
+### wjs-cli@0.1.3
 
 * Support for Android ^5.0.0
 
 * Added module publishinng
 
-* Added [documentation for module creations](docs/Modules/introduction.md)
+* Added [documentation for module creation](docs/Modules/introduction.md)
+
+### wjs-cli@0.1.4
+
+* Fixed change-log error in readme
+
+* Added task runner features
+
+* Modularized source code
+
+* Added option to initialize a local (Personal) project option
+
+* Added contributing.md
 
 ### Coming soon
 

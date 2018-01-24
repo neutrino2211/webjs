@@ -1,5 +1,0 @@
-{
-    "flame": {
-        "build": "../modules/flame/index.js"
-    }
-}

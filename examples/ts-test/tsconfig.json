@@ -1,15 +1,15 @@
 {
-            "compilerOptions":{
-                "noImplicitAny": false,
-                "removeComments": true,
-                "preserveConstEnums": true,
-                "experimentalDecorators": true,
-                "allowJs": true,
-                "module": "es6",
-                "target": "ES2015"
-            },
-            "include":[
-                "app/**/*"
-            ]
-        }
+    "compilerOptions":{
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "allowJs": true,
+        "module": "es6",
+        "target": "ES2015"
+    },
+    "include":[
+        "app/**/*"
+    ]
+}
         

@@ -133,14 +133,64 @@ public class MainActivity extends AppCompatActivity{
 
 ```
 
+and modules for different types of projects are stored in seperate locations
+
+* `Java` modules are stored in `resources/java`
+* `Javascript` modules are stored in `resources/WTS`
+* `Typescript` modules are stored in `resources/Typescript`
+* `Vue` and `React` modules are stored in `resources/vue-modules`
+
 ## module.conf 
 
-For any module that is dependent on a specific update or wjs-cli version, make a `module.conf` file in the module folder and put the version required
+module.conf is a configuration file for your module.
+current fields are:
+* `name`: this is an alias for your module (Only use this in taskRunners)
+* `type`: this is the type of your module (Use `task` for task runners)
+* `engine`: this is the main file for your module (Only use this for task runners)
+* `requires`: this is the minimum update version your module needs to run 
+
+### Examples
+
+#### Module
+
+Configuration file.
 
 ```conf
-requires = <update-version> #e.g updates.update-0-1-3_001
+requires = <update-version>
+```
+Install.js
+
+```js
+var path = require("path");
+
+global.unpackTo(path.join(__dirname,"myModule.js"),"resources/module-type-directory/myModule.js")
+```
+
+#### Task
+
+Configuration file
+
+```conf
+name = <alias>
+type = "task"
+engine = <relative-path-to-file>
+#version requirements if any
+requires = <update-version?>
+```
+
+Engine file
+
+```js
+/**
+ * cwd is the directory the task is running in
+ * args is the command line arguments converted to an object e.g the arguments of
+ * wjs run <your-task> --print --text="Hello World" will be {print:true,text:"Hello World"}
+ */
+module.exports = function(cwd,args){
+    console.log("Hi i am running in "+cwd+" and the option print is "+args.print+" with text as "+args.text);
+}
 ```
 
 ## Package and publish
 
-Run `wjs publish <name>` where in our case name is update-0-1-3_001
+Run `wjs publish <name> --type=<type>` where name is the folder the module code is in and type is the type of module (`taskEngine` for task and `module` for a module)

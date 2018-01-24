@@ -1,5 +1,17 @@
 {
     "project-type" : "typescript",
     "compileCommand" : "webpack",
-    "extraModules": []
+    "root": "www",
+    "local": true,
+	"custom" : true,
+    "extraModules": [],
+    "android": {
+        "app_name": "TS test",
+        "package": "com.wjs.test.tstest",
+        "color": {
+            "accent": "#eeeeee",
+            "primary": "#eeeeee",
+            "primaryDark": "#eeeeee"
+        }
+    }
 }
