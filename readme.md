@@ -12,7 +12,7 @@
 
 * Run `wjs -v` to confirm installation
 
-* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`(coming soon)  or leave app type out to initialize a javascript project
+* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`  or leave app type out to initialize a javascript project
 
 * Run `cd <app-name> && wjs development` to start the development server
 
@@ -20,6 +20,8 @@
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
 Check out [how to make a module](docs/Modules/introduction.md)
+
+* To create an app with an android project in its directory use `wjs init <app-name> <app-type> --local` and to allow editing the android source code use `wjs init <app-name> <app-type> --local --package=<app-package-name>`
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 

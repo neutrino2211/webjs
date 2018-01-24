@@ -141,35 +141,16 @@ else if(operation == "install"){
         process.exit()
     }
 
-    var config = {
-        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
-        authDomain: "webjs-f76df.firebaseapp.com",
-        databaseURL: "https://webjs-f76df.firebaseio.com",
-        projectId: "webjs-f76df",
-        storageBucket: "webjs-f76df.appspot.com",
-        messagingSenderId: "404258524081"
-    };
-    var app = firebase.initializeApp(config);
-    var databaseRef = app.database().ref();
-    var package = require(path.join(__dirname,"../package.json"));
-    // console.log(flags().update.slice(-4))
-    var updateVersion = "update-"+package.version.replace(/\./g,"-");
-    var latestVersion = databaseRef.child(updateVersion);
-    // console.log(latestVersion.);
-    latestVersion.on("value",function(snapshot){
-        var ver = "updates."+updateVersion+"_"+operand.split(".").join("");
-        console.log(chalk.green("Installing  "+operand));
-        Install(ver).Then = function(err,p){
-            if(err){
-                console.log(""+err);
-                console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-                process.exit(3);
-            }else{
-                console.log(`Update complete`)
-            }
-            process.exit()
+    Install(operand).Then = function(err,p){
+        if(err){
+            console.log(chalk.red(""+err));
+            console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+            process.exit(3);
+        }else{
+            console.log(`Download complete`)
         }
-    })
+        process.exit()
+    }
     
 }
 
@@ -296,13 +277,25 @@ else if(operation == "publish"){
         process.exit()
     }
 
+    var term = require("terminal-kit").terminal;
+    var Progress = term.progressBar({
+        width: 80,
+        title: "Publishing module",
+        eta: true,
+        percent: true
+    });
+
+    Progress.update(0)
+
     var destinationZip = path.join(process.cwd(),operand+".zip");
 
     zip.addLocalFolder(path.join(process.cwd(),operand));
+
+    Progress.update(10);
     
     zip.writeZip(destinationZip);
 
-    var term = require("terminal-kit").terminal;
+    Progress.update(20);
 
     var gcs = require('@google-cloud/storage');
 
@@ -312,15 +305,10 @@ else if(operation == "publish"){
         keyFileName: path.join(__dirname,'../gcloud.json')
     });
 
-    var Progress = term.progressBar({
-        width: 80,
-        title: "Publishing module",
-        eta: true,
-        percent: true
-    });
-
+    var TYPE = utils.flags().type||"updates";
+    // console.log(type);
     var bucket = storage.bucket("webjs-f76df.appspot.com");
-    var upload = bucket.upload(destinationZip,{destination: "updates/"+operand},function(e,f){
+    var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand},function(e,f){
         // console.log(f)
         if(e){
             print(chalk.red(""+e))
@@ -331,11 +319,20 @@ else if(operation == "publish"){
             print(chalk.green("Published "+operand))
         }
     })
-    Progress.update(0);
 }
 
 else if(operation == "build"){
     utils.quietCompile(utils.build);
+}
+
+else if(operation == "run"){
+    var p = require(path.join(__dirname,"../package.json"));
+    if(p["wjs:installedModules"][operand]){
+        var m = require(p["wjs:installedModules"][operand]);
+        m(process.cwd())
+    }else{
+        console.log(chalk.red("Can not find module ("+operand+")"))
+    }
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){

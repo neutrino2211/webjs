@@ -153,11 +153,13 @@ exports.parseConf = function(file){
 
     var a = contents.split("\n");
     a.forEach(function(kv){
-        /*kva means Key-Value-Array*/
-        var kva = kv.split("=");
-        var key = kva[0].trim();
-        var value = kva[1].trim();
-        kvm[key] = value;
+        if(!kv.trim().startsWith("#")){
+            /*kva means Key-Value-Array*/
+            var kva = kv.split("=");
+            var key = kva[0].trim();
+            var value = kva[1].trim();
+            kvm[key] = value;
+        }
     })
 
     return kvm;

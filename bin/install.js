@@ -1,3 +1,6 @@
+var fs        = require("fs-extra");
+var path      = require("path");
+var changeDir = require("./utils").changeDir;
 var parseConf = require("./utils").parseConf;
 
 module.exports = function Install(operand){
@@ -18,6 +21,7 @@ module.exports = function Install(operand){
 
     var bucket = storage.bucket("webjs-f76df.appspot.com");
     console.log("Downloading...")
+    console.log(wjsModule+".zip")
     bucket.file(wjsModule+".zip").download({
         destination: modulePath
     },(err)=>{
@@ -36,10 +40,15 @@ module.exports = function Install(operand){
                 var conf = parseConf(path.join(modulesPath,operand.split(".")[1],"module.conf"));
                 var package = require(path.join(__dirname,"../package.json"));
                 // console.log(package)
-                if(package["last-update"] != conf.requires){
+                if(conf.requires && package["last-update"] != conf.requires){
                     var updateVersion = "update-"+package.version.replace(/\./g,"-");
-                    console.log(chalk.red("Error : This download requires "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
+                    console.log(chalk.red("Error : This download requires update version "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
                     process.exit(9);
+                }
+
+                if(conf.type === "module"){
+                    package["wjs:installedModules"][conf.name] = path.join(modulesPath,operand.split(".")[1],conf.engine);
+                    fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,undefined,"\t"));
                 }
             }
             if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"install.js")))
