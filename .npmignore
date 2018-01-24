@@ -4,7 +4,6 @@ backup
 node_modules
 resources/Typescript/angular
 resources/update-*
-modules/*
 *.keystore
 *.keystore.old
 *.log

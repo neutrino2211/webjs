@@ -4,9 +4,7 @@
 		"wjs": "./bin/wjs.js"
 	},
 	"last-update": "updates.update-0-1-4_000",
-	"wjs:installedModules": {
-		"hello": "C:\\Users\\ADMIN\\Desktop\\WebJS\\modules\\taskEngines.HelloRunner\\engine.js"
-	},
+	"wjs:installedModules": {},
 	"version": "0.1.4",
 	"description": "An app creator ",
 	"main": "index.js",
