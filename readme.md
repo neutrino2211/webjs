@@ -596,17 +596,33 @@ app.load(Application)
 
 ### wjs-cli@0.1.1
 
+* Bug fix
+
+### wjs-cli@0.1.2
+
 * Added update feature
 
 * Bug fix
 
-### wjs-cli@0.1.2
+### wjs-cli@0.1.3
 
 * Support for Android ^5.0.0
 
 * Added module publishinng
 
 * Added [documentation for module creations](docs/Modules/introduction.md)
+
+### wjs-cli@0.1.4
+
+* Fixed change-log error in readme
+
+* Added task runner features
+
+* Modularized source code
+
+* Added option to initialize a local (Personal) project option
+
+* Added contributing.md
 
 ### Coming soon
 
