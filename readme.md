@@ -21,7 +21,13 @@
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
 Check out [how to make a module](docs/Modules/introduction.md)
 
-* To create an app with an android project in its directory use `wjs init <app-name> <app-type> --local` and to allow editing the android source code use `wjs init <app-name> <app-type> --local --package=<app-package-name>`
+* Use `wjs install <package-name>` to install a package, which is either a module or task runner 
+
+* To create an app with an android project in its directory use `wjs init <app-name> <app-type> --local` which makes a native project directory in your app folder, and to allow editing the android source code use `wjs init <app-name> <app-type> --local --package=<app-package-name>` which generates the default wjs android source
+
+* Use `wjs tasks` to see installed task runners
+
+* Use `wjs run <task-alias>` to run the task
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 

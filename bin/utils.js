@@ -15,11 +15,15 @@ var resourcesPath      = path.join(__dirname,"../resources");
 var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def");
 
-exports.flags = function(){
+/**
+ * @argument {Array<String>} args
+ */
+
+exports.flags = function(args){
     var FLAGS = [];
     var map = {};
 
-    process.argv.forEach((f)=>{
+    (args||process.argv).forEach((f)=>{
         if(f.startsWith("--")){
             FLAGS.push(f);
         }
@@ -28,8 +32,8 @@ exports.flags = function(){
     FLAGS.forEach((f)=>{
         if(f.indexOf("=") > 0){
             var v = f.slice(2).split("=")[1];
-            if(f.slice(2).split("=")[1].indexOf(",") > -1){
-                v = f.slice(2).split("=")[1].split(",");
+            if(v.startsWith('"') && v.endsWith('"')){
+                v = v.slice(1,v.length-2);
             }
             map[f.slice(2).split("=")[0]] = v;
         }else{
@@ -86,7 +90,9 @@ exports.usage = function(name){
         init: "wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
         update: "wjs update <version?>\nIf you need to install a specific version, run \n wjs update --version=<update-version>",
         "check-update": "wjs check-update",
-        install : "wjs install <module>"
+        install : "wjs install <module>",
+        tasks: "wjs tasks",
+        run: "wjs run <task-alias>\nrun "+chalk.green("wjs tasks")+" to see installed task runners"
     }
     if(name == "*"){
         print("Usage:")

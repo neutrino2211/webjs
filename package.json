@@ -3,7 +3,7 @@
 	"bin": {
 		"wjs": "./bin/wjs.js"
 	},
-	"last-update": "updates.update-0-1-3_000",
+	"last-update": "updates.update-0-1-4_000",
 	"wjs:installedModules": {
 		"hello": "C:\\Users\\ADMIN\\Desktop\\WebJS\\modules\\taskEngines.HelloRunner\\engine.js"
 	},

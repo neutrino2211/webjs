@@ -46,7 +46,7 @@ module.exports = function Install(operand){
                     process.exit(9);
                 }
 
-                if(conf.type === "module"){
+                if(conf.type === "task"){
                     package["wjs:installedModules"][conf.name] = path.join(modulePath.slice(0,modulePath.length-4),conf.engine);
                     // console.log(package)
                     fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,undefined,"\t"));

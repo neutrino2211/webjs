@@ -32,6 +32,8 @@ var refreshMode        = "initial";
 if(args.length > 0){
     var operation = args[0];
     var operand   = args[1];
+}else{
+    console.log(chalk.red("No arguments"))
 }
 
 
@@ -326,13 +328,34 @@ else if(operation == "build"){
 }
 
 else if(operation == "run"){
+    try{
+        utils.checkArg(1)
+        // checkArg(2)
+
+    }catch(e){
+        utils.usage("run");
+        process.exit(1)
+    }
     var p = require(path.join(__dirname,"../package.json"));
     if(p["wjs:installedModules"][operand]){
         var m = require(p["wjs:installedModules"][operand]);
-        m(process.cwd())
+        m(process.cwd(),utils.flags(args.slice(2)))
     }else{
         console.log(chalk.red("Can not find module ("+operand+")"))
     }
+}
+
+else if(operation == "tasks"){
+    var p = require(path.join(__dirname,"../package.json"));
+    var m = p["wjs:installedModules"];
+    var modules = Object.getOwnPropertyNames(m);
+    if(modules.length == 0){
+        console.log(chalk.red("No tasks installed"));
+        process.exit()
+    }
+    modules.forEach(function(name){
+        console.log(chalk.green(name)+chalk.yellow(" -> ")+chalk.blue(m[name]))
+    })
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){
