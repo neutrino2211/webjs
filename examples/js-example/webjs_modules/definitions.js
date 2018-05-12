@@ -1,4 +1,4 @@
-import { $ } from "core";
+import { $ } from "./web";
 
 export function WJSModule(options){
     $(document.body).load(options.template.startsWith("/") ? options.template : "/"+options.template);

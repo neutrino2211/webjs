@@ -17,14 +17,12 @@ export function WJSModule(options){
 export class TemplateApplication{
     constructor(){
         console.log("Ready")
-        document.addEventListener("__INIT__",()=>{
-            this.onTemplateLoad();
-        });
     }
 
     onViewLoad(){
         $("body").append(this.template)
-        document.dispatchEvent(new Event("__INIT__"))
+        this.onTemplateLoad();
+        // document.dispatchEvent(new Event("__INIT__"))
         // this.ovl();
         // window.WJS_PAGE_STATE = 1;
     }

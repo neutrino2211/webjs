@@ -1,5 +1,5 @@
 import { $ } from "./web";
-
+window.WJS_APP_NAMESPACE = {};
 export function load(appClass){
     var application = new appClass();
     application.onViewLoad();
@@ -11,6 +11,14 @@ export function title(title){
     t.innerText = title
 
     document.head.appendChild(t)
+}
+
+export function isNativeEnvironment(){
+    return window.native?true:false;
+}
+
+export function nativeCallback(fn){
+    return URL.createObjectURL(new Blob(["("+fn+")()"]));
 }
 
 export var events = {
@@ -47,6 +55,14 @@ export function parseHTML(string) {
     var parser = new DOMParser();
     var doc = parser.parseFromString(string, "text/html");
     return doc;
+}
+
+export function store(name,data){
+    window.WJS_APP_NAMESPACE[name] = data;
+}
+
+export function get(name){
+    return window.WJS_APP_NAMESPACE[name];
 }
 
 export function JSX(fu, ...args) {

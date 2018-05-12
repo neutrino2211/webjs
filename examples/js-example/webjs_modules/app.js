@@ -1,20 +1,20 @@
-import { build,$,modules } from "core";
+import { build,$,modules } from "./web";
 
 // var require : any;
-var process ;
-var pageRoot;
-var bodyElement;
-var e = ['nav', 'input', 'video', 'image', 'form', 'audio'];
-this.elements = e;
-this.bodyElement;
-this.layout = document;
-this.loadBackend = function(path){
-    if(typeof process == "object"){
-        build(path);
-    }else{
-        console.log("Environment does not support backend")
-    }
-}
+// var process ;
+// var pageRoot;
+// var bodyElement;
+// var e = ['nav', 'input', 'video', 'image', 'form', 'audio'];
+// this.elements = e;
+// this.bodyElement;
+// this.layout = document;
+// this.loadBackend = function(path){
+//     if(typeof process == "object"){
+//         build(path);
+//     }else{
+//         console.log("Environment does not support backend")
+//     }
+// }
 
 export function load(appClass){
     var application = new appClass();
@@ -204,7 +204,7 @@ export function socket(proto) {
     }
 
     function f(s, callback) {
-        var event = s.trim().toLowerCase();
+        var event = s.trim();
         if (event == 'message') {
             sock.onmessage = callback;
         } else if (event == 'connection') {

@@ -1,0 +1,20 @@
+{
+  "name": "parcel-angular-template",
+  "version": "2.0.0",
+  "description": "Angular template for parcel",
+  "main": "index.js",
+  "dependencies": {
+    "@angular/common": "^6.0.0",
+    "@angular/compiler": "^6.0.0",
+    "@angular/core": "^6.0.0",
+    "@angular/forms": "^6.0.0",
+    "@angular/platform-browser": "^6.0.0",
+    "@angular/platform-browser-dynamic": "^6.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
+    "core-js": "^2.5.2",
+    "rxjs": "^5.5.5",
+    "systemjs": "^0.20.19",
+    "zone.js": "^0.8.18",
+    "typescript": "^2.6.2"
+  }
+}

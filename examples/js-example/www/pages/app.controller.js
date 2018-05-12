@@ -1,6 +1,5 @@
 import * as reflex from "../reflex.component";
-import { WJSModule } from "wjs/definitions";
-import * as wjs from "core";
+import { WJSModule } from "../../webjs_modules/definitions";
 
 export default class Controller{
     /**

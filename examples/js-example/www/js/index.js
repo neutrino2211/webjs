@@ -70,12 +70,12 @@
 "use strict";
 /* unused harmony export body */
 /* unused harmony export styleSheet */
-/* harmony export (immutable) */ __webpack_exports__["b"] = build;
+/* unused harmony export build */
 /* unused harmony export use */
 /* unused harmony export print */
 /* unused harmony export entry */
 const modules = {};
-/* harmony export (immutable) */ __webpack_exports__["c"] = modules;
+/* harmony export (immutable) */ __webpack_exports__["b"] = modules;
 
 const $ = window.$;
 /* harmony export (immutable) */ __webpack_exports__["a"] = $;
@@ -126,24 +126,24 @@ function entry(func){
 /* unused harmony export loadJSX */
 /* unused harmony export globalModule */
 /* unused harmony export append */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__web__ = __webpack_require__(0);
 
 
 // var require : any;
-var process ;
-var pageRoot;
-var bodyElement;
-var e = ['nav', 'input', 'video', 'image', 'form', 'audio'];
-this.elements = e;
-this.bodyElement;
-this.layout = document;
-this.loadBackend = function(path){
-    if(typeof process == "object"){
-        Object(__WEBPACK_IMPORTED_MODULE_0_core__["b" /* build */])(path);
-    }else{
-        console.log("Environment does not support backend")
-    }
-}
+// var process ;
+// var pageRoot;
+// var bodyElement;
+// var e = ['nav', 'input', 'video', 'image', 'form', 'audio'];
+// this.elements = e;
+// this.bodyElement;
+// this.layout = document;
+// this.loadBackend = function(path){
+//     if(typeof process == "object"){
+//         build(path);
+//     }else{
+//         console.log("Environment does not support backend")
+//     }
+// }
 
 function load(appClass){
     var application = new appClass();
@@ -213,7 +213,7 @@ function createPageRoot(){
     iframe.style.width  = "100%";
     iframe.style.paddingTop = (window.innerHeight/10)+"px";
 
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(bodyElement).append(iframe)
+    Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(bodyElement).append(iframe)
     pageRoot = iframe;
     // iframe.contentWindow
 }
@@ -318,7 +318,7 @@ function add (str) {
     }
 }
 function jQ(e) {
-    return Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(e);
+    return Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(e);
 }
 function socket(proto) {
     if (!proto) {
@@ -333,7 +333,7 @@ function socket(proto) {
     }
 
     function f(s, callback) {
-        var event = s.trim().toLowerCase();
+        var event = s.trim();
         if (event == 'message') {
             sock.onmessage = callback;
         } else if (event == 'connection') {
@@ -410,16 +410,16 @@ function openPage (page) {
     },1000)
 }
 function loadJSX(jsx) {
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(bodyElement).append(jsx);
+    Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(bodyElement).append(jsx);
 }
 function globalModule(m) {
-    var properties = Object.getOwnPropertyNames(__WEBPACK_IMPORTED_MODULE_0_core__["c" /* modules */][m]);
+    var properties = Object.getOwnPropertyNames(__WEBPACK_IMPORTED_MODULE_0__web__["b" /* modules */][m]);
     properties.forEach(function(p) {
-        window[p] = __WEBPACK_IMPORTED_MODULE_0_core__["c" /* modules */][m][p];
+        window[p] = __WEBPACK_IMPORTED_MODULE_0__web__["b" /* modules */][m][p];
     })
 }
 function append (element) {
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(bodyElement).append(element)
+    Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(bodyElement).append(element)
 };
 
 
@@ -429,11 +429,11 @@ function append (element) {
 
 "use strict";
 /* unused harmony export WJSModule */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__web__ = __webpack_require__(0);
 
 
 function WJSModule(options){
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(document.body).load(options.template.startsWith("/") ? options.template : "/"+options.template);
+    Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(document.body).load(options.template.startsWith("/") ? options.template : "/"+options.template);
     var p = new options.controller(document);
     (options.styleSheets ? options.styleSheets : []).forEach(function(element) {
         var css = document.createElement("link");
@@ -441,7 +441,7 @@ function WJSModule(options){
         css.href = element;
         document.head.appendChild(css);
     }, this);
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(document.body).ready(function(){
+    Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])(document.body).ready(function(){
         p.onViewLoad();
     })
 }
@@ -455,7 +455,7 @@ class TemplateApplication{
     }
 
     onViewLoad(){
-        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("body").append(this.template)
+        Object(__WEBPACK_IMPORTED_MODULE_0__web__["a" /* $ */])("body").append(this.template)
         document.dispatchEvent(new Event("__INIT__"))
         // this.ovl();
         // window.WJS_PAGE_STATE = 1;
@@ -497,7 +497,7 @@ class TemplateApplicationPage{
 /* unused harmony export floatingActionButton */
 /* unused harmony export ui */
 /* unused harmony export colors */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__web_js__ = __webpack_require__(0);
 
 
 function icons(name){
@@ -556,7 +556,7 @@ function introduceElement(element,parent){
         document.body.appendChild(element)
     }
 
-    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element).animate({
+    Object(__WEBPACK_IMPORTED_MODULE_0__web_js__["a" /* $ */])(element).animate({
         height: initialH,
         width : initialW
     },400)
@@ -781,8 +781,8 @@ var TransitioningFloatingActionButton = new __WEBPACK_IMPORTED_MODULE_0__reflex_
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Reflex; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wjs_app__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_core__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__webjs_modules_app_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_web_js__ = __webpack_require__(0);
 
 
 
@@ -846,7 +846,7 @@ class component {
                 // }
             })
             // console.log(tags[i])
-            var b = Object(__WEBPACK_IMPORTED_MODULE_0_wjs_app__["b" /* parseHTML */])((self.__parse != "")?self.__parse:self.__html).body.children;
+            var b = Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_app_js__["b" /* parseHTML */])((self.__parse != "")?self.__parse:self.__html).body.children;
             console.log()
             for(var j=0;j<b.length;j++){
                 // console.log(self.__parse);
@@ -928,7 +928,7 @@ class HTMLRenderer {
             renderers = renderers[0];
             window.__renderers = renderers;
         }
-        __WEBPACK_IMPORTED_MODULE_1_core__["a" /* $ */].get(this.__page,function(html){
+        __WEBPACK_IMPORTED_MODULE_1__webjs_modules_web_js__["a" /* $ */].get(this.__page,function(html){
             // console.log(html)
             // var doc = parseHTML(html);
             // console.log(doc);
@@ -958,7 +958,7 @@ class HTMLRenderer {
         if(Array.isArray(renderers[0])){
             renderers = renderers[0];
         }
-        __WEBPACK_IMPORTED_MODULE_1_core__["a" /* $ */].get(this.__page,function(html){
+        __WEBPACK_IMPORTED_MODULE_1__webjs_modules_web_js__["a" /* $ */].get(this.__page,function(html){
             // console.log(html)
             // var doc = parseHTML(html);
             // console.log(doc);
@@ -992,14 +992,17 @@ var Reflex = {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_core__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_app__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_app__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__webjs_modules_definitions__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__webjs_modules_material__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_app_controller__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__reflex_module__ = __webpack_require__(5);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__reflex_component__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__webjs_modules_media__ = __webpack_require__(8);
 //Declare imports here.
+
+
 
 
 
@@ -1020,10 +1023,10 @@ class Application {
     //Your apps entry point
     onViewLoad(){
         // document.body.style.background = "linear-gradient(#009688)";
-        __WEBPACK_IMPORTED_MODULE_1_wjs_app__["c" /* title */]("Tsowa Mainasara Al-amin")
+        __WEBPACK_IMPORTED_MODULE_1__webjs_modules_app__["c" /* title */]("Tsowa Mainasara Al-amin")
         document.body.style.overflowX = "hidden";
         // document.body.style.overflowY = "scroll";
-        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("head").append("<link rel='stylesheet' href='pages/page.css'/>")
+        Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])("head").append("<link rel='stylesheet' href='pages/page.css'/>")
         function sms(number, message){
             if(typeof native !== "undefined"){
                 native.sms(number,message);
@@ -1034,11 +1037,11 @@ class Application {
 
         function AnimateRotate(e,angle) {
             // caching the object for performance reasons
-            var $elem = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(e);
+            var $elem = Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(e);
         
             // we use a pseudo object for the animation
             // (starts from `0` to `angle`), you can name it as you want
-            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])({deg: 0}).animate({deg: angle}, {
+            Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])({deg: 0}).animate({deg: angle}, {
                 duration: 200,
                 step: function(now) {
                     // in the step-callback (that is fired each step of the animation),
@@ -1052,7 +1055,7 @@ class Application {
         }
 
         var HomePage = new __WEBPACK_IMPORTED_MODULE_5__reflex_module__["a" /* Reflex */].HTMLRenderer("./pages/app.reflex.html");
-        
+        // 1. No source
         HomePage.render(
             {
                 component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["c" /* Footer */],
@@ -1062,16 +1065,21 @@ class Application {
                 component: __WEBPACK_IMPORTED_MODULE_6__reflex_component__["h" /* Skill */],
                 tag: "skill",
                 onRender(elements){
+                    var p = new __WEBPACK_IMPORTED_MODULE_7__webjs_modules_media__["a" /* Photo */]();
+                    // alert(p)
+                    p.capture(function(file){
+                        console.log(file)
+                    })
                     var animated = true;
                     var l = elements[0].children[0].style.width;
                     elements[0].children[0].style.width = "0%";
-                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scroll(function(){
-                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scrollTop()+innerHeight;
+                    Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(window).scroll(function(){
+                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(window).scrollTop()+innerHeight;
 
                         // console.log($pos,$(elements[0]).offset().top)
 
-                        if($pos > Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0]).offset().top && animated){
-                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0].children[0]).animate({
+                        if($pos > Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(elements[0]).offset().top && animated){
+                            Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(elements[0].children[0]).animate({
                                 width: l
                             },400);
                             animated = false;
@@ -1084,32 +1092,32 @@ class Application {
                 tag: "app-transitioning-fab",
                 onRender(element){
                     var deg = 0;
-                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scroll(function(ev){
+                    Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(window).scroll(function(ev){
                         // console.log($(window).scrollTop())
-                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(window).scrollTop();
+                        var $pos = Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(window).scrollTop();
                         // console.log($pos,$("#header").offset().top)
-                        if($pos < Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#my-name").offset().top && deg != 0){
+                        if($pos < Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])("#my-name").offset().top && deg != 0){
                             AnimateRotate(element[0],0);
                             deg = 0;
-                        }else if($pos > Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#my-name").offset().top && deg != 180){
+                        }else if($pos > Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])("#my-name").offset().top && deg != 180){
                             AnimateRotate(element[0],180);
                             deg = 180;
                         }
                     })
 
                     // console.log(element)
-                    Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element[0]).click(function(){
+                    Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(element[0]).click(function(){
                         deg = (deg == 180)?0:180;
                         AnimateRotate(element[0],deg);
                         if(deg != 0){
-                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])('html,body').animate({ scrollTop: Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])("#header").offset().top }, 'slow');
+                            Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])('html,body').animate({ scrollTop: Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])("#header").offset().top }, 'slow');
                         }else{
-                            Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])('html,body').animate({ scrollTop: 0 }, 'slow');
+                            Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])('html,body').animate({ scrollTop: 0 }, 'slow');
                         }
                         return false;
                     })
                     setTimeout(function(){
-                        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(element[0]).removeClass("scale-out");
+                        Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(element[0]).removeClass("scale-out");
                     },500)
                 }
             },
@@ -1119,7 +1127,7 @@ class Application {
                 onRender(elements){
                     // $(elements[0]).carousel();
                     setTimeout(function(){
-                        Object(__WEBPACK_IMPORTED_MODULE_0_core__["a" /* $ */])(elements[0].children[1]).removeClass("scale-out").addClass("scale-in");
+                        Object(__WEBPACK_IMPORTED_MODULE_0__webjs_modules_web__["a" /* $ */])(elements[0].children[1]).removeClass("scale-out").addClass("scale-in");
                     },500);
                 }
             },
@@ -1135,7 +1143,7 @@ class Application {
     }
 }
 
-__WEBPACK_IMPORTED_MODULE_1_wjs_app__["a" /* load */](Application)
+__WEBPACK_IMPORTED_MODULE_1__webjs_modules_app__["a" /* load */](Application)
         
 
 /***/ }),
@@ -1144,9 +1152,7 @@ __WEBPACK_IMPORTED_MODULE_1_wjs_app__["a" /* load */](Application)
 
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__reflex_component__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_wjs_definitions__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_core__ = __webpack_require__(0);
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__webjs_modules_definitions__ = __webpack_require__(2);
 
 
 
@@ -1169,6 +1175,95 @@ class Controller{
     }
 }
 /* unused harmony export default */
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+class Photo {
+    constructor() {
+        this.mediaInput = document.createElement("input");
+        this.mediaInput.type = "file";
+        this.mediaInput.accept = "image/*";
+        this.mediaInput.setAttribute("capture","user");
+        alert("Init");
+        document.body.appendChild(this.mediaInput)
+    }
+
+    onComplete(callback){
+        this.callback = callback;
+    }
+
+    capture(callback){
+        var self = this;
+        this.mediaInput.click()
+
+        this.mediaInput.onchange = function(){
+            if(callback){
+                callback(self.mediaInput.files[0])
+            }else{
+                alert(self.mediaInput.files[0])
+            }
+        }
+    }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Photo;
+
+
+class Video {
+    constructor() {
+        this.mediaInput = document.createElement("input");
+        this.mediaInput.type = "file";
+        this.mediaInput.accept = "video/*;capture=camcorder";
+    }
+
+    onComplete(callback){
+        this.callback = callback;
+    }
+
+    capture(){
+        var self = this;
+        this.mediaInput.click()
+
+        this.mediaInput.onchange = function(){
+            if(self.callback){
+                self.callback(self.mediaInput.files[0])
+            }else{
+                alert(self.mediaInput.files[0])
+            }
+        }
+    }
+}
+/* unused harmony export Video */
+
+
+class Audio {
+    constructor() {
+        this.mediaInput = document.createElement("input");
+        this.mediaInput.type = "file";
+        this.mediaInput.accept = "audio/*;capture=microphone";
+    }
+
+    onComplete(callback){
+        this.callback = callback;
+    }
+
+    capture(){
+        var self = this;
+        this.mediaInput.click()
+
+        this.mediaInput.onchange = function(){
+            if(self.callback){
+                self.callback(self.mediaInput.files[0])
+            }else{
+                alert(self.mediaInput.files[0])
+            }
+        }
+    }
+}
+/* unused harmony export Audio */
 
 
 /***/ })

@@ -14,9 +14,11 @@ var resize_image       = require("resize-img");
 var resourcesPath      = path.join(__dirname,"../resources");
 var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def");
+var Parcel = require("parcel")
 
 /**
  * @argument {Array<String>} args
+ * @description Turn command line options into an object.
  */
 
 exports.flags = function(args){
@@ -46,6 +48,7 @@ exports.flags = function(args){
 
 /**
  * @argument {Object} flags
+ * @description Use the flags object to detect what project is wjs-cli preparing
  */
 
 exports.mode = function(flags){
@@ -66,6 +69,7 @@ exports.mode = function(flags){
 
 /**
  * @argument {String} directory
+ * @description Write development index.html to allow hot-reload.
  */
 
 exports.writeDev = function(directory){
@@ -74,6 +78,7 @@ exports.writeDev = function(directory){
 
 /**
  * @argument {String} directory
+ * @description Write production index.html which does not contain hot reload
  */
 
 exports.writePro = function(directory){
@@ -82,23 +87,28 @@ exports.writePro = function(directory){
 
 /**
  * @argument {String} name
+ * @description Print the usage of a command or print the usage of all commands if "*" is specified
  */
 
 exports.usage = function(name){
     var commands = {
-        add: "wjs add <module>",
-        init: "wjs init <App-name> <option>\noptions:\n\t--javascript\n\t--typescript\n\t--vue",
-        update: "wjs update <version?>\nIf you need to install a specific version, run \n wjs update --version=<update-version>",
-        "check-update": "wjs check-update",
-        install : "wjs install <module>",
-        tasks: "wjs tasks",
-        run: "wjs run <task-alias>\nrun "+chalk.green("wjs tasks")+" to see installed task runners"
+        add: "wjs add <module>\n\t - Add any installed module to current project",
+        init: "wjs init <App-name> <option>\n\t - Initialize a project of the option type\n\t - options:\n\t\t --javascript\n\t\t --typescript\n\t\t --react\n\t\t --vue",
+        update: "wjs update <version?>\n\t - If you need to install a specific version, run \n\t - wjs update --version=<update-version>",
+        "check-update": "wjs check-update\n\t - Check if there are nightly updates or patches",
+        install : "wjs install <module>\n\t - Install third party module",
+        tasks: "wjs tasks\n\t - List task runners installed",
+        run: "wjs run <task-alias>\n\t - run "+chalk.green("wjs tasks")+" to see installed task runners",
+        development: "wjs run development\n\t - Run the code compiler in watch mode",
+        build: "wjs build <platform?>\n\t - Compiles the code into a website if no target platform is specified\n\t - Supported platforms\n\t\t -> Android"
     }
     if(name == "*"){
         print("Usage:")
         Object.getOwnPropertyNames(commands).forEach((c)=>{
             print(commands[c]);
         })
+    }else if(commands[name] == undefined){
+        print(chalk.red(`No argument called '${name}'`))
     }else{
         print("Usage:\n"+commands[name]);
     }
@@ -106,6 +116,7 @@ exports.usage = function(name){
 
 /**
  * @return {Array<String>}
+ * @description Get the list of all current wjs modules used by a project
  */
 exports.getModules = function(){
     return fs.readdirSync(path.join(process.cwd(),"webjs_modules"));
@@ -113,6 +124,7 @@ exports.getModules = function(){
 
 /**
  * @argument {String} Manifest
+ * @description Convert a configuration object to JSON and write it to "wjs-config.json" 
  */
 
 exports.makeManifest = function(Manifest){
@@ -120,24 +132,37 @@ exports.makeManifest = function(Manifest){
 }
 
 /**
-* @returns {Map<Object>}
-*/
-exports.getManifest = function(){
-   var manifest;
-   if(fs.existsSync(path.join(process.cwd(),"wjs-config.json"))){
-       return JSON.parse(fs.readFileSync(path.join(process.cwd(),"wjs-config.json")).toString("utf-8"));   
-   }else{
-       return {"project-type":"javascript",compileCommand: "webpack",extraModules:[]};
-   }
+ * 
+ * @returns {{}} Object representation of manifest or the default "wjs-config.json" if the project has no manifest
+ */
+exports.getManifest = function(cwd){
+
+    if(!cwd){
+        cwd = process.cwd();
+    }
+
+    var manifest;
+    if(fs.existsSync(path.join(cwd,"wjs-config.json"))){
+        return JSON.parse(fs.readFileSync(path.join(cwd,"wjs-config.json")).toString("utf-8"));   
+    }else{
+        return {"project-type":"javascript",compileCommand: "webpack",extraModules:[]};
+    }
 }
 
 /**
  * @argument {String} directory
+ * @description Get all non-module dependencies and package in the build directory
  */
 
 exports.getProjectDependencies = function(directory){
-    if(fs.pathExistsSync(path.join(directory,"app","pages"))){
-        fs.copySync(path.join(directory,"app","pages"),path.join(directory,"www","pages"))
+    if(fs.pathExistsSync(path.join(directory,"app","assets"))){
+        fs.copySync(path.join(directory,"app","assets"),path.join(directory,"www","assets"))
+    }
+    var arr = exports.getManifest().include;
+    if(arr && Array.isArray(arr)){
+        for(var i = 0; i<arr.length ; i++){
+            fs.copySync(path.join(directory,"app",arr[i]),path.join(directory,"www",arr[i]))
+        }
     }
     var man = exports.getManifest();
     var type = man["project-type"];
@@ -149,6 +174,7 @@ exports.getProjectDependencies = function(directory){
 
 /**
  * @argument {String} file
+ * @description Parse configuration of a module
  */
 
 exports.parseConf = function(file){
@@ -173,6 +199,7 @@ exports.parseConf = function(file){
 
 /**
  * @argument {String} extension
+ * @description Return extension of project files based on current project type
  */
 
 exports.extensions = function(extension){
@@ -191,6 +218,7 @@ exports.extensions = function(extension){
 
 /**
  * @argument {String} packageName
+ * @description Get gradle build configuration of default android wjs wrapper project
  */
 
 exports.makeGradleBuild = function(packageName){
@@ -205,6 +233,7 @@ exports.makeGradleBuild = function(packageName){
 
 /**
  * @argument {{local:Boolean,app_name:String,package:String,color:{accent:String,primary:String,primaryDark:String}}} androidManifest
+ * @description Convert specified image in android section of project configuration to Android specified icon sizes
  */
 
 exports.makeApplicationIcons = function(androidManifest){
@@ -270,6 +299,7 @@ exports.makeApplicationIcons = function(androidManifest){
 
 /**
  * @argument {String} packageName
+ * @description Get the Android app Java source code ready for compilation
  */
 
 exports.makeJavaSource = function(packageName,local,p){
@@ -279,13 +309,23 @@ exports.makeJavaSource = function(packageName,local,p){
 
     var packageToPath = packageName.split(".").join("/");
     var javaPath = path.join(androidProjectDirectory,"app/src/main/java",packageToPath);
-    fs.emptyDirSync(javaPath);
+    fs.removeSync(javaPath);
     fs.mkdirpSync(javaPath);
     fs.copySync(path.join(__dirname,"../resources/java"),javaPath);
+
+    var used_modules = exports.getManifest().android.extraModules === undefined? [] : exports.getManifest().android.extraModules;
+    var extraModulesCode = "";
+    var extraModulesImports = "";
+    used_modules.forEach(function(m){
+        var c = fs.readFileSync(path.join(resourcesPath,"java","modules",m+".java"),"utf-8");
+        extraModulesImports+=c.split("/*")[1].split("*/")[0]+"\n";
+        extraModulesCode+=(c+"\n");
+    })
+
     var wai = path.join(javaPath,"WebAppInterface.java");
     var maj = path.join(javaPath,"MainActivity.java");
-
-    fs.writeFileSync(wai,fs.readFileSync(wai).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName));
+    var mod_wai = fs.readFileSync(wai).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName).replace(/{{EXTRA_IMPORTS}}/g,extraModulesCode).replace(/{{Dependencies}}/g,extraModulesImports);
+    fs.writeFileSync(wai, mod_wai);
     fs.writeFileSync(maj,fs.readFileSync(maj).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName))
 }
 
@@ -299,7 +339,7 @@ exports.makeManifestXML = function/*package*/(packageName){
     if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
 
     var dom = new xml.DOMParser();
-    var manifestPath = path.join(androidProjectDirectory,"app/src/main/AndroidManifest.xml");
+    var manifestPath = path.join(resourcesPath,"java/AndroidManifest.xml");
     var stringsDomContent = dom.parseFromString(fs.readFileSync(manifestPath).toString("utf-8"),"text/xml");
     var arr = stringsDomContent.documentElement.getElementsByTagName("manifest")._node.attributes;
     
@@ -309,11 +349,36 @@ exports.makeManifestXML = function/*package*/(packageName){
         }
     }
 
+    if(Array.isArray(exports.getManifest().android.permissions)){
+        console.log(chalk.blue("Found specified permissions"))
+        var permissions = exports.getManifest().android.permissions;
+
+        permissions.forEach(function(permission){
+            var per = stringsDomContent.createElement("uses-permission")
+            per.setAttribute("android:name","android.permission."+permission.toUpperCase())
+            stringsDomContent.documentElement.appendChild(per)
+        })
+    }
+
+
+    if(Array.isArray(exports.getManifest().android.features)){
+        console.log(chalk.blue("Found specified features"))
+        var features = exports.getManifest().android.features;
+
+        features.forEach(function(feature){
+            // console.log(stringsDomContent.documentElement.getElementsByTagName("manifest")._node)
+            var per = stringsDomContent.createElement("uses-feature")
+            // per.
+            per.setAttribute("android:name","android."+feature)
+            stringsDomContent.documentElement.appendChild(per)
+        })
+    }
+
     var ser = new xml.XMLSerializer();
     
     var ts = ser.serializeToString(stringsDomContent);
-
-    fs.writeFileSync(manifestPath,ts);
+    // console.log(ts);
+    fs.writeFileSync(path.join(androidProjectDirectory,"app/src/main/AndroidManifest.xml"),ts);
 }
 
 exports.makeStringXML = function(){
@@ -354,11 +419,11 @@ exports.makeColorsXML = function(){
         var n = arr[i].getAttribute("name");
     
         if(n == "colorPrimary"){
-            arr[i].lastChild.data = exports.getManifest().android.color.primary;
+            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.primary:"#000000";
         }else if(n == "colorPrimaryDark"){
-            arr[i].lastChild.data = exports.getManifest().android.color.primaryDark;
+            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.primaryDark:"#000000";
         }else if(n == "colorAccent"){
-            arr[i].lastChild.data = exports.getManifest().android.color.accent;
+            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.accent:"#000000";
         }
     }
     
@@ -373,8 +438,8 @@ exports.makeColorsXML = function(){
  * @argument {String} directory
  */
 
-exports.init = function(directory){
-    var flag = exports.flags();
+exports.init = function(directory,flag){
+    // var flag = exports.flags();
     var type = exports.mode(flag);
     var config = projectDefinitions[type].config;
     if(fs.existsSync(directory))fs.removeSync(directory);
@@ -383,7 +448,7 @@ exports.init = function(directory){
     "project-type" : "${type}",
     "compileCommand" : "${projectDefinitions[type].compileCommand?projectDefinitions[type].compileCommand:"webpack"}",
     "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"www"}",
-    "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}
+    "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}${projectDefinitions[type].entry?'\n\t"entry":"'+projectDefinitions[type].entry+'",':""}
     "extraModules": []
 }`;
     var wjsDefaultModules = projectDefinitions[type].defaultModules;
@@ -405,7 +470,7 @@ exports.init = function(directory){
         `)
     }
     
-    if(projectDefinitions[type].entry){
+    if(projectDefinitions[type].entry  &&  projectDefinitions[type].config){
         fs.mkdirpSync(path.join(directory,"app"))
         fs.mkdirpSync(path.join(directory,"www"))
         fs.writeFileSync(path.join(directory,projectDefinitions[type].entry),projectDefinitions[type].appContents);
@@ -420,8 +485,8 @@ exports.init = function(directory){
     if(flag.vue){
         fs.copySync(path.join(__dirname,"../resources","vue"),path.join(directory))
     }else if(flag.react){
-        fs.copySync(path.join(__dirname,"../resources","wjs-react"),path.join(directory))
-        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"app/refresh.js"))
+        fs.copySync(path.join(__dirname,"../resources","parcel-react-master"),path.join(directory))
+        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"src/refresh.js"))
     }else{
         fs.copySync(path.join(__dirname,"../resources","jsconfig.rsrc.json"),path.join(directory,"app","jsconfig.json"))
         var customHtml = fs.readFileSync(path.join(__dirname,"../resources","dev-index.html")).toString("utf-8")
@@ -464,7 +529,7 @@ exports.refresh = function(c){
     if(c){
         c.send("refresh")
     }else{
-        console.log(`Open ${chalk.blue.bold("http://localhost:3100")} to enable hot reload`);
+        console.log(`Open ${chalk.blue.bold("http://localhost:"+global.port)} to enable hot reload`);
     }
 }
 
@@ -475,19 +540,43 @@ exports.refresh = function(c){
  */
 
 exports.compile = function(c){
-    console.log("Compiling....")
+    // console.log("Compiling....")
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest();
-    var compile = exec(manifest.compileCommand);
-    compile.stdout.on("end",() => {
-        console.log("App running in "+chalk.blue.bold("http://localhost:3100"))
-        exports.refresh(c)
-        compile.removeAllListeners()
-    })
-    compile.stderr.on("data",()=>{
-        console.log("Error compiling");
-        process.exit(2)
-    })
+    if(manifest.compileCommand && global.notCompiling){
+        global.notCompiling = false;
+        if(manifest.compileCommand.startsWith("$")) manifest.compileCommand = global.BIN_PATH+"\\"+manifest.compileCommand.slice(1);
+        // console.log("Using "+manifest.compileCommand+" to compile")
+        var compile = exec(manifest.compileCommand);
+        compile.stdout.on("end",() => {
+            if(global.flags.hot){
+                exports.refresh(c)
+            }
+            // console.log(chalk.green("success"))
+            global.notCompiling = true;
+            compile.removeAllListeners()
+        })
+        compile.stderr.on("data",()=>{
+            console.log("Error compiling");
+            process.exit(2)
+        })
+    }else if(manifest.compileCommand == undefined && global.notCompiling){
+        global.notCompiling = false;
+        var bundler = new Parcel(manifest.entry);
+        bundler.hmr = false;
+        if(manifest["project-type"] === "react") process.env.NODE_ENV = "development";
+        bundler.bundle()
+        .then(function(){
+            console.log(chalk.green("Done"))
+            global.notCompiling = true;
+            // exports.refresh(c)
+        })
+        .catch(function(e){
+            console.log("Error compiling:");
+            console.log(e);
+            process.exit(2)
+        })
+    }
 }
 
 /**
@@ -498,7 +587,9 @@ exports.quietCompile = function(cb){
     console.log("Compiling....")
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest();
+    if(manifest.compileCommand.startsWith("$")) manifest.compileCommand = global.BIN_PATH+"\\"+manifest.compileCommand.slice(1);
     var compile = exec(manifest.compileCommand);
+    
     compile.stdout.on("end",() => {
         cb()
         compile.removeAllListeners()
@@ -527,11 +618,11 @@ exports.build = function(){
 
         exports.makeStringXML();
         exports.makeColorsXML();
-        if(exports.getManifest().custom == "undefined"){
+        if(exports.getManifest().custom){
+            console.log("Customized source code "+chalk.green("(active)"))
+        }else{
             exports.makeJavaSource(exports.getManifest().android.package,exports.getManifest().local);
             console.log("Customized source code "+chalk.yellow("(inactive)"))
-        }else{
-            console.log("Customized source code "+chalk.green("(active)"))
         }
         exports.makeGradleBuild(exports.getManifest().android.package);
         exports.makeManifestXML(exports.getManifest().android.package);
@@ -590,7 +681,7 @@ exports.build = function(){
                 console.log(chalk.green("App ready at "+appPath))
                 fs.removeSync(path.join(resourcesPath,"build/android"));
             }
-            var javaPath = path.join(__dirname,"../resources/android/app/src/main/java",exports.getManifest().android.package.split(".").join("/"));
+            var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
             fs.emptyDirSync(javaPath);
         })
     }else{

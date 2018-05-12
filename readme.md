@@ -624,6 +624,10 @@ app.load(Application)
 
 * Added contributing.md
 
+### wjs-cli@0.1.5
+
+* Bug fixes
+
 ### Coming soon
 
 * More typescript modules.

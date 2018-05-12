@@ -1,11 +1,13 @@
 //Declare imports here.
-import { $ } from "core"
-import * as app from "wjs/app"
+import { $ } from "../webjs_modules/web"
+import * as app from "../webjs_modules/app"
 import { WJSModule } from "../webjs_modules/definitions";
 import * as material from "../webjs_modules/material";
 import Controller from "./pages/app.controller";
 import { Reflex } from "./reflex.module";
 import * as reflex from "./reflex.component";
+
+import { Photo } from "../webjs_modules/media";
 
 class Application {
     constructor(){
@@ -51,7 +53,7 @@ class Application {
         }
 
         var HomePage = new Reflex.HTMLRenderer("./pages/app.reflex.html");
-        
+        // 1. No source
         HomePage.render(
             {
                 component: reflex.Footer,
@@ -61,6 +63,11 @@ class Application {
                 component: reflex.Skill,
                 tag: "skill",
                 onRender(elements){
+                    var p = new Photo();
+                    // alert(p)
+                    p.capture(function(file){
+                        console.log(file)
+                    })
                     var animated = true;
                     var l = elements[0].children[0].style.width;
                     elements[0].children[0].style.width = "0%";

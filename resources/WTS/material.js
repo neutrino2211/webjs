@@ -62,9 +62,20 @@ export function introduceElement(element,parent){
     },400)
 }
 
+export function toolbarFAB(obj){
+    var a = document.createElement("a");
+    a.className = `btn-floating btn-${obj.size} ${obj.color}`;
+    var i = obj.icon||document.createElement("i");
+    // i.innerText = obj.icon||"";
+    a.appendChild(i);
+    return a;
+}
+
 export function floatingActionButton(obj) {
     var btn = document.createElement("div");
-    btn.className = `fixed-action-btn ${obj.position ? obj.position : "right" } ${obj.type||""}`
+    // alert(obj.position||"none")
+    btn.className = `fixed-action-btn ${obj.position||"" } ${obj.type||""}`;
+    // alert(btn.className);
     var a = document.createElement("a");
     a.className = `btn-floating btn-${obj.size} ${obj.color}`;
     var i = obj.icon||document.createElement("i");
@@ -77,6 +88,7 @@ export function floatingActionButton(obj) {
     }
 
     obj.fab.forEach(function(fab) {
+        // console.log(fab)
         var li = document.createElement("li");
         li.className = "waves-effect";
         li.appendChild(fab)

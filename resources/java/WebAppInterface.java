@@ -1,10 +1,22 @@
 package {{PACKAGE_NAME}};
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
+import java.util.Map;
+import java.util.HashMap;
+import android.view.KeyEvent;
+import java.util.concurrent.Callable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import android.webkit.WebView;
+
+//Extra imports dependencies
+
+// {{Dependencies}}
 
 /**
  * Created by ADMIN on 24/12/2017.
@@ -12,10 +24,13 @@ import android.widget.Toast;
 
 public class WebAppInterface {
     Context c;
-
-    WebAppInterface(Context context){
+    WebView w;
+    WebAppInterface(Context context, WebView wv){
         c = context;
+        w = wv;
     }
+
+    private Map<String,String> events = new HashMap<String,String>();
 
     @JavascriptInterface
 
@@ -39,10 +54,33 @@ public class WebAppInterface {
     }
 
     @JavascriptInterface
+    public String platform(){
+        return "Android";
+    }
+
+    @JavascriptInterface
     public void  sms(String number,String body){
         String s = "smsto:" + number;
         Intent smsto = new Intent(Intent.ACTION_SENDTO,Uri.parse(s));
         smsto.putExtra("sms_body",body);
         c.startActivity(smsto);
     }
+
+    @JavascriptInterface
+    public void eventListener(String name,String function){
+        events.put(name,function);
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK){
+            if(events.containsKey("backButtonPressed")){
+                // toast("javascript:"+events.get("backButtonPressed")+";");
+                w.loadUrl("javascript:"+events.get("backButtonPressed")+";");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // {{EXTRA_IMPORTS}}
 }

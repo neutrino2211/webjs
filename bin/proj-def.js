@@ -35,6 +35,10 @@ module: {
         {
             test: /\.ts?$/,
             use: "ts-loader"
+        },
+        {
+            test: /\.svg?$/,
+            use: "svg-inline-loader"
         }
     ]
 },
@@ -56,7 +60,7 @@ resolve:{
         root: "app",
         entry:"app/app.ts",
         modulesPath: path.join(__dirname,"../resources","Typescript"),
-        serverRoot: "www",
+        serverRoot: "dist",
         appContents: `//Declare imports here.
 import * as wjs from "core"
 import * as app from "wjs/app"
@@ -86,6 +90,10 @@ module: {
         {
             test: /\.ts?$/,
             use: "ts-loader"
+        },
+        {
+            test: /\.svg?$/,
+            use: "svg-inline-loader"
         }
     ]
 },
@@ -116,9 +124,9 @@ resolve:{
     },
 
     react: {
-        root: "app",
-        entry:false,
-        compileCommand: "webpack",
+        root: "src",
+        entry: "src/index.html",
+        compileCommand: false,
         modulesPath: path.join(__dirname,"../resources","vue-modules"),
         config: false,
         serverRoot: "dist",
@@ -153,6 +161,15 @@ entry: './app/app.js',
 output: {
     filename: 'index.js',
     path:     __dirname+'/www/js'
+},
+
+module: {
+    rules: [
+        {
+            test: /\.svg?$/,
+            use: "svg-inline-loader"
+        }
+    ]
 },
 
 resolve:{
