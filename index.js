@@ -1,1 +1,3 @@
-throw new Error("wjs-cli is a cli tool");
+var wjs = require("./bin/wjs");
+
+module.exports = wjs;

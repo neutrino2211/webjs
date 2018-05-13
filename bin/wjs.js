@@ -78,11 +78,7 @@ function Development(flags){
         var connection = res.accept('',res.origin);
         // connection.send("refresh")
         c = connection;
-    })
-
-    if(PT == "javascript" || PT == "typescript"){
-        utils.writeDev(process.cwd());
-    }
+    });
     // console.log(path.join(process.cwd(),AR))
     // server.Source = path.join(process.cwd(),SR);
 
@@ -305,20 +301,52 @@ function Publish (operand,cwd,flags){
         process.exit(12)
     }
 
-    var TYPE = flags.type||"updates";
+    var TYPE = flags.type;
+
+    if(flags.type == "update" && flags.password != ""){
+        var config = {
+            apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+            authDomain: "webjs-f76df.firebaseapp.com",
+            databaseURL: "https://webjs-f76df.firebaseio.com",
+            projectId: "webjs-f76df",
+            storageBucket: "webjs-f76df.appspot.com",
+            messagingSenderId: "404258524081"
+        };
+        var app = firebase.initializeApp(config);
+        print("Authenticating\n")
+        app.auth().signInWithEmailAndPassword(flags.email,flags.password)
+        .then(function(){
+            var bucket = storage.bucket("webjs-f76df.appspot.com");
+            var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
+                // console.log(f)
+                if(e){
+                    print(chalk.red(""+e))
+                    term("\n")
+                    process.exit(11);
+                }else{
+                    Progress.update(100)
+                    print(chalk.green("Published "+operand))
+                }
+            })
+        })
+        .catch(function(e){
+            console.log(chalk.red("Authentication"+e))
+        })
+    }else{
+        var bucket = storage.bucket("webjs-f76df.appspot.com");
+        var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
+            // console.log(f)
+            if(e){
+                print(chalk.red(""+e))
+                term("\n")
+                process.exit(11);
+            }else{
+                Progress.update(100)
+                print(chalk.green("Published "+operand))
+            }
+        })
+    }
     // console.log(type);
-    var bucket = storage.bucket("webjs-f76df.appspot.com");
-    var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
-        // console.log(f)
-        if(e){
-            print(chalk.red(""+e))
-            term("\n")
-            process.exit(11);
-        }else{
-            Progress.update(100)
-            print(chalk.green("Published "+operand))
-        }
-    })
 }
 
 function Run(operand,cwd,flags){

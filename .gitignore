@@ -22,4 +22,6 @@ backup
 modules
 module-dev
 .gitignore
-*.py
+*.
+tests/**/.cache
+tests/**/dist

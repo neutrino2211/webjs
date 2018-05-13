@@ -434,6 +434,20 @@ exports.makeColorsXML = function(){
     fs.writeFileSync(path.join(androidProjectDirectoryValues,"colors.xml"),ts);
 }
 
+function ask(t,question,cb){
+
+    t(question)
+
+    t.inputField({},function(e,i){
+        if(e){
+            console.log(e);
+            process.exit(1);
+        }
+
+        cb(i)
+    })
+}
+
 /**
  * @argument {String} directory
  */
@@ -446,35 +460,11 @@ exports.init = function(directory,flag){
     fs.mkdirSync(directory);
     var wjsManifest = `{
     "project-type" : "${type}",
-    "compileCommand" : "${projectDefinitions[type].compileCommand?projectDefinitions[type].compileCommand:"webpack"}",
     "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"www"}",
     "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}${projectDefinitions[type].entry?'\n\t"entry":"'+projectDefinitions[type].entry+'",':""}
     "extraModules": []
 }`;
     var wjsDefaultModules = projectDefinitions[type].defaultModules;
-    if(flag.typescript || flag.angular){
-        fs.writeFileSync(path.join(directory,"tsconfig.json"),`{
-    "compilerOptions":{
-        "noImplicitAny": false,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "experimentalDecorators": true,
-        "allowJs": true,
-        "module": "es6",
-        "target": "ES2015"
-    },
-    "include":[
-        "app/**/*"
-    ]
-}
-        `)
-    }
-    
-    if(projectDefinitions[type].entry  &&  projectDefinitions[type].config){
-        fs.mkdirpSync(path.join(directory,"app"))
-        fs.mkdirpSync(path.join(directory,"www"))
-        fs.writeFileSync(path.join(directory,projectDefinitions[type].entry),projectDefinitions[type].appContents);
-    }
 
     if(config){
         fs.writeFileSync(path.join(directory,"webpack.config.js"),config)
@@ -483,18 +473,38 @@ exports.init = function(directory,flag){
         fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
     })
     if(flag.vue){
-        fs.copySync(path.join(__dirname,"../resources","vue"),path.join(directory))
+        fs.copySync(path.join(__dirname,"../resources","wjs-vue"),path.join(directory))
     }else if(flag.react){
-        fs.copySync(path.join(__dirname,"../resources","parcel-react-master"),path.join(directory))
-        fs.copySync(path.join(__dirname,"../resources/js/refresh.js"),path.join(directory,"src/refresh.js"))
+        fs.copySync(path.join(__dirname,"../resources","wjs-react"),path.join(directory))
+    }else if(flag.javascript){
+        fs.copySync(path.join(__dirname,"../resources","wjs-javascript"),path.join(directory))
+    }else if(flag.typescript){
+        fs.copySync(path.join(__dirname,"../resources","wjs-typescript"),path.join(directory))
     }else{
-        fs.copySync(path.join(__dirname,"../resources","jsconfig.rsrc.json"),path.join(directory,"app","jsconfig.json"))
-        var customHtml = fs.readFileSync(path.join(__dirname,"../resources","dev-index.html")).toString("utf-8")
-        fs.writeFileSync(path.join(directory,"www","index.html"),customHtml);
-        fs.copySync(path.join(__dirname,"../resources","js"),path.join(directory,"www","js"))
-        fs.copySync(path.join(__dirname,"../resources","styles"),path.join(directory,"www","css"))
-        fs.copySync(path.join(__dirname,"../resources","fonts"),path.join(directory,"www","fonts"))
+        exports.usage("*");
+        process.exit(0)
     }
+
+    var pjson = JSON.parse(fs.readFileSync(path.join(directory,"package.json")).toString())
+    // console.log(JSON.stringify(pjson,undefined,"\t"))
+    console.log(chalk.magenta("Please answer these questions to continue with the setup"))
+    var t = require("terminal-kit").terminal;
+    ask(t,chalk.green("Author: "),function(i){
+        pjson.author = i;
+        console.log()
+        ask(t,chalk.green("Version: "),function(i){
+            pjson.version = i
+            console.log("\nMaking package.json")
+            // console.log(JSON.stringify(pjson,undefined,"\t"))
+            fs.writeFileSync(path.join(directory,"package.json"),JSON.stringify(pjson,undefined,"\t"))
+            t.processExit()
+        })
+    })
+    var a =directory.split(path.sep);
+    pjson.name = a[a.length-1]
+
+    var beautifiedConfig = JSON.stringify(JSON.parse(wjsManifest),undefined,"\t");
+    beautifiedConfig.compileCommand = undefined;
 
     if(flag.local === true){
         if(flag.package){
@@ -504,7 +514,7 @@ exports.init = function(directory,flag){
         }
         fs.copySync(path.join(__dirname,"../resources","android"),path.join(directory,"android"));
     }
-    fs.writeFileSync(path.join(directory,"wjs-config.json"),wjsManifest);
+    fs.writeFileSync(path.join(directory,"wjs-config.json"),beautifiedConfig);
     
 }
 
@@ -539,44 +549,27 @@ exports.refresh = function(c){
  * @argument {websocket.Socket.connnection} c
  */
 
-exports.compile = function(c){
+exports.compile = function(cb){
     // console.log("Compiling....")
     exports.getProjectDependencies(process.cwd())
-    var manifest = exports.getManifest();
-    if(manifest.compileCommand && global.notCompiling){
-        global.notCompiling = false;
-        if(manifest.compileCommand.startsWith("$")) manifest.compileCommand = global.BIN_PATH+"\\"+manifest.compileCommand.slice(1);
-        // console.log("Using "+manifest.compileCommand+" to compile")
-        var compile = exec(manifest.compileCommand);
-        compile.stdout.on("end",() => {
-            if(global.flags.hot){
-                exports.refresh(c)
-            }
-            // console.log(chalk.green("success"))
-            global.notCompiling = true;
-            compile.removeAllListeners()
-        })
-        compile.stderr.on("data",()=>{
-            console.log("Error compiling");
-            process.exit(2)
-        })
-    }else if(manifest.compileCommand == undefined && global.notCompiling){
-        global.notCompiling = false;
-        var bundler = new Parcel(manifest.entry);
-        bundler.hmr = false;
-        if(manifest["project-type"] === "react") process.env.NODE_ENV = "development";
-        bundler.bundle()
-        .then(function(){
-            console.log(chalk.green("Done"))
-            global.notCompiling = true;
-            // exports.refresh(c)
-        })
-        .catch(function(e){
-            console.log("Error compiling:");
-            console.log(e);
-            process.exit(2)
-        })
-    }
+    var manifest = exports.getManifest(process.cwd())
+    global.notCompiling = false;
+    var bundler = new Parcel(manifest.entry);
+    if(manifest["project-type"] === "react") process.env.NODE_ENV = "development";
+    bundler.bundle()
+    .then(function(){
+        console.log(chalk.green("Done"))
+        global.notCompiling = true;
+        cb && cb(false)
+        if(cb) bundler.stop();
+        // exports.refresh(c)
+    })
+    .catch(function(e){
+        console.log("Error compiling:");
+        console.log(e);
+        cb && cb(e)
+        process.exit(2)
+    })
 }
 
 /**

@@ -7,8 +7,6 @@ import Controller from "./pages/app.controller";
 import { Reflex } from "./reflex.module";
 import * as reflex from "./reflex.component";
 
-import { Photo } from "../webjs_modules/media";
-
 class Application {
     constructor(){
         this.myCustomTag = new Reflex.Component(`
@@ -63,11 +61,6 @@ class Application {
                 component: reflex.Skill,
                 tag: "skill",
                 onRender(elements){
-                    var p = new Photo();
-                    // alert(p)
-                    p.capture(function(file){
-                        console.log(file)
-                    })
                     var animated = true;
                     var l = elements[0].children[0].style.width;
                     elements[0].children[0].style.width = "0%";

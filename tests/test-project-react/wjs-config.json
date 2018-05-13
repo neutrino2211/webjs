@@ -1,0 +1,7 @@
+{
+	"project-type": "react",
+	"root": "dist",
+	"local": false,
+	"entry": "src/index.html",
+	"extraModules": []
+}
