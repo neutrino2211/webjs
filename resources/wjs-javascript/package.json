@@ -1,0 +1,9 @@
+{
+  "author": "azu",
+  "license": "MIT",
+  "name": "parcel-typescript-example",
+  "version": "1.0.0",
+  "dependencies": {
+    "cross-env": "^5.1.1"
+  }
+}

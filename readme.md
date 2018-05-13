@@ -47,35 +47,30 @@ Vue projects dont have modules yet.
 The default wjs hello world app entry point looks like this.
 
 ```javascript
-//Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app";
 
-class Application{
-    constructor(){
-        wjs.print("ready");
+class App {
+    constructor (root){
+        root.innerHTML = "<h1>Hello World</h1>";
     }
-    
-    //Your apps entry point
+
     onViewLoad(){
-        wjs.print("main");
+        console.log("Done")
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
-Obviously all it does is write "readymain" to the page
+Obviously all it does is set "main" as the root innerHTML
 
-But you can also do more, like add html templates by extending the class with the `TemplateApplication` class in the definitions module
+But you can also do more, like add html templates by extending the class with the `TemplatePage` class in the app module
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
-import { TemplateApplication } from "wjs/definitions";
+import * as app from "../webjs_modules/app"
 
-class Application extends TemplateApplication{
+class Application extends app.TemplatePage{
     constructor(){
         //Call the super class
         super();
@@ -92,31 +87,6 @@ class Application extends TemplateApplication{
 app.load(Application)
 ```
 
-For javascript apps the `WJSModule` feature is at a somewhat stable stage meaning not much will change and those changes won't affect your app much. It can be used like this
-
-```javascript
-
-import * as wjs from "../webjs_modules/web"
-import * as app from "../webjs_modules/app"
-import { WJSModule } from "../webjs_modules/definitions"
-
-class Application{
-    constructor(){
-        //Code to run before the app loads
-    }
-
-    onViewLoad(){
-        //Code to run after the app loads
-
-        WJSModule({
-            controller: /*Any page controller class*/,
-            template: /*Any html page*/,
-            styleSheets: /*An array of paths to stylesheets*/
-        });
-    }
-}
-
-```
 A page controller looks something like this
 
 ```javascript
@@ -141,18 +111,17 @@ Using pages as modules is as easy as adding the new keyword to invoke the class 
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app"
 import { PageName } from "path/to/PageName";
 
-class Application{
+class Application {
     constructor(){
         //Code to run before the app loads
+        var page = new PageName();
     }
     
     //Your apps entry point
     onViewLoad(){
-        var page = new PageName();
         page.onViewLoad()
     }
 }
@@ -162,30 +131,23 @@ app.load(Application)
 
 ### Typescript
 
-A typescript app is not much different from a javascript app but special cases will be added soon.
+A typescript app is not much different from a javascript app.
 
 ### Vue
 
-For vue apps just go ahead and read the docs at [the vue js site](https://vuejs.org/v2/guide/). But for development reasons the main.js file needs to import the `refresh.js` file given for browser hot-reload.
+For vue apps just go ahead and read the docs at [the vue js site](https://vuejs.org/v2/guide/)
 
 ```javascript
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import "./refresh"
+import Vue from 'vue';
+import App from "./App.vue"
 
-Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  router,
-  template: '<App/>',
-  components: { App }
-})
-
+  render: h => h(App),
+  template: "<App/>"
+});
 ```
 
 But vue specific modules are not ready yet so follow the vue docs only.
@@ -206,12 +168,13 @@ the app module has features like
 
 * streams
 
+* TemplatePage
+
 ### streams, sockets and events
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app"
 
 class Application{
     constructor(){
@@ -241,7 +204,7 @@ class Application{
             var datas = data.split("").join("<br>").split("");
             //Emit the event and print the characters
             document.emit("printed-message");
-            app.stream(datas).pipe(wjs.print)
+            app.stream(datas).pipe(document.write)
         })
 
         //And you can remove event the element listeners by using app.events.strip(<element>);
@@ -255,8 +218,7 @@ app.load(Application)
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app"
 
 class Application{
     constructor(){
@@ -282,86 +244,13 @@ class Application{
 app.load(Application)
 ```
 
-### core
-
-* print
-
-* Jquery
-
-The core module is very light for now but will get buff soon
-
-#### print function
-
-This just writes text to the screen
-
-#### Jquery
-
-This is the familiar `$` variable available from the core module
+#### TemplatePages
 
 ```javascript
 //Declare imports here.
-import { $ } from "core"
-import * as app from "wjs/app"
-
-class Application{
-    constructor(){
-        $(document).load(()=>{
-            alert("Document loaded");
-        })
-    }
-
-    //Your apps entry point
-    onViewLoad(){
-        $("body").css("background-color","blue");
-    }
-}
-
-app.load(Application)
-```
-
-### definittions
-
-the definitions module comes with 
-
-* TemplateApplication class
-
-* WJSModule function
-
-#### WJSModule function
-
-```javascript
-
-import * as wjs from "../webjs_modules/web"
 import * as app from "../webjs_modules/app"
-import { WJSModule } from "../webjs_modules/definitions"
 
-class Application{
-    constructor(){
-        //Code to run before the app loads
-    }
-
-    onViewLoad(){
-        //Code to run after the app loads
-
-        WJSModule({
-            controller: /*Any page controller class*/,
-            template: /*Any html page*/,
-            styleSheets: /*An array of paths to stylesheets*/
-        });
-    }
-}
-
-```
-
-#### TemplateApplication class
-
-```javascript
-//Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
-import { TemplateApplication } from "wjs/definitions";
-
-class Application extends TemplateApplication{
+class Application extends app.TemplatePage {
     constructor(){
         //Call the super class
         super();
@@ -396,9 +285,8 @@ This gives you the ability to add css classes in javascript!!! ikr
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
-import * as material from "wjs/material"
+import * as app from "../webjs_modules/app"
+import * as material from "../webjs_modules/material"
 
 class Application{
     constructor(){
@@ -438,9 +326,8 @@ All material standard colors and icons are present and ready to use
 
 ```javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
-import * as material from "wjs/material"
+import * as app from "../webjs_modules/app"
+import * as material from "../webjs_modules/material"
 
 class Application{
     constructor(){
@@ -624,13 +511,11 @@ app.load(Application)
 
 * Added contributing.md
 
+### wjs-cli@0.1.5
+
+* Bug fixes
+
 ### Coming soon
-
-* More typescript modules.
-
-* Vue specific modules.
-
-* Complete docs (including module docs).
 
 * More android features.
 

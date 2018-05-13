@@ -2,9 +2,11 @@ Test
 rollback
 backup
 node_modules
+module-dev
 resources/Typescript/angular
 resources/update-*
 *.keystore
 *.keystore.old
 *.log
+*.py
 *.vstags

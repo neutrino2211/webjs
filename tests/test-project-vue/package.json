@@ -1,0 +1,13 @@
+{
+	"name": "test-project-vue",
+	"version": "0.0.1",
+	"author": "Tsowa Mainasara Al-amin",
+	"license": "MIT",
+	"dependencies": {
+		"@vue/component-compiler-utils": "^1.2.1",
+		"vue": "^2.5.2",
+		"vue-hot-reload-api": "^2.3.0",
+		"vue-router": "^3.0.1",
+		"vue-template-compiler": "^2.5.16"
+	}
+}

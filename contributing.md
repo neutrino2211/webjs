@@ -1,7 +1,7 @@
 # Contributing
 
 When contributing to this repository, please first discuss the change you wish to make via issue,
-email, or any other method with [me](mailto://neutrino2211@gmail.com) before making a change. 
+email, or any other method with [me](mailto:neutrino2211@gmail.com) before making a change. 
 
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
@@ -12,8 +12,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 2. Update the README.md with details of changes to the interface, this includes new environment 
    variables, command line syntax, useful file locations and container parameters.
 3. Increase the version numbers in any examples files and the README.md to the new version that this
-   Pull Request would represent. In this beta i use sequential 
-   versioning but plan to use [SemVer](http://semver.org/) as of wjs-cli@1.0.0.
+   Pull Request would represent NB : I use [SemVer](http://semver.org/).
 4. You may merge the Pull Request in once you have the sign-off of two other developers, or if you 
    do not have permission to do that, you may request the second reviewer to merge it for you.
 
@@ -74,7 +73,7 @@ further defined and clarified by project maintainers.
 ### Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting [me](mailto://neutrino2211@gmail.com). All
+reported by contacting [me](mailto:neutrino2211@gmail.com). All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. I am
 obligated to maintain confidentiality with regard to the reporter of an incident.

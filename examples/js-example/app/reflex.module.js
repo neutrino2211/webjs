@@ -1,5 +1,5 @@
-import { parseHTML } from "wjs/app";
-import { $ } from "core";
+import { parseHTML } from "../webjs_modules/app.js";
+import { $ } from "../webjs_modules/web.js";
 
 class component {
     /**

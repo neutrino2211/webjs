@@ -1,6 +1,6 @@
 //Declare imports here.
-import { $ } from "core"
-import * as app from "wjs/app"
+import { $ } from "../webjs_modules/web"
+import * as app from "../webjs_modules/app"
 import { WJSModule } from "../webjs_modules/definitions";
 import * as material from "../webjs_modules/material";
 import Controller from "./pages/app.controller";
@@ -51,7 +51,7 @@ class Application {
         }
 
         var HomePage = new Reflex.HTMLRenderer("./pages/app.reflex.html");
-        
+        // 1. No source
         HomePage.render(
             {
                 component: reflex.Footer,

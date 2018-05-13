@@ -16,8 +16,9 @@ var http               = require("https");
 var args               = process.argv.slice(2,process.argv.length);
 var exec               = require("child_process").exec;
 var utils              = require('./utils');
+var flags              = utils.flags(args);
 var chalk              = require("chalk");
-var server             = require("../resources/server");
+var express            = require("express");
 var package            = require("../package.json");
 var Install            = require("./install");
 var firebase           = require("firebase");
@@ -37,6 +38,7 @@ if(args.length > 0){
 }
 
 
+global.BIN_PATH = path.join(__dirname,"../node_modules/.bin")
 global.RESOURCES_PATH = path.join(__dirname,"../resources");
 global.unpackResource = function(from,to){
     fs.emptyDirSync(path.join(global.RESOURCES_PATH,to));
@@ -47,40 +49,67 @@ global.unpackTo = function(from,to){
     fs.copySync(from,path.join(__dirname,"../",to))
 }
 
-// init argument block
+function Development(flags){
+    console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
+    var manifest = utils.getManifest();
 
-if (operation == "init"){
+    var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;
+    var AR /*app root */    = projectDefinitions[manifest["project-type"]].root;
+    var PT /*project type*/ = manifest["project-type"];
+
+    var port = 3100;
+
+    global.flags = flags;
+    global.port  = port;
+    // var S = server.createServer({
+    //     root: path.join(process.cwd(),SR)
+    // });
+
+    var app = express();
+    app.use(express.static(SR))
+    var S = app.listen(3100);
+    //declare websocket for refreshing web page.
+    var ws = new websocket.server({
+        httpServer: S
+    })
+    // utils.compile(c);
+    // var c;
+    ws.on("request", (res) => {
+        var connection = res.accept('',res.origin);
+        // connection.send("refresh")
+        c = connection;
+    });
+    // console.log(path.join(process.cwd(),AR))
+    // server.Source = path.join(process.cwd(),SR);
+
+    // S.root = path.join(process.cwd(),AR)
+    // S.listen(3100);
+    global.notCompiling = true;
+    utils.compile(c)
+    fs.watch(path.join(process.cwd(),AR),{
+        recursive: true
+    }, ()=>{
+        utils.compile(c)
+    })
+
+    if(flags.o||flags.open){
+        require('opn')('http://localhost:'+port);
+    }
+}
+
+function Init(operand,cwd,flags){
     try{
         utils.checkArg(1)
-        // checkArg(2)
 
     }catch(e){
         utils.usage("init");
         process.exit(1)
     }
-    // changeDir("Test")
     print("Initializing app in "+path.join(process.cwd(),operand))
-    // var cmd = exec(`cordova create ${operand} ${args[2]} ${operand}`)
-    // changeDir(operand)
-    // print("Cordova\n\n")
-    utils.init(path.join(process.cwd(),operand))
-    // cmd.stdout.on("data",function(chunk){
-    //     print(chunk)
-    // })
-
-    // cmd.stdout.on("end",function(){
-        
-    // })
-    // cmd.stderr.on("data",chunk => {
-    //     print("CORDOVA ERROR: ",chunk)
-    // })
+    utils.init(path.join(cwd,operand),flags)
 }
 
-
-//Update argument block
-
-else if (operation == "update"){
-
+function Update(flags){
     var config = {
         apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
         authDomain: "webjs-f76df.firebaseapp.com",
@@ -98,8 +127,8 @@ else if (operation == "update"){
     // console.log(latestVersion.);
     latestVersion.on("value",function(snapshot){
         var ver;
-        if(utils.flags().version){
-            ver = "updates."+updateVersion+"_"+utils.flags().version.split(".").join("");
+        if(flags.version){
+            ver = "updates."+updateVersion+"_"+flags.version.split(".").join("");
         }else{
             ver = snapshot.val();
         }
@@ -118,7 +147,7 @@ else if (operation == "update"){
                 }else{
                     console.log(`Update complete`)
                     // console.log(package);
-                    if(utils.flags().version == undefined){
+                    if(flags.version == undefined){
                         package["last-update"] = ver;
                         fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
                     }
@@ -132,10 +161,7 @@ else if (operation == "update"){
     })
 }
 
-
-//Install argument block
-
-else if(operation == "install"){
+function INSTALL(operand){
     try {
         utils.checkArg(1)
     } catch (error) {
@@ -153,13 +179,9 @@ else if(operation == "install"){
         }
         process.exit()
     }
-    
 }
 
-
-//Version argument block
-
-else if(operation == "-v"){
+function Version(){
     var json = fs.readFileSync(path.join(__dirname,"../","package.json")).toString();
 
     var pack = JSON.parse(json);
@@ -171,16 +193,15 @@ else if(operation == "-v"){
     console.log("Version : "+pack.version+"\nCurrent update : "+pack["last-update"].split("updates."+updateVersion+"_")[1].split("").join("."));
 }
 
-//Add app dependency
-else if(operation == "add"){
-    var manifest = utils.getManifest();
+function Add(operand,cwd){
+    var manifest = utils.getManifest(cwd);
     var ext = utils.extensions(manifest["project-type"]);
     var type = manifest["project-type"];
     // operand = operand.endsWith(ext) ? operand :operand+ext;
     if(fs.existsSync(path.join(projectDefinitions[type].modulesPath,operand)) && manifest.extraModules.indexOf(operand) == -1){
         manifest.extraModules.push(operand);
         manifest.extraModules.forEach((m)=>{
-            fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(process.cwd(),"webjs_modules",m));
+            fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
         })
         console.log("Dependency added")
     }
@@ -203,40 +224,7 @@ else if(operation == "add"){
     utils.makeManifest(manifest);
 }
 
-//Development
-
-else if(operation == "run-dev" || operation == "development"){
-    console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
-    var manifest = utils.getManifest();
-    s = server.Start(3100);
-    //declare websocket for refreshing web page.
-    var ws = new websocket.server({
-        httpServer: s
-    })
-    // var c;
-    ws.on("request", (res) => {
-        var connection = res.accept('',res.origin);
-        // connection.send("refresh")
-        c = connection;
-    })
-
-    var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;
-    var AR /*app root */    = projectDefinitions[manifest["project-type"]].root;
-    var PT /*project type*/ = manifest["project-type"];
-    if(PT == "javascript" || PT == "typescript"){
-        utils.writeDev(process.cwd());
-    }
-    // console.log(path.join(process.cwd(),AR))
-    server.Source = path.join(process.cwd(),SR);
-    utils.compile(c)
-    fs.watch(path.join(process.cwd(),AR),{
-        recursive: true
-    }, ()=>{
-        utils.compile(c)
-    })
-}
-
-else if(operation == "check-update"){
+function CheckUpdate(){
     var config = {
         apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
         authDomain: "webjs-f76df.firebaseapp.com",
@@ -250,7 +238,7 @@ else if(operation == "check-update"){
     var package = require(path.join(__dirname,"../package.json"));
     var updateVersion = "update-"+package.version.replace(/\./g,"-");
     var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
-    // console.log(latestVersion.);
+    // console.log(latestVersion);
     latestVersion.on("value",function(snapshot){
         var ver = snapshot.val();
         // console.log(snapshot.val())
@@ -270,11 +258,11 @@ else if(operation == "check-update"){
     })
 }
 
-else if(operation == "publish"){
+function Publish (operand,cwd,flags){
     var Zip = require("adm-zip");
     var zip = new Zip();
 
-    if(!fs.existsSync(path.join(process.cwd(),operand))){
+    if(!fs.existsSync(path.join(cwd,operand))){
         print(chalk.red("Error : folder '"+chalk.yellow(operand)+"' not found"))
         process.exit()
     }
@@ -289,7 +277,7 @@ else if(operation == "publish"){
 
     Progress.update(0)
 
-    var destinationZip = path.join(process.cwd(),operand+".zip");
+    var destinationZip = path.join(cwd,operand+".zip");
 
     zip.addLocalFolder(operand);
 
@@ -307,30 +295,63 @@ else if(operation == "publish"){
         keyFileName: path.join(__dirname,'../gcloud.json')
     });
 
-    var TYPE = utils.flags().type||"updates";
+    if(!flags.type){
+        console.log(chalk.red("Type of module not specified"))
+        console.log("Exiting");
+        process.exit(12)
+    }
+
+    var TYPE = flags.type;
+
+    if(flags.type == "update" && flags.password != ""){
+        var config = {
+            apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+            authDomain: "webjs-f76df.firebaseapp.com",
+            databaseURL: "https://webjs-f76df.firebaseio.com",
+            projectId: "webjs-f76df",
+            storageBucket: "webjs-f76df.appspot.com",
+            messagingSenderId: "404258524081"
+        };
+        var app = firebase.initializeApp(config);
+        print("Authenticating\n")
+        app.auth().signInWithEmailAndPassword(flags.email,flags.password)
+        .then(function(){
+            var bucket = storage.bucket("webjs-f76df.appspot.com");
+            var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
+                // console.log(f)
+                if(e){
+                    print(chalk.red(""+e))
+                    term("\n")
+                    process.exit(11);
+                }else{
+                    Progress.update(100)
+                    print(chalk.green("Published "+operand))
+                }
+            })
+        })
+        .catch(function(e){
+            console.log(chalk.red("Authentication"+e))
+        })
+    }else{
+        var bucket = storage.bucket("webjs-f76df.appspot.com");
+        var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
+            // console.log(f)
+            if(e){
+                print(chalk.red(""+e))
+                term("\n")
+                process.exit(11);
+            }else{
+                Progress.update(100)
+                print(chalk.green("Published "+operand))
+            }
+        })
+    }
     // console.log(type);
-    var bucket = storage.bucket("webjs-f76df.appspot.com");
-    var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
-        // console.log(f)
-        if(e){
-            print(chalk.red(""+e))
-            term("\n")
-            process.exit(11);
-        }else{
-            Progress.update(100)
-            print(chalk.green("Published "+operand))
-        }
-    })
 }
 
-else if(operation == "build"){
-    utils.quietCompile(utils.build);
-}
-
-else if(operation == "run"){
+function Run(operand,cwd,flags){
     try{
         utils.checkArg(1)
-        // checkArg(2)
 
     }catch(e){
         utils.usage("run");
@@ -339,10 +360,64 @@ else if(operation == "run"){
     var p = require(path.join(__dirname,"../package.json"));
     if(p["wjs:installedModules"][operand]){
         var m = require(p["wjs:installedModules"][operand]);
-        m(process.cwd(),utils.flags(args.slice(2)))
+        m(cwd,flags)
     }else{
         console.log(chalk.red("Can not find module ("+operand+")"))
     }
+}
+
+// init argument block
+
+if (operation == "init"){
+    Init(operand,process.cwd(),flags)
+}
+
+
+//Update argument block
+
+else if (operation == "update"){
+    Update(flags)
+}
+
+
+//Install argument block
+
+else if(operation == "install"){
+    INSTALL(operand)
+}
+
+
+//Version argument block
+
+else if(operation == "-v"){
+    Version()
+}
+
+//Add app dependency
+else if(operation == "add"){
+    Add(operand,process.cwd())
+}
+
+//Development
+
+else if(operation == "run-dev" || operation == "development"){
+    Development(flags);
+}
+
+else if(operation == "check-update"){
+    CheckUpdate()
+}
+
+else if(operation == "publish"){
+    Publish(operand,process.cwd(),flags)
+}
+
+else if(operation == "build"){
+    utils.quietCompile(utils.build);
+}
+
+else if(operation == "run"){
+    Run(operand,process.cwd(),flags);
 }
 
 else if(operation == "tasks"){
@@ -359,9 +434,18 @@ else if(operation == "tasks"){
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){
-    utils.usage("*");
+    if(operand == undefined){
+        utils.usage("*");
+    }else{
+        utils.usage(operand)
+    }
 }
 
 else {
     utils.usage("*");
 }
+
+exports.init        = Init;
+exports.install     = INSTALL;
+exports.publish     = Publish;
+exports.development = Development;

@@ -1,7 +1,3 @@
-console.log("Hello world")
-var fs = require("fs")
-// var cordovaAPIS = require("cordova-lib");
-// var cordovaCLI = require("cordova/src/cli")
-// var cordovaFunctions = require("cordova/cordova")
+var wjs = require("./bin/wjs");
 
-console.log(process.platform,process.env.Path.split(";"))
+module.exports = wjs;

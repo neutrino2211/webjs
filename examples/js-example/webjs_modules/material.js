@@ -1,4 +1,4 @@
-import { $ } from "core"
+import { $ } from "./web.js"
 
 export function icons(name){
     var icon = document.createElement("i");

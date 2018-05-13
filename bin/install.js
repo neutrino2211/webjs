@@ -52,8 +52,8 @@ module.exports = function Install(operand){
                     fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,undefined,"\t"));
                 }
             }
-            if(fs.existsSync(path.join(modulesPath,operand.split(".")[1],"install.js")))
-                require(path.join(modulesPath,operand.split(".")[1],"install.js"));
+            if(fs.existsSync(path.join(modulePath.slice(0,modulePath.length-4),"install.js")))
+                require(path.join(modulePath.slice(0,modulePath.length-4),"install.js"));
             console.log("Cleaning Up...");
             // fs.removeSync(modulesPath);
             console.log("Successfully installed "+operand)

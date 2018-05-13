@@ -1,0 +1,7 @@
+{
+	"project-type": "javascript",
+	"root": "dist",
+	"local": false,
+	"entry": "src/index.html",
+	"extraModules": []
+}
