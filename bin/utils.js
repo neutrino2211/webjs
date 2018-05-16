@@ -549,13 +549,13 @@ exports.refresh = function(c){
  * @argument {websocket.Socket.connnection} c
  */
 
-exports.compile = function(cb){
+exports.compile = function(cb,o){
     // console.log("Compiling....")
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest(process.cwd())
     global.notCompiling = false;
-    var bundler = new Parcel(manifest.entry);
-    if(manifest["project-type"] === "react") process.env.NODE_ENV = "development";
+    var bundler = new Parcel(manifest.entry,o);
+    if(manifest["project-type"] === "react" && cb == undefined) process.env.NODE_ENV = "development";
     bundler.bundle()
     .then(function(){
         console.log(chalk.green("Done"))
@@ -582,93 +582,97 @@ exports.build = function(){
     var f = exports.flags();
     var cwd = process.cwd();
     var p = cwd.split("\\");
+    process.env.NODE_ENV = "production"
     exports.quietCompile(function(){
-        
-    });
-    if(f.android){
-        var androidProjectDirectory = path.join(resourcesPath,"android");
-
-        if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
-
-        console.log(chalk.green("Building for Android"+(exports.getManifest().local?" (Local Project)":"")));
-        if(typeof exports.getManifest().android === "undefined"){
-            console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
-            process.exit(9);
-        }
-        // fs.copySync(path.join(resourcesPath,"android"),path.join(resourcesPath,"build/android"));
-
-        exports.makeStringXML();
-        exports.makeColorsXML();
-        if(exports.getManifest().custom){
-            console.log("Customized source code "+chalk.green("(active)"))
-        }else{
-            exports.makeJavaSource(exports.getManifest().android.package,exports.getManifest().local);
-            console.log("Customized source code "+chalk.yellow("(inactive)"))
-        }
-        exports.makeGradleBuild(exports.getManifest().android.package);
-        exports.makeManifestXML(exports.getManifest().android.package);
-        exports.makeApplicationIcons(exports.getManifest().android);
-
-        fs.copySync(path.join(cwd,exports.getManifest().root),path.join(androidProjectDirectory,"app/src/main/assets/www"));
-        var outputPath = path.join(androidProjectDirectory,"app/build/outputs/apk/app-debug.apk");
-        process.chdir(androidProjectDirectory);
-        var gradlew;
-
-        switch (os.platform()) {
-            case "win32":
-                gradlew = "gradlew"
-                break;
-        
-            default:
-                gradlew = "./gradlew"
-                break;
-        }
-        var p = cwd.split("\\");
-        var gradle = exec(`${gradlew} assembleDebug`);
-        var err;
-        if(f.verbose){
-            gradle.stdout.on("data",function(data){
-                process.stdout.write(data.toString())
-            })
-        }
-
-        gradle.stderr.once("error",function(data){
-            print(chalk.red("Error initializing gradle"))
-            process.exit(10);
-        })
-
-        gradle.stderr.on("data",function(data){
-            process.stderr.write(data)
-        })
-
-        function getApp(){
-            process.chdir(cwd);
+        if(f.android){
+            var androidProjectDirectory = path.join(resourcesPath,"android");
+    
+            if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
+    
+            console.log(chalk.green("Building for Android"+(exports.getManifest().local?" (Local Project)":"")));
+            if(typeof exports.getManifest().android === "undefined"){
+                console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
+                process.exit(9);
+            }
+            // fs.copySync(path.join(resourcesPath,"android"),path.join(resourcesPath,"build/android"));
+    
+            exports.makeStringXML();
+            exports.makeColorsXML();
+            if(exports.getManifest().custom){
+                console.log("Customized source code "+chalk.green("(active)"))
+            }else{
+                exports.makeJavaSource(exports.getManifest().android.package,exports.getManifest().local);
+                console.log("Customized source code "+chalk.yellow("(inactive)"))
+            }
+            exports.makeGradleBuild(exports.getManifest().android.package);
+            exports.makeManifestXML(exports.getManifest().android.package);
+            exports.makeApplicationIcons(exports.getManifest().android);
+    
+            fs.copySync(path.join(cwd,exports.getManifest().root),path.join(androidProjectDirectory,"app/src/main/assets/www"));
+            var outputPath = path.join(androidProjectDirectory,"app/build/outputs/apk/app-debug.apk");
+            process.chdir(androidProjectDirectory);
+            var gradlew;
+    
+            switch (os.platform()) {
+                case "win32":
+                    gradlew = "gradlew"
+                    break;
+            
+                default:
+                    gradlew = "./gradlew"
+                    break;
+            }
             var p = cwd.split("\\");
-            if(!fs.existsSync(outputPath)){
+            var gradle = exec(`${gradlew} assembleDebug`);
+            var err;
+            if(f.verbose){
+                gradle.stdout.on("data",function(data){
+                    process.stdout.write(data.toString())
+                })
+            }
+    
+            gradle.stderr.once("error",function(data){
                 print(chalk.red("Error initializing gradle"))
                 process.exit(10);
-            }
-            fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
-        }
-
-        gradle.stdout.on("end",function(){
-            if(err){
-                console.log(chalk.red("Error:\n\n")+err)
+            })
+    
+            gradle.stderr.on("data",function(data){
+                process.stderr.write(data)
+            })
+    
+            function getApp(){
                 process.chdir(cwd);
-            }else{
-                getApp()
                 var p = cwd.split("\\");
-                var appPath = path.join(cwd,p[p.length-1]+".apk");
-                console.log(chalk.green("App ready at "+appPath))
-                fs.removeSync(path.join(resourcesPath,"build/android"));
+                if(!fs.existsSync(outputPath)){
+                    print(chalk.red("Error initializing gradle"))
+                    process.exit(10);
+                }
+                fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
             }
-            var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
-            var assetsPath = path.join(__dirname,"../resources/android/app/src/main/assets");
-            fs.emptyDirSync(javaPath);
-        })
-    }else{
-        console.log(chalk.green("App static files ready at "+path.join(cwd,exports.getManifest().root)))
-    }
+    
+            gradle.stdout.on("end",function(){
+                if(err){
+                    console.log(chalk.red("Error:\n\n")+err)
+                    process.chdir(cwd);
+                }else{
+                    getApp()
+                    var p = cwd.split("\\");
+                    var appPath = path.join(cwd,p[p.length-1]+".apk");
+                    console.log(chalk.green("App ready at "+appPath))
+                    fs.removeSync(path.join(resourcesPath,"build/android"));
+                }
+                var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
+                var assetsPath = path.join(__dirname,"../resources/android/app/src/main/assets");
+                fs.emptyDirSync(javaPath);
+            })
+        }else{
+            console.log(chalk.green("App static files ready at "+path.join(cwd,exports.getManifest().root)))
+        }
+    },{
+        minify: true,
+        target: "browser",
+        publicUrl: "./"
+    });
 }
 
 exports.compileAndRefresh = function(c){

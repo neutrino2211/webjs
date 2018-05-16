@@ -1,5 +1,7 @@
 # wjs-cli:
 
+![alt logo](docs/logo.jpg)
+
 ## CLI for making web and android apps with HTML , CSS and JS (ES7)
 
 # Under development.
@@ -12,14 +14,20 @@
 
 * Run `wjs -v` to confirm installation
 
+![wjs -v](docs/videos/wjs-v.mp4)
+
 * Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`  or leave app type out to initialize a javascript project
 
+![wjs init](docs/videos/wjs-init.mp4)
+
 * Run `cd <app-name> && wjs development` to start the development server
+
+![wjs development](docs/videos/wjs-dev.mp4)
 
 * Open http://localhost:3100 in your browser to view the app
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
-Check out [how to make a module](docs/Modules/introduction.md)
+Check out [how to make a module](docs/create-modules.md)
 
 * Use `wjs install <package-name>` to install a package, which is either a module or task runner 
 
@@ -27,9 +35,13 @@ Check out [how to make a module](docs/Modules/introduction.md)
 
 * Use `wjs tasks` to see installed task runners
 
+![wjs tasks](docs/videos/wjs-tasks.mp4)
+
 * Use `wjs run <task-alias>` to run the task
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
+
+![wjs build --android --verbose](docs/videos/wjs-android.mp4)
 
 For a typescript project first `npm init` the project directory then install `ts-loader` and `typescript` with `npm install typescript ts-loader`.
 
@@ -497,7 +509,7 @@ app.load(document.getElementById("js-main"),App);
 
 * Added module publishinng
 
-* Added [documentation for module creation](docs/Modules/introduction.md)
+* Added [documentation for making modules](docs/create-modules.md)
 
 ### wjs-cli@0.1.4
 

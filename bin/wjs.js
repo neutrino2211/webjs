@@ -13,10 +13,8 @@ var args               = process.argv.slice(2,process.argv.length);
 var utils              = require('./utils');
 var flags              = utils.flags(args);
 var chalk              = require("chalk");
-var express            = require("express");
 var Install            = require("./install");
 var firebase           = require("firebase");
-var websocket          = require("websocket");
 var projectDefinitions = require("./proj-def")
 var refreshMode        = "initial";
 //Specify argument types
@@ -41,7 +39,9 @@ global.unpackTo = function(from,to){
 }
 
 function Development(flags){
-    console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
+    var websocket          = require("websocket");
+    var express            = require("express");
+    // console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
     var manifest = utils.getManifest();
 
     var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;

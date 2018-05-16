@@ -91,8 +91,6 @@
 
 * Bug fixes
 
-## wjs-cli@1.0.0
-
 ### wjs-cli@1.0.0
 
 * Removal of the following modules
