@@ -582,6 +582,7 @@ exports.build = function(){
     var f = exports.flags();
     var cwd = process.cwd();
     var p = cwd.split("\\");
+    exports.quietCompile();
     if(f.android){
         var androidProjectDirectory = path.join(resourcesPath,"android");
 
@@ -660,6 +661,7 @@ exports.build = function(){
                 fs.removeSync(path.join(resourcesPath,"build/android"));
             }
             var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
+            var assetsPath = path.join(__dirname,"../resources/android/app/src/main/assets");
             fs.emptyDirSync(javaPath);
         })
     }else{
