@@ -9,7 +9,6 @@
 	"description": "A Native and Web App creation tool",
 	"main": "index.js",
 	"scripts": {
-		"postinstall": "node bin/webpack-check.js",
 		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js"
 	},
 	"keywords": [

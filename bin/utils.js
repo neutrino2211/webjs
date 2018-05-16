@@ -576,22 +576,7 @@ exports.compile = function(cb){
  * @argument {Function} cb
  */
 
-exports.quietCompile = function(cb){
-    console.log("Compiling....")
-    exports.getProjectDependencies(process.cwd())
-    var manifest = exports.getManifest();
-    if(manifest.compileCommand.startsWith("$")) manifest.compileCommand = global.BIN_PATH+"\\"+manifest.compileCommand.slice(1);
-    var compile = exec(manifest.compileCommand);
-    
-    compile.stdout.on("end",() => {
-        cb()
-        compile.removeAllListeners()
-    })
-    compile.stderr.on("data",()=>{
-        console.log("Error compiling");
-        process.exit(2)
-    })
-}
+exports.quietCompile = exports.compile;
 
 exports.build = function(){
     var f = exports.flags();

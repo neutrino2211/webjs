@@ -4,6 +4,7 @@ const utils = require("../bin/utils");
 const assert = require("assert");
 
 describe("Javascript app",function(){
+    this.slow(20000)
     const jsTestDirectory = path.join(__dirname,"test-project-js");
     process.chdir(jsTestDirectory)
     it("should have a dist folder",function(done){

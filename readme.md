@@ -84,7 +84,7 @@ class Application extends app.TemplatePage{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 A page controller looks something like this
@@ -126,7 +126,7 @@ class Application {
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### Typescript
@@ -211,7 +211,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### load and JSX functions
@@ -241,7 +241,7 @@ class Application{
     }
 }
 //Load function that bootstraps the applications
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### TemplatePages
@@ -264,7 +264,7 @@ class Application extends app.TemplatePage {
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### material
@@ -317,7 +317,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### icons and colors
@@ -357,7 +357,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 #### Android
 
@@ -419,7 +419,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### TODO (More docs)
@@ -515,15 +515,13 @@ app.load(Application)
 
 * Bug fixes
 
+### wjs-cli@1.0.0
+
+* Bug fixes
+
 ### Coming soon
 
 * More android features.
-
-### **Deprecated** to be removed at 1.0.0
-
-* run-dev command
-
-* device module
 
 Use `wjs check-update` to check for version updates and bug fixes
 

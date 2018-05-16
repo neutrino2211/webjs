@@ -1,3 +1,5 @@
+(<any>window).WJS_APP_NAMESPACE = {}
+
 class WJSWebSocket extends WebSocket{
     constructor(addr,proto: string | string[]){
         super(addr,proto);
@@ -90,6 +92,23 @@ export function JSX(fu: Function, ...args: any[]) {
         }
         return div
     }
+}
+
+
+export function isNativeEnvironment(){
+    return (<any>window).native?true:false;
+}
+
+export function nativeCallback(fn){
+    return URL.createObjectURL(new Blob(["("+fn+")()"]));
+}
+
+export function store(name,data){
+    (<any>window).WJS_APP_NAMESPACE[name] = data;
+}
+
+export function get(name){
+    return (<any>window).WJS_APP_NAMESPACE[name];
 }
 
 export function stream (arr: any) {

@@ -118,3 +118,5 @@
 * Parcel bundler now used instead of webpack
 
 * Adoption of express as development server
+
+* Critical change in project structure

@@ -5,6 +5,7 @@ const assert = require("assert");
 
 
 describe("Typescript app",function(){
+    this.slow(20000)
     const tsTestDirectory = path.join(__dirname,"test-project-ts");
     process.chdir(tsTestDirectory)
     it("should have a dist folder",function(done){

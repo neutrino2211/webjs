@@ -5,6 +5,7 @@ const assert = require("assert");
 
 
 describe("React app",function(){
+    this.slow(9000)
     const reactTestDirectory = path.join(__dirname,"test-project-react");
     process.chdir(reactTestDirectory)
     it("should have a dist folder",function(done){
