@@ -3,9 +3,9 @@
 	"bin": {
 		"wjs": "./bin/wjs.js"
 	},
-	"last-update": "updates.update-1-0-0_000",
+	"last-update": "updates.update-1-0-1_000",
 	"wjs:installedModules": {},
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A Native and Web App creation tool",
 	"main": "index.js",
 	"scripts": {
