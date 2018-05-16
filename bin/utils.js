@@ -582,7 +582,9 @@ exports.build = function(){
     var f = exports.flags();
     var cwd = process.cwd();
     var p = cwd.split("\\");
-    exports.quietCompile();
+    exports.quietCompile(function(){
+        
+    });
     if(f.android){
         var androidProjectDirectory = path.join(resourcesPath,"android");
 
