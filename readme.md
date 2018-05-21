@@ -14,15 +14,9 @@
 
 * Run `wjs -v` to confirm installation
 
-![wjs -v](docs/videos/wjs-v.mp4)
-
-* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`  or leave app type out to initialize a javascript project
-
-![wjs init](docs/videos/wjs-init.mp4)
+* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`
 
 * Run `cd <app-name> && wjs development` to start the development server
-
-![wjs development](docs/videos/wjs-dev.mp4)
 
 * Open http://localhost:3100 in your browser to view the app
 
@@ -35,13 +29,9 @@ Check out [how to make a module](docs/create-modules.md)
 
 * Use `wjs tasks` to see installed task runners
 
-![wjs tasks](docs/videos/wjs-tasks.mp4)
-
 * Use `wjs run <task-alias>` to run the task
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
-
-![wjs build --android --verbose](docs/videos/wjs-android.mp4)
 
 For a typescript project first `npm init` the project directory then install `ts-loader` and `typescript` with `npm install typescript ts-loader`.
 
@@ -117,7 +107,7 @@ export class PageName{
 }
 ```
 
-A page controller can also be a page if you use `app.load(PAGE_NAME);`
+A page controller can also be a page if you use `app.load(ROOT_ELEMENT,PAGE_NAME);`
 
 Using pages as modules is as easy as adding the new keyword to invoke the class e.g
 
@@ -398,8 +388,7 @@ Android functions are available as `native` and that syntax is planned to be mai
 
 ``` javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app"
 
 class Application{
     constructor(){
@@ -438,15 +427,15 @@ app.load(document.getElementById("js-main"),App);
 
 ## Changelog
 
-#### wjs-cli@0.0.1
+### wjs-cli@0.0.1
 
 * Published wjs-cli on npm
 
-#### wjs-cli@0.0.2 
+### wjs-cli@0.0.2 
 
 * Added install feature to allow installation of any third party module
 
-#### wjs-cli@0.0.3
+### wjs-cli@0.0.3
 
 * Created wjs-config.json file to allow specification of compile procedure and dependencies 
 
@@ -461,7 +450,7 @@ app.load(document.getElementById("js-main"),App);
     4. Typescript application support
 
 * Made basic typescript modules namely  `app.ts` , `web.ts (core)`, `http.ts` , `definitions.ts` , `material.ts`
-#### wjs-cli@0.0.4
+### wjs-cli@0.0.4
 
 * Bug fixes
 
@@ -469,7 +458,7 @@ app.load(document.getElementById("js-main"),App);
 
 * Vue support
 
-#### wjs-cli@0.0.5
+### wjs-cli@0.0.5
 
 * More bug fixes
 

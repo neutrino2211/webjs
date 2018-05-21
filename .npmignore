@@ -29,5 +29,4 @@ resources/WTS/flame
 resources/WTS/node
 .gitignore
 *.
-tests/**/.cache
-tests/**/dist
+tests
