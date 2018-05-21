@@ -138,7 +138,6 @@ and modules for different types of projects are stored in seperate locations
 * `Java` modules are stored in `resources/java`
 * `Javascript` modules are stored in `resources/WTS`
 * `Typescript` modules are stored in `resources/Typescript`
-* `Vue` and `React` modules are stored in `resources/vue-modules`
 
 ## module.conf 
 

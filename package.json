@@ -3,13 +3,12 @@
 	"bin": {
 		"wjs": "./bin/wjs.js"
 	},
-	"last-update": "updates.update-1-0-0_000",
+	"last-update": "updates.update-1-0-1_000",
 	"wjs:installedModules": {},
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A Native and Web App creation tool",
 	"main": "index.js",
 	"scripts": {
-		"postinstall": "node bin/webpack-check.js",
 		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js"
 	},
 	"keywords": [
@@ -40,7 +39,6 @@
 		"fs-extra": "^4.0.1",
 		"opn": "^5.2.0",
 		"parcel": "^1.8.1",
-		"react-onsenui": "^1.10.0",
 		"resize-img": "^1.1.2",
 		"terminal-kit": "^1.14.3",
 		"ts-loader": "latest",

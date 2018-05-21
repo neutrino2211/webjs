@@ -25,3 +25,5 @@ module-dev
 *.
 tests/**/.cache
 tests/**/dist
+tests/**/node_modules
+docs/videos

@@ -137,7 +137,6 @@ export class TemplatePage{
 
     onViewLoad(){
         this.root.innerHTML = this.template;
-        alert(this.template)
         this.onTemplateLoad();
     }
 }

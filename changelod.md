@@ -91,8 +91,6 @@
 
 * Bug fixes
 
-## wjs-cli@1.0.0
-
 ### wjs-cli@1.0.0
 
 * Removal of the following modules
@@ -118,3 +116,5 @@
 * Parcel bundler now used instead of webpack
 
 * Adoption of express as development server
+
+* Critical change in project structure

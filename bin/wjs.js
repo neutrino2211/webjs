@@ -7,25 +7,14 @@ var print = console.log;
 //Declare variables
 var s;
 var c;
-var os                 = require("os");
 var fs                 = require("fs-extra");
-var xml                = require("xmldom");
-var cwd                = process.cwd();
 var path               = require("path");
-var http               = require("https");
 var args               = process.argv.slice(2,process.argv.length);
-var exec               = require("child_process").exec;
 var utils              = require('./utils');
 var flags              = utils.flags(args);
 var chalk              = require("chalk");
-var express            = require("express");
-var package            = require("../package.json");
 var Install            = require("./install");
 var firebase           = require("firebase");
-var websocket          = require("websocket");
-var resize_image       = require("resize-img");
-var resourcesPath      = path.join(__dirname,"../resources");
-var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def")
 var refreshMode        = "initial";
 //Specify argument types
@@ -50,7 +39,9 @@ global.unpackTo = function(from,to){
 }
 
 function Development(flags){
-    console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
+    var websocket          = require("websocket");
+    var express            = require("express");
+    // console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
     var manifest = utils.getManifest();
 
     var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;

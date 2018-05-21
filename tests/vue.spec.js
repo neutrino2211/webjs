@@ -5,6 +5,7 @@ const assert = require("assert");
 
 
 describe("Vue app",function(){
+    this.slow(9000)
     const vueTestDirectory = path.join(__dirname,"test-project-vue");
     process.chdir(vueTestDirectory)
     it("should have a dist folder",function(done){

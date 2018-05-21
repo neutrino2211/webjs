@@ -1,5 +1,7 @@
 # wjs-cli:
 
+![alt logo](docs/logo.jpg)
+
 ## CLI for making web and android apps with HTML , CSS and JS (ES7)
 
 # Under development.
@@ -12,14 +14,14 @@
 
 * Run `wjs -v` to confirm installation
 
-* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`  or leave app type out to initialize a javascript project
+* Run `wjs init <app-name> <app-type>` where app type can be any of `--typescript` ,`--vue` ,  `--javascript`, `--react`
 
 * Run `cd <app-name> && wjs development` to start the development server
 
 * Open http://localhost:3100 in your browser to view the app
 
 * To add a dependency run `wjs add <module>` where the module can be a default module or a third party module
-Check out [how to make a module](docs/Modules/introduction.md)
+Check out [how to make a module](docs/create-modules.md)
 
 * Use `wjs install <package-name>` to install a package, which is either a module or task runner 
 
@@ -84,7 +86,7 @@ class Application extends app.TemplatePage{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 A page controller looks something like this
@@ -105,7 +107,7 @@ export class PageName{
 }
 ```
 
-A page controller can also be a page if you use `app.load(PAGE_NAME);`
+A page controller can also be a page if you use `app.load(ROOT_ELEMENT,PAGE_NAME);`
 
 Using pages as modules is as easy as adding the new keyword to invoke the class e.g
 
@@ -126,7 +128,7 @@ class Application {
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### Typescript
@@ -211,7 +213,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### load and JSX functions
@@ -241,7 +243,7 @@ class Application{
     }
 }
 //Load function that bootstraps the applications
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### TemplatePages
@@ -264,7 +266,7 @@ class Application extends app.TemplatePage {
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### material
@@ -317,7 +319,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 #### icons and colors
@@ -357,7 +359,7 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 #### Android
 
@@ -386,8 +388,7 @@ Android functions are available as `native` and that syntax is planned to be mai
 
 ``` javascript
 //Declare imports here.
-import * as wjs from "core"
-import * as app from "wjs/app"
+import * as app from "../webjs_modules/app"
 
 class Application{
     constructor(){
@@ -419,22 +420,22 @@ class Application{
     }
 }
 
-app.load(Application)
+app.load(document.getElementById("js-main"),App);
 ```
 
 ### TODO (More docs)
 
 ## Changelog
 
-#### wjs-cli@0.0.1
+### wjs-cli@0.0.1
 
 * Published wjs-cli on npm
 
-#### wjs-cli@0.0.2 
+### wjs-cli@0.0.2 
 
 * Added install feature to allow installation of any third party module
 
-#### wjs-cli@0.0.3
+### wjs-cli@0.0.3
 
 * Created wjs-config.json file to allow specification of compile procedure and dependencies 
 
@@ -449,7 +450,7 @@ app.load(Application)
     4. Typescript application support
 
 * Made basic typescript modules namely  `app.ts` , `web.ts (core)`, `http.ts` , `definitions.ts` , `material.ts`
-#### wjs-cli@0.0.4
+### wjs-cli@0.0.4
 
 * Bug fixes
 
@@ -457,7 +458,7 @@ app.load(Application)
 
 * Vue support
 
-#### wjs-cli@0.0.5
+### wjs-cli@0.0.5
 
 * More bug fixes
 
@@ -497,7 +498,7 @@ app.load(Application)
 
 * Added module publishinng
 
-* Added [documentation for module creation](docs/Modules/introduction.md)
+* Added [documentation for making modules](docs/create-modules.md)
 
 ### wjs-cli@0.1.4
 
@@ -515,15 +516,13 @@ app.load(Application)
 
 * Bug fixes
 
+### wjs-cli@1.0.0
+
+* Bug fixes
+
 ### Coming soon
 
 * More android features.
-
-### **Deprecated** to be removed at 1.0.0
-
-* run-dev command
-
-* device module
 
 Use `wjs check-update` to check for version updates and bug fixes
 

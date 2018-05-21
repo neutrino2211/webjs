@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.ama.attendo">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.wjs.test.js">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 
@@ -15,4 +15,4 @@
         </activity>
     </application>
 
-<uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.CAMERA"/><uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/><uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"/><uses-feature android:name="android.hardware.camera"/></manifest>
+</manifest>

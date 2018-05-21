@@ -1,5 +1,3 @@
-import { $ } from "core"
-
 export function icons(name){
     var icon = document.createElement("i");
     icon.innerText = name;
@@ -35,31 +33,6 @@ export function setElementClass(element,name){
     })
 
     return element
-}
-
-/**
- * @param {HTMLElement} parent
- * @param {HTMLElement} element 
- */
-
-export function introduceElement(element,parent){
-
-    var initialH = element.style.height;
-    var initialW = element.style.width;
-
-    element.style.width = "0px";
-    element.style.height = "0px";
-
-    if(parent){
-        parent.appendChild(element)
-    }else{
-        document.body.appendChild(element)
-    }
-
-    $(element).animate({
-        height: initialH,
-        width : initialW
-    },400)
 }
 
 export function toolbarFAB(obj){
