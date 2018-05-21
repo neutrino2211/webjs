@@ -664,6 +664,7 @@ exports.build = function(){
                 var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
                 var assetsPath = path.join(__dirname,"../resources/android/app/src/main/assets");
                 fs.emptyDirSync(javaPath);
+                fs.emptyDirSync(assetsPath)
             })
         }else{
             console.log(chalk.green("App static files ready at "+path.join(cwd,exports.getManifest().root)))
