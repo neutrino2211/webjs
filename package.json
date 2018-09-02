@@ -1,11 +1,11 @@
 {
 	"name": "wjs-cli",
 	"bin": {
-		"wjs": "./bin/wjs.js"
+		"wjs": "./dist/src/index.js"
 	},
-	"last-update": "updates.update-1-0-1_000",
+	"last-update": "updates.update-2-0-0_000",
 	"wjs:installedModules": {},
-	"version": "1.0.1",
+	"version": "2.0.0",
 	"description": "A Native and Web App creation tool",
 	"main": "index.js",
 	"scripts": {

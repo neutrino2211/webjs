@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
-const utils = require("../bin/utils");
+const utils = require("../js/utils");
 const assert = require("assert");
 
 describe("Javascript app",function(){

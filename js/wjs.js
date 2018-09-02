@@ -27,15 +27,15 @@ if(args.length > 0){
 }
 
 
-global.BIN_PATH = path.join(__dirname,"../node_modules/.bin")
-global.RESOURCES_PATH = path.join(__dirname,"../resources");
+global.BIN_PATH = path.join(__dirname,"../../node_modules/.bin")
+global.RESOURCES_PATH = path.join(__dirname,"../../resources");
 global.unpackResource = function(from,to){
     fs.emptyDirSync(path.join(global.RESOURCES_PATH,to));
     fs.copySync(from,path.join(global.RESOURCES_PATH,to))
 }
 
 global.unpackTo = function(from,to){
-    fs.copySync(from,path.join(__dirname,"../",to))
+    fs.copySync(from,path.join(__dirname,"../../",to))
 }
 
 function Development(flags){
@@ -111,7 +111,7 @@ function Update(flags){
     };
     var app = firebase.initializeApp(config);
     var databaseRef = app.database().ref();
-    var package = require(path.join(__dirname,"../package.json"));
+    var package = require(path.join(__dirname,"../../package.json"));
     // console.log(flags().update.slice(-4))
     var updateVersion = "update-"+package.version.replace(/\./g,"-");
     var latestVersion = databaseRef.child(updateVersion);
@@ -140,7 +140,7 @@ function Update(flags){
                     // console.log(package);
                     if(flags.version == undefined){
                         package["last-update"] = ver;
-                        fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,null,"\t"))
+                        fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,null,"\t"))
                     }
                 }
                 process.exit()
@@ -173,7 +173,7 @@ function INSTALL(operand){
 }
 
 function Version(){
-    var json = fs.readFileSync(path.join(__dirname,"../","package.json")).toString();
+    var json = fs.readFileSync(path.join(__dirname,"../../","package.json")).toString();
 
     var pack = JSON.parse(json);
 
@@ -280,10 +280,10 @@ function Publish (operand,cwd,flags){
 
     var gcs = require('@google-cloud/storage');
 
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../gcloud.json');
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../../gcloud.json');
     var storage = gcs({
         projectId: 'webjs-f76df',
-        keyFileName: path.join(__dirname,'../gcloud.json')
+        keyFileName: path.join(__dirname,'../../gcloud.json')
     });
 
     if(!flags.type){
@@ -348,7 +348,7 @@ function Run(operand,cwd,flags){
         utils.usage("run");
         process.exit(1)
     }
-    var p = require(path.join(__dirname,"../package.json"));
+    var p = require(path.join(__dirname,"../../package.json"));
     if(p["wjs:installedModules"][operand]){
         var m = require(p["wjs:installedModules"][operand]);
         m(cwd,flags)
@@ -412,7 +412,7 @@ else if(operation == "run"){
 }
 
 else if(operation == "tasks"){
-    var p = require(path.join(__dirname,"../package.json"));
+    var p = require(path.join(__dirname,"../../package.json"));
     var m = p["wjs:installedModules"];
     var modules = Object.getOwnPropertyNames(m);
     if(modules.length == 0){

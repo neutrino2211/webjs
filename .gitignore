@@ -1,5 +1,6 @@
 gcloud.json
 Test
+bin
 rollback
 node_modules
 */node_modules
