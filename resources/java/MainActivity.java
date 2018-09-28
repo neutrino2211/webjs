@@ -12,8 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.*;
 import android.view.KeyEvent;
 import android.widget.Toast;
-// import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.os.Bundle;
 import {{PACKAGE_NAME}}.WebAppInterface;
 
@@ -56,7 +54,7 @@ public class MainActivity extends AppCompatActivity{
         webview.setWebViewClient(new WebViewClient(){
             @Override 
             public void onReceivedError(WebView wv, WebResourceRequest r, WebResourceError e){
-                Toast.makeText(a,"Request : '"+r+"' with error '"+e+"'",Toast.LENGTH_LONG).show();
+                wi.HandleChromeClientErrors(wv,r,e);
             }
         });
         //Load

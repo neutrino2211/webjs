@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.wjs.test.js">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.wjs.IBBUL">
 
     <uses-permission android:name="android.permission.INTERNET"/>
 

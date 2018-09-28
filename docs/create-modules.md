@@ -1,24 +1,12 @@
 # How to make wjs-cli modules
 
-## Step1 create folder
+## Create folder
 
 The name of this folder has to be in a specific format. The format is update-`wjs-cli target version (replace . with -)`_`update name e.g (AndroidFSWebviewPlugin)`, so for an update named `AndroidFSPlugin` targeting wjs-cli@0.1.3 the folder name will be `update-0-1-3_AndroidFSPlugin`
 
-## Step2 create install.js file
+## Source file formats
 
-wjs-cli executes the install.js file included in the folder.
-
-Create the install.js file in the folder
-
-So if the module is to change the AndroidWebview source code to include fs features, you add the new source code to the folder created above e.g "NewWJSSource.java" and in the install.js add this code
-
-```javascript
-var path = require("path");
-
-global.unpackTo(path.join(__dirname,"NewWJSSource.java"),"resources/java/WebAppInterface.java")
-```
-
-NB: wjs-cli uses placeholders in `MainActivity.java` and `WebAppInterface.java` to assign package names to android apps so any where the app package name is required use `{{PACKAGE_NAME}}` e.g
+wjs-cli uses placeholders in `MainActivity.java` and `WebAppInterface.java` to assign package names to android apps so any where the app package name is required use `{{PACKAGE_NAME}}` e.g
 
 ### WebAppInterface.java
 
@@ -139,14 +127,20 @@ and modules for different types of projects are stored in seperate locations
 * `Javascript` modules are stored in `resources/WTS`
 * `Typescript` modules are stored in `resources/Typescript`
 
-## module.conf 
+## The module.conf file
 
 module.conf is a configuration file for your module.
 current fields are:
 * `name`: this is an alias for your module (Only use this in taskRunners)
-* `type`: this is the type of your module (Use `task` for task runners)
+* `type`: this is the type of your module, module types include.
+    - `task`: this is to specify a task runner.
+    - `module-js`: this specifies a javascript module.
+    - `module-ts`: this specifies a typescript module.
+    - `module-rx`: this specifies a react-js module.
+    - `module-vue`: this specifies a vue-js module.
+    - `module-java`: this specifies a java module.
 * `engine`: this is the main file for your module (Only use this for task runners)
-* `requires`: this is the minimum update version your module needs to run 
+* `requires`: this is the minimum update version your module needs to run
 
 ### Examples
 
@@ -156,13 +150,6 @@ Configuration file.
 
 ```conf
 requires = <update-version>
-```
-Install.js
-
-```js
-var path = require("path");
-
-global.unpackTo(path.join(__dirname,"myModule.js"),"resources/module-type-directory/myModule.js")
 ```
 
 #### Task

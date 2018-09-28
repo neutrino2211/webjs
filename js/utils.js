@@ -11,7 +11,7 @@ var path               = require("path");
 var exec               = require("child_process").exec;
 var chalk              = require("chalk");
 var resize_image       = require("resize-img");
-var resourcesPath      = path.join(__dirname,"../resources");
+var resourcesPath      = path.join(__dirname,"../../resources");
 var valuesPath         = path.join(resourcesPath,"android/app/src/main/res/values");
 var projectDefinitions = require("./proj-def");
 var Parcel = require("parcel")
@@ -73,7 +73,7 @@ exports.mode = function(flags){
  */
 
 exports.writeDev = function(directory){
-    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(__dirname,"../resources","dev-index.html")).toString("utf-8"))
+    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(resourcesPath,"dev-index.html")).toString("utf-8"))
 }
 
 /**
@@ -82,7 +82,7 @@ exports.writeDev = function(directory){
  */
 
 exports.writePro = function(directory){
-    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(__dirname,"../resources","index.html")).toString("utf-8"))
+    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(resourcesPath,"index.html")).toString("utf-8"))
 }
 
 /**
@@ -140,8 +140,6 @@ exports.getManifest = function(cwd){
     if(!cwd){
         cwd = process.cwd();
     }
-
-    var manifest;
     if(fs.existsSync(path.join(cwd,"wjs-config.json"))){
         return JSON.parse(fs.readFileSync(path.join(cwd,"wjs-config.json")).toString("utf-8"));   
     }else{
@@ -155,9 +153,7 @@ exports.getManifest = function(cwd){
  */
 
 exports.getProjectDependencies = function(directory){
-    if(fs.pathExistsSync(path.join(directory,"app","assets"))){
-        fs.copySync(path.join(directory,"app","assets"),path.join(directory,"www","assets"))
-    }
+    //Get any extra uncompiled items to the final folder for dynamic referencing
     var arr = exports.getManifest().include;
     if(arr && Array.isArray(arr)){
         for(var i = 0; i<arr.length ; i++){
@@ -167,6 +163,7 @@ exports.getProjectDependencies = function(directory){
     var man = exports.getManifest();
     var type = man["project-type"];
     
+    //Copy all wjsModules needed for the build
     man.extraModules.forEach((m)=>{
         fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
     })
@@ -183,13 +180,20 @@ exports.parseConf = function(file){
     /*kvm means Key-Value-Map*/
     var kvm = {};
 
-    var a = contents.split("\n");
+    var a = contents.replace(/\\r/g,"").split("\n");
     a.forEach(function(kv){
         if(!kv.trim().startsWith("#")){
             /*kva means Key-Value-Array*/
             var kva = kv.split("=");
             var key = kva[0].trim();
             var value = kva[1].trim();
+            if(value[0] == "%"){
+                var aa = value.slice(1).split(",");
+                value = []
+                aa.forEach(function(aaa){
+                    value.push(aaa.trim());
+                })
+            }
             kvm[key] = value;
         }
     })
@@ -227,7 +231,7 @@ exports.makeGradleBuild = function(packageName){
     if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
 
     var gradle_build_path = path.join(androidProjectDirectory,"app/build.gradle");
-    var resource_gradle_build_path = path.join(__dirname,"../resources/java/build.gradle");
+    var resource_gradle_build_path = path.join(resourcesPath,"/java/build.gradle");
     fs.writeFileSync(gradle_build_path,fs.readFileSync(resource_gradle_build_path).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName));
 }
 
@@ -244,11 +248,11 @@ exports.makeApplicationIcons = function(androidManifest){
 
     if(androidManifest.local === true)androidProjectDirectory = path.join(process.cwd(),"android");
 
+    //If no icons are specified then use default android icons else use those included
     if(!androidManifest.icons){
         console.log(chalk.yellow("Warning: no image files specified for "+androidManifest.app_name));
-        // process.exit(8);
-        normalImagePath = path.join(__dirname,"../resources/java/ic_launcher.png");
-        circularImagePath = path.join(__dirname,"../resources/java/ic_launcher_round.png");
+        normalImagePath = path.join(resourcesPath,"/java/ic_launcher.png");
+        circularImagePath = path.join(resourcesPath,"/java/ic_launcher_round.png");
     }else{
         normalImagePath = path.join(process.cwd(),androidManifest.icons.normal);
         circularImagePath = path.join(process.cwd(),androidManifest.icons.circular);
@@ -280,14 +284,17 @@ exports.makeApplicationIcons = function(androidManifest){
     };
 
     launcher_types.forEach(function(type,index){
+        //Get needed resolution for this image based on it's index
         var resolution = launcher_resolutions[index.toString()];
 
+        //Resize it and save it with it's size description  ["h","m","xh","xxh","xxxh"]
         resize_image(new Buffer(fs.readFileSync(normalImagePath)),resolution).then(function(buffer){
             fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"dpi","ic_launcher.png"),buffer);
         }).catch(function(err){
             console.log(chalk.red(""+err));
         });
 
+        //Resize it and save it with it's size description  ["h","m","xh","xxh","xxxh"] and specify as round        
         resize_image(new Buffer(fs.readFileSync(circularImagePath)),resolution).then(function(buffer){
             fs.writeFileSync(path.join(launchers_path,"mipmap-"+type+"dpi","ic_launcher_round.png"),buffer);
         }).catch(function(err){
@@ -295,6 +302,27 @@ exports.makeApplicationIcons = function(androidManifest){
         });
     })    
 
+}
+
+/**
+ * @argument {Array<String>} moduleList
+ * @description Return object of all modules with their exported functions
+ * @returns {}
+ */
+
+function getWJSNativeModules(moduleList){
+    var javaModules = path.join(resourcesPath,"java","modules");
+    var modules = {};
+    moduleList.forEach(function(e){
+        var modulePath = path.join(javaModules,e);
+        //Parse module configuration into object
+        var config = exports.parseConf(path.join(modulePath,"module.conf"))
+        modules[config.name] = {
+            "exports": config.exports,
+            "dependencies": config.dependencies
+        };
+    })
+    return modules;
 }
 
 /**
@@ -309,49 +337,76 @@ exports.makeJavaSource = function(packageName,local,p){
 
     var packageToPath = packageName.split(".").join("/");
     var javaPath = path.join(androidProjectDirectory,"app/src/main/java",packageToPath);
-    fs.removeSync(javaPath);
+    fs.removeSync(path.join(androidProjectDirectory,"app/src/main/java"));
     fs.mkdirpSync(javaPath);
-    fs.copySync(path.join(__dirname,"../resources/java"),javaPath);
+    fs.copySync(path.join(resourcesPath,"/java"),javaPath);
+    fs.removeSync(path.join(androidProjectDirectory,"app/src/main/java",packageToPath,"modules"));
 
     var used_modules = exports.getManifest().android.extraModules === undefined? [] : exports.getManifest().android.extraModules;
+    //Code declaration
     var extraModulesCode = "";
+    //Code import
     var extraModulesImports = "";
-    used_modules.forEach(function(m){
-        var c = fs.readFileSync(path.join(resourcesPath,"java","modules",m+".java"),"utf-8");
-        extraModulesImports+=c.split("/*")[1].split("*/")[0]+"\n";
-        extraModulesCode+=(c+"\n");
+    //Code initialization
+    var extraModulesImportsInitialization = "";
+    var modules = getWJSNativeModules(used_modules);
+    Object.getOwnPropertyNames(modules).forEach(function(k){
+        fs.copySync(path.join(resourcesPath,"java","modules",k,k+".java"),path.join(androidProjectDirectory,"app/src/main/java/wjs/modules/",k+".java"));
+        extraModulesImports += "import wjs.modules."+k+";\n"; //e.g import wjs.modules.Camera
+        var className = k;
+        var jsName = k[0].toLowerCase()+k.slice(1); //Give it a javascript-ish name e.g fomr CameraModule to cameraModule
+        extraModulesCode += `${className} ${jsName};\n\t`;// CameraModule cameraModule;
+        /*
+        @JavascriptInterface
+        public Object getCameraModule(){
+            cameraModule = new CameraModule(c);//c for Context
+        }
+        */
+        extraModulesImportsInitialization += `@JavascriptInterface\n\tpublic Object get${className}(){\n\t\t${jsName} = new ${className}(c);\n\t\treturn ${jsName};\n\t}`;
     })
-
     var wai = path.join(javaPath,"WebAppInterface.java");
     var maj = path.join(javaPath,"MainActivity.java");
-    var mod_wai = fs.readFileSync(wai).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName).replace(/{{EXTRA_IMPORTS}}/g,extraModulesCode).replace(/{{Dependencies}}/g,extraModulesImports);
+    //Replace all instances of placeholders with their respective content
+    var mod_wai = fs.readFileSync(wai).toString("utf-8").
+    replace(/{{PACKAGE_NAME}}/g,packageName).
+    replace(/{{Dependencies}}/g,extraModulesImports).
+    replace(/{{EXTRA_IMPORTS_DECLARATION}}/g,extraModulesCode).
+    replace(/{{EXTRA_IMPORTS_INITIALIZATION}}/g,extraModulesImportsInitialization);
+    //Write files
     fs.writeFileSync(wai, mod_wai);
     fs.writeFileSync(maj,fs.readFileSync(maj).toString("utf-8").replace(/{{PACKAGE_NAME}}/g,packageName))
 }
 
 /**
  * @argument {String} packageName
+ * @description Generate AndroidManifest.xml file
  */
 
 exports.makeManifestXML = function/*package*/(packageName){
     var androidProjectDirectory = path.join(resourcesPath,"android");
+    const manifest = exports.getManifest();
 
-    if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
+    //If the android project is within the wjs project folder then use that instead
+    if(manifest.local === true)androidProjectDirectory = path.join(process.cwd(),"android");
 
+    //Init XML DOM parser
     var dom = new xml.DOMParser();
     var manifestPath = path.join(resourcesPath,"java/AndroidManifest.xml");
     var stringsDomContent = dom.parseFromString(fs.readFileSync(manifestPath).toString("utf-8"),"text/xml");
+    //Get the attributes of the <manifest> tag
     var arr = stringsDomContent.documentElement.getElementsByTagName("manifest")._node.attributes;
     
     for(var m=0;m<arr.length;m++){
+        //Set the package attribute to the packageName supplied.
         if(arr[m].name == "package"){
             arr[m].value = packageName;
         }
     }
 
-    if(Array.isArray(exports.getManifest().android.permissions)){
+    //If the android app has specific permissions then add them to the new AndroidManifest.xml
+    if(Array.isArray(manifest.android.permissions)){
         console.log(chalk.blue("Found specified permissions"))
-        var permissions = exports.getManifest().android.permissions;
+        var permissions = manifest.android.permissions;
 
         permissions.forEach(function(permission){
             var per = stringsDomContent.createElement("uses-permission")
@@ -361,14 +416,13 @@ exports.makeManifestXML = function/*package*/(packageName){
     }
 
 
-    if(Array.isArray(exports.getManifest().android.features)){
+    ////If the android app has specific features then add them to the new AndroidManifest.xml
+    if(Array.isArray(manifest.android.features)){
         console.log(chalk.blue("Found specified features"))
-        var features = exports.getManifest().android.features;
+        var features = manifest.android.features;
 
         features.forEach(function(feature){
-            // console.log(stringsDomContent.documentElement.getElementsByTagName("manifest")._node)
             var per = stringsDomContent.createElement("uses-feature")
-            // per.
             per.setAttribute("android:name","android."+feature)
             stringsDomContent.documentElement.appendChild(per)
         })
@@ -376,64 +430,79 @@ exports.makeManifestXML = function/*package*/(packageName){
 
     var ser = new xml.XMLSerializer();
     
+    //Convert xml DOM to string and write it to the new AndroidManifest.xml
     var ts = ser.serializeToString(stringsDomContent);
-    // console.log(ts);
     fs.writeFileSync(path.join(androidProjectDirectory,"app/src/main/AndroidManifest.xml"),ts);
 }
 
+/**
+ * @description Generate strings.xml file
+ */
 exports.makeStringXML = function(){
     var androidProjectDirectoryValues = valuesPath;
-
-    if(exports.getManifest().local === true)androidProjectDirectoryValues = path.join(process.cwd(),"android/app/src/main/res/values");
+    const manifest = exports.getManifest();
+    //If the android project is within the wjs project folder then use that instead
+    if(manifest.local === true)androidProjectDirectoryValues = path.join(process.cwd(),"android/app/src/main/res/values");
 
     var dom = new xml.DOMParser();
     var stringsDomContent = dom.parseFromString(fs.readFileSync(path.join(androidProjectDirectoryValues,"strings.xml")).toString("utf-8"),"text/xml");
+
     var arr = stringsDomContent.documentElement.getElementsByTagName("string");
     for(var i = 0;i<arr.length; i++){
         var n = arr[i].getAttribute("name");
-    
+        //Change the app_name attribute to manifest.app_name value
         if(n == "app_name"){
-            // console.log(arr[i].lastChild.data)
-            arr[i].lastChild.data = exports.getManifest().android.app_name;
+            arr[i].lastChild.data = manifest.android.app_name;
         }
     }
     
     var ser = new xml.XMLSerializer();
     
+    //Convert xml DOM to string and write it
     var ts = ser.serializeToString(stringsDomContent);
-    
-    // console.log(ts)
-
     fs.writeFileSync(path.join(androidProjectDirectoryValues,"strings.xml"),ts);
 }
 
+
+/**
+ * @description Generate colors.xml file
+ */
 exports.makeColorsXML = function(){
     var androidProjectDirectoryValues = valuesPath;
+    const manifest = exports.getManifest();
 
-    if(exports.getManifest().local === true)androidProjectDirectoryValues = path.join(process.cwd(),"android/app/src/main/res/values");
+    //If the android project is within the wjs project folder then use that instead
+    if(manifest.local === true)androidProjectDirectoryValues = path.join(process.cwd(),"android/app/src/main/res/values");
 
     var dom = new xml.DOMParser();
     var stringsDomContent = dom.parseFromString(fs.readFileSync(path.join(androidProjectDirectoryValues,"colors.xml")).toString("utf-8"),"text/xml");
+    //Get attributes of the <color> tag
     var arr = stringsDomContent.documentElement.getElementsByTagName("color");
     for(var i = 0;i<arr.length; i++){
         var n = arr[i].getAttribute("name");
-    
+        //Set the <color> tag values based on their names
         if(n == "colorPrimary"){
-            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.primary:"#000000";
+            arr[i].lastChild.data = manifest.android.color?manifest.android.color.primary:"#000000";
         }else if(n == "colorPrimaryDark"){
-            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.primaryDark:"#000000";
+            arr[i].lastChild.data = manifest.android.color?manifest.android.color.primaryDark:"#000000";
         }else if(n == "colorAccent"){
-            arr[i].lastChild.data = exports.getManifest().android.color?exports.getManifest().android.color.accent:"#000000";
+            arr[i].lastChild.data = manifest.android.color?manifest.android.color.accent:"#000000";
         }
     }
     
     var ser = new xml.XMLSerializer();
-    
+    //Convert xml DOM to string and write it
     var ts = ser.serializeToString(stringsDomContent);
-
     fs.writeFileSync(path.join(androidProjectDirectoryValues,"colors.xml"),ts);
 }
 
+/**
+ * 
+ * @param {TerminalKit} t 
+ * @param {String} question 
+ * @param {Function} cb 
+ * @description Prompt user for input using TerminalKit
+ */
 function ask(t,question,cb){
 
     t(question)
@@ -450,13 +519,17 @@ function ask(t,question,cb){
 
 /**
  * @argument {String} directory
+ * @argument {Object} flag
+ * @description Initialize wjs project
  */
 
 exports.init = function(directory,flag){
-    // var flag = exports.flags();
     var type = exports.mode(flag);
     var config = projectDefinitions[type].config;
-    if(fs.existsSync(directory))fs.removeSync(directory);
+    //If the path already exists then remove it
+    if(fs.existsSync(directory)){
+        fs.removeSync(directory)
+    };
     fs.mkdirSync(directory);
     var wjsManifest = `{
     "project-type" : "${type}",
@@ -469,24 +542,28 @@ exports.init = function(directory,flag){
     if(config){
         fs.writeFileSync(path.join(directory,"webpack.config.js"),config)
     }
+
+    //Include all default modules for the project
     wjsDefaultModules.forEach((m)=>{
         fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
     })
+
+    //Get starter code relevant to project type
     if(flag.vue){
-        fs.copySync(path.join(__dirname,"../resources","wjs-vue"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-vue"),path.join(directory))
     }else if(flag.react){
-        fs.copySync(path.join(__dirname,"../resources","wjs-react"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-react"),path.join(directory))
     }else if(flag.javascript){
-        fs.copySync(path.join(__dirname,"../resources","wjs-javascript"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-javascript"),path.join(directory))
     }else if(flag.typescript){
-        fs.copySync(path.join(__dirname,"../resources","wjs-typescript"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-typescript"),path.join(directory))
     }else{
         exports.usage("*");
         process.exit(0)
     }
 
+    //Prepare package.json
     var pjson = JSON.parse(fs.readFileSync(path.join(directory,"package.json")).toString())
-    // console.log(JSON.stringify(pjson,undefined,"\t"))
     console.log(chalk.magenta("Please answer these questions to continue with the setup"))
     var t = require("terminal-kit").terminal;
     ask(t,chalk.green("Author: "),function(i){
@@ -495,25 +572,24 @@ exports.init = function(directory,flag){
         ask(t,chalk.green("Version: "),function(i){
             pjson.version = i
             console.log("\nMaking package.json")
-            // console.log(JSON.stringify(pjson,undefined,"\t"))
             fs.writeFileSync(path.join(directory,"package.json"),JSON.stringify(pjson,undefined,"\t"))
             t.processExit()
         })
     })
-    var a =directory.split(path.sep);
+    var a = directory.split(path.sep);
     pjson.name = a[a.length-1]
-
     var beautifiedConfig = JSON.stringify(JSON.parse(wjsManifest),undefined,"\t");
     beautifiedConfig.compileCommand = undefined;
-
+    //Generate standard Java code for Android project if the project is to have custom android files 
     if(flag.local === true){
         if(flag.package){
             exports.makeJavaSource(flag.package,true,directory);
             exports.makeGradleBuild(flag.package);
             exports.makeManifestXML(flag.package);
         }
-        fs.copySync(path.join(__dirname,"../resources","android"),path.join(directory,"android"));
+        fs.copySync(path.join(resourcesPath,"android"),path.join(directory,"android"));
     }
+    //Write wjs configuration file
     fs.writeFileSync(path.join(directory,"wjs-config.json"),beautifiedConfig);
     
 }
@@ -543,14 +619,11 @@ exports.refresh = function(c){
     }
 }
 
-// console.log(flags());
-
 /**
  * @argument {websocket.Socket.connnection} c
  */
 
 exports.compile = function(cb,o){
-    // console.log("Compiling....")
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest(process.cwd())
     global.notCompiling = false;
@@ -562,13 +635,127 @@ exports.compile = function(cb,o){
         global.notCompiling = true;
         cb && cb(false)
         if(cb) bundler.stop();
-        // exports.refresh(c)
     })
     .catch(function(e){
         console.log("Error compiling:");
         console.log(e);
         cb && cb(e)
         process.exit(2)
+    })
+}
+
+
+/**
+ * @description Clean up residual Android build files
+ */
+function cleanUpAndroid(){
+    var javaPath = path.join(resourcesPath,"/android/app/src/main/java");
+    var assetsPath = path.join(resourcesPath,"/android/app/src/main/assets");
+    fs.emptyDirSync(javaPath);
+    fs.emptyDirSync(assetsPath)
+}
+
+
+/**
+ * @description Build the android app
+ * @param {String} cwd 
+ * @param {Object} f 
+ */
+function buildAndroid(cwd,f){
+    const manifest = exports.getManifest();
+    var androidProjectDirectory = path.join(resourcesPath,"android");
+
+    //If manifest.local is true the the android source resides in <project-dir>/android
+    if(manifest.local === true)androidProjectDirectory = path.join(process.cwd(),"android");
+
+    console.log(chalk.green("Building for Android"+(manifest.local?" (Local Project)":"")));
+    //Check for the existence of the android configuration in the manifest and exit if it does not
+    if(typeof manifest.android === "undefined"){
+        console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
+        process.exit(9);
+    }
+
+    //Generate the colors.xml and string.xml files for the Android app
+    exports.makeStringXML();
+    exports.makeColorsXML();
+
+    if(manifest.custom){
+        console.log("Customized source code "+chalk.green("(active)"))
+    }else{
+        //Generate the Java source of the android project if manifest.custom is false meaning there is no custom java to load
+        exports.makeJavaSource(manifest.android.package,manifest.local);
+        console.log("Customized source code "+chalk.yellow("(inactive)"))
+    }
+
+    //Generate the build.gradle, AndroidManifest.xml and ApplicationIcons
+    exports.makeGradleBuild(manifest.android.package);
+    exports.makeManifestXML(manifest.android.package);
+    exports.makeApplicationIcons(manifest.android);
+
+    //If the --no-compile flag exists then just copy the html sources to the www folder else compile before copying
+    if(f["no-compile"])
+        fs.copySync(path.join(cwd,projectDefinitions[manifest["project-type"]].root),path.join(androidProjectDirectory,"app/src/main/assets/www"));
+    else
+        fs.copySync(path.join(cwd,manifest.root),path.join(androidProjectDirectory,"app/src/main/assets/www"));
+    var outputPath = path.join(androidProjectDirectory,"app/build/outputs/apk/app-debug.apk");
+    
+    //Go to android project directory and get ready to build
+    process.chdir(androidProjectDirectory);
+    var gradlew;
+    //Get gradlew command based on operating system
+    switch (os.platform()) {
+        case "win32":
+            gradlew = "gradlew"
+            break;
+    
+        default:
+            gradlew = "./gradlew"
+            break;
+    }
+    var p = cwd.split("\\");
+    var gradle = exec(`${gradlew} assembleDebug`);
+    var err;
+
+    //Show command output if --verbose is set
+    if(f.verbose){
+        gradle.stdout.on("data",function(data){
+            process.stdout.write(data.toString())
+        })
+    }
+
+    //Exit on gradle error and clean up files
+    gradle.stderr.once("error",function(){
+        print(chalk.red("Error initializing gradle"))
+        cleanUpAndroid()
+        process.exit(10);
+    })
+
+    gradle.stderr.on("data",function(data){
+        process.stderr.write(data)
+    })
+
+    function getApp(){
+        process.chdir(cwd);
+        var p = cwd.split("\\");
+        if(!fs.existsSync(outputPath)){
+            print(chalk.red("Error initializing gradle"))
+            process.exit(10);
+        }
+        fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
+    }
+
+    gradle.stdout.on("end",function(){
+        if(err){
+            console.log(chalk.red("Error:\n\n")+err)
+            process.chdir(cwd);
+        }else{
+            getApp()
+            var p = cwd.split("\\");
+            var appPath = path.join(cwd,p[p.length-1]+".apk");
+            console.log(chalk.green("App ready at "+appPath))
+            fs.removeSync(path.join(resourcesPath,"build/android"));
+        }
+        cleanUpAndroid()
     })
 }
 
@@ -579,101 +766,33 @@ exports.compile = function(cb,o){
 exports.quietCompile = exports.compile;
 
 exports.build = function(){
+    const manifest = exports.getManifest();
     var f = exports.flags();
     var cwd = process.cwd();
     var p = cwd.split("\\");
     process.env.NODE_ENV = "production"
-    exports.quietCompile(function(){
+    //If no compilation is needed proceed to building android or web
+    if(f["no-compile"]){
         if(f.android){
-            var androidProjectDirectory = path.join(resourcesPath,"android");
-    
-            if(exports.getManifest().local === true)androidProjectDirectory = path.join(process.cwd(),"android");
-    
-            console.log(chalk.green("Building for Android"+(exports.getManifest().local?" (Local Project)":"")));
-            if(typeof exports.getManifest().android === "undefined"){
-                console.log(chalk.red("Error : Android configuration not found\n\nCheck the readme at https://github.com/neutrino2211/webjs for how to make an android configuration"));
-                process.exit(9);
-            }
-            // fs.copySync(path.join(resourcesPath,"android"),path.join(resourcesPath,"build/android"));
-    
-            exports.makeStringXML();
-            exports.makeColorsXML();
-            if(exports.getManifest().custom){
-                console.log("Customized source code "+chalk.green("(active)"))
-            }else{
-                exports.makeJavaSource(exports.getManifest().android.package,exports.getManifest().local);
-                console.log("Customized source code "+chalk.yellow("(inactive)"))
-            }
-            exports.makeGradleBuild(exports.getManifest().android.package);
-            exports.makeManifestXML(exports.getManifest().android.package);
-            exports.makeApplicationIcons(exports.getManifest().android);
-    
-            fs.copySync(path.join(cwd,exports.getManifest().root),path.join(androidProjectDirectory,"app/src/main/assets/www"));
-            var outputPath = path.join(androidProjectDirectory,"app/build/outputs/apk/app-debug.apk");
-            process.chdir(androidProjectDirectory);
-            var gradlew;
-    
-            switch (os.platform()) {
-                case "win32":
-                    gradlew = "gradlew"
-                    break;
-            
-                default:
-                    gradlew = "./gradlew"
-                    break;
-            }
-            var p = cwd.split("\\");
-            var gradle = exec(`${gradlew} assembleDebug`);
-            var err;
-            if(f.verbose){
-                gradle.stdout.on("data",function(data){
-                    process.stdout.write(data.toString())
-                })
-            }
-    
-            gradle.stderr.once("error",function(data){
-                print(chalk.red("Error initializing gradle"))
-                process.exit(10);
-            })
-    
-            gradle.stderr.on("data",function(data){
-                process.stderr.write(data)
-            })
-    
-            function getApp(){
-                process.chdir(cwd);
-                var p = cwd.split("\\");
-                if(!fs.existsSync(outputPath)){
-                    print(chalk.red("Error initializing gradle"))
-                    process.exit(10);
-                }
-                fs.renameSync(outputPath,path.join(cwd,p[p.length-1]+".apk"));
-            }
-    
-            gradle.stdout.on("end",function(){
-                if(err){
-                    console.log(chalk.red("Error:\n\n")+err)
-                    process.chdir(cwd);
-                }else{
-                    getApp()
-                    var p = cwd.split("\\");
-                    var appPath = path.join(cwd,p[p.length-1]+".apk");
-                    console.log(chalk.green("App ready at "+appPath))
-                    fs.removeSync(path.join(resourcesPath,"build/android"));
-                }
-                var javaPath = path.join(__dirname,"../resources/android/app/src/main/java");
-                var assetsPath = path.join(__dirname,"../resources/android/app/src/main/assets");
-                fs.emptyDirSync(javaPath);
-                fs.emptyDirSync(assetsPath)
-            })
+            buildAndroid(cwd,f);
         }else{
-            console.log(chalk.green("App static files ready at "+path.join(cwd,exports.getManifest().root)))
+            fs.copySync(path.join(cwd,projectDefinitions[manifest["project-type"]].root),path.join(cwd,manifest.root))
+            console.log(chalk.green("App static files ready at "+path.join(cwd,manifest.root)))
         }
-    },{
-        minify: true,
-        target: "browser",
-        publicUrl: "./"
-    });
+    } else {
+        exports.quietCompile(function(){
+            //If the --android flag exists then build for android else just compile the html
+            if(f.android){
+                buildAndroid(cwd,f);
+            }else{
+                console.log(chalk.green("App static files ready at "+path.join(cwd,manifest.root)))
+            }
+        },{
+            minify: true,
+            target: "browser",
+            publicUrl: "./"
+        });
+    }
 }
 
 exports.compileAndRefresh = function(c){

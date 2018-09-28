@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 import java.util.Map;
 import java.util.HashMap;
@@ -12,11 +11,11 @@ import android.view.KeyEvent;
 import java.util.concurrent.Callable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import android.webkit.WebView;
+import android.webkit.*;
 
 //Extra imports dependencies
 
-// {{Dependencies}}
+{{Dependencies}}
 
 /**
  * Created by ADMIN on 24/12/2017.
@@ -25,6 +24,8 @@ import android.webkit.WebView;
 public class WebAppInterface {
     Context c;
     WebView w;
+    boolean debug = false;
+    {{EXTRA_IMPORTS_DECLARATION}}
     WebAppInterface(Context context, WebView wv){
         c = context;
         w = wv;
@@ -33,7 +34,11 @@ public class WebAppInterface {
     private Map<String,String> events = new HashMap<String,String>();
 
     @JavascriptInterface
+    public void debugToast(boolean b){
+        debug = b;
+    }
 
+    @JavascriptInterface
     public void toast(String text){
         Toast.makeText(c,text,Toast.LENGTH_LONG).show();
     }
@@ -71,6 +76,8 @@ public class WebAppInterface {
         events.put(name,function);
     }
 
+    {{EXTRA_IMPORTS_INITIALIZATION}}
+
     public boolean onKeyDown(int keyCode, KeyEvent event){
         if(event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK){
             if(events.containsKey("backButtonPressed")){
@@ -82,5 +89,9 @@ public class WebAppInterface {
         return false;
     }
 
-    // {{EXTRA_IMPORTS}}
+    public void HandleChromeClientErrors(WebView wv, WebResourceRequest r, WebResourceError e){
+        if(debug){
+            Toast.makeText(c,"Request : '"+r+"' with error '"+e+"'",Toast.LENGTH_LONG).show();
+        }
+    }
 }

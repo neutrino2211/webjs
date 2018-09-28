@@ -404,7 +404,7 @@ else if(operation == "publish"){
 }
 
 else if(operation == "build"){
-    utils.quietCompile(utils.build);
+    utils.build();
 }
 
 else if(operation == "run"){

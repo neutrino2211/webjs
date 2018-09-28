@@ -1,6 +1,7 @@
 gcloud.json
 Test
 bin
+dist
 rollback
 node_modules
 */node_modules
@@ -28,3 +29,4 @@ tests/**/.cache
 tests/**/dist
 tests/**/node_modules
 docs/videos
+prebuild-test

@@ -358,7 +358,7 @@ else if (operation == "publish") {
     Publish(operand, process.cwd(), flags);
 }
 else if (operation == "build") {
-    utils.quietCompile(utils.build);
+    utils.build();
 }
 else if (operation == "run") {
     Run(operand, process.cwd(), flags);
