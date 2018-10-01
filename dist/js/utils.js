@@ -90,7 +90,7 @@ exports.usage = function (name) {
         install: "wjs install <module>\n\t - Install third party module",
         tasks: "wjs tasks\n\t - List task runners installed",
         run: "wjs run <task-alias>\n\t - run " + chalk.green("wjs tasks") + " to see installed task runners",
-        development: "wjs run development\n\t - Run the code compiler in watch mode",
+        development: "wjs development\n\t - Run the code compiler in watch mode",
         build: "wjs build <platform?>\n\t - Compiles the code into a website if no target platform is specified\n\t - Supported platforms\n\t\t -> Android"
     };
     if (name == "*") {

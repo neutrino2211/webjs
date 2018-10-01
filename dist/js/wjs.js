@@ -42,27 +42,17 @@ function Development(flags) {
     var port = 3100;
     global.flags = flags;
     global.port = port;
-    // var S = server.createServer({
-    //     root: path.join(process.cwd(),SR)
-    // });
     var app = express();
+    var middleware = function (req, res, next) {
+        console.log("Debug [" + Date() + "]: " + chalk.default.blue(req.url));
+        if (req.url.endsWith("/") && req.url != "/") {
+            req.url = req.url.slice(0, -1);
+        }
+        next();
+    };
+    app.use(middleware);
     app.use(express.static(SR));
     var S = app.listen(3100);
-    //declare websocket for refreshing web page.
-    var ws = new websocket.server({
-        httpServer: S
-    });
-    // utils.compile(c);
-    // var c;
-    ws.on("request", function (res) {
-        var connection = res.accept('', res.origin);
-        // connection.send("refresh")
-        c = connection;
-    });
-    // console.log(path.join(process.cwd(),AR))
-    // server.Source = path.join(process.cwd(),SR);
-    // S.root = path.join(process.cwd(),AR)
-    // S.listen(3100);
     global.notCompiling = true;
     utils.compile(c);
     fs.watch(path.join(process.cwd(), AR), {

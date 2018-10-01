@@ -4,6 +4,7 @@ bin
 dist
 rollback
 node_modules
+examples
 */node_modules
 resources/android
 resources/*.zip

@@ -3,6 +3,8 @@ rollback
 backup
 node_modules
 module-dev
+examples
+src
 resources/Typescript/angular
 resources/update-*
 *.keystore
