@@ -327,67 +327,16 @@ function Run(operand, cwd, flags) {
         console.log(chalk.red("Can not find module (" + operand + ")"));
     }
 }
-// init argument block
-if (operation == "init") {
-    Init(operand, process.cwd(), flags);
-}
-//Update argument block
-else if (operation == "update") {
-    Update(flags);
-}
-//Install argument block
-else if (operation == "install") {
-    INSTALL(operand);
-}
-//Version argument block
-else if (operation == "-v") {
-    Version();
-}
-//Add app dependency
-else if (operation == "add") {
-    Add(operand, process.cwd());
-}
-//Development
-else if (operation == "run-dev" || operation == "development") {
-    Development(flags);
-}
-else if (operation == "check-update") {
-    CheckUpdate();
-}
-else if (operation == "publish") {
-    Publish(operand, process.cwd(), flags);
-}
-else if (operation == "build") {
-    utils.build();
-}
-else if (operation == "run") {
-    Run(operand, process.cwd(), flags);
-}
-else if (operation == "tasks") {
-    var p = require(path.join(__dirname, "../../package.json"));
-    var m = p["wjs:installedModules"];
-    var modules = Object.getOwnPropertyNames(m);
-    if (modules.length == 0) {
-        console.log(chalk.red("No tasks installed"));
-        process.exit();
-    }
-    modules.forEach(function (name) {
-        console.log(chalk.green(name) + chalk.yellow(" -> ") + chalk.blue(m[name]));
-    });
-}
-else if (operation == "-h" || operation == "--help" || operation == "help") {
-    if (operand == undefined) {
-        utils.usage("*");
-    }
-    else {
-        utils.usage(operand);
-    }
-}
-else {
-    utils.usage("*");
-}
 exports.init = Init;
 exports.install = INSTALL;
 exports.publish = Publish;
 exports.development = Development;
+exports.operation = operation;
+exports.operand = operand;
+exports.flags = flags;
+exports.update = Update;
+exports.version = Version;
+exports.run = Run;
+exports.checkUpdate = CheckUpdate;
+exports.add = Add;
 //# sourceMappingURL=wjs.js.map
