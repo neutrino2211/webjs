@@ -626,22 +626,27 @@ exports.refresh = function(c){
 exports.compile = function(cb,o){
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest(process.cwd())
-    global.notCompiling = false;
-    var bundler = new Parcel(manifest.entry,o);
-    if(manifest["project-type"] === "react" && cb == undefined) process.env.NODE_ENV = "development";
-    bundler.bundle()
-    .then(function(){
-        console.log(chalk.green("Done"))
-        global.notCompiling = true;
-        cb && cb(false)
-        if(cb) bundler.stop();
-    })
-    .catch(function(e){
-        console.log("Error compiling:");
-        console.log(e);
-        cb && cb(e)
-        process.exit(2)
-    })
+    // console.log(notCompiling)
+    if(global.notCompiling){
+        global.notCompiling = false;
+        var bundler = new Parcel(manifest.entry,o);
+        if(manifest["project-type"] === "react" && cb == undefined) process.env.NODE_ENV = "development";
+        bundler.bundle()
+        .then(function(){
+            console.log(chalk.green("Done"))
+            global.notCompiling = true;
+            if(cb){
+                bundler.stop()
+                cb()
+            };
+        })
+        .catch(function(e){
+            console.log("Error compiling:");
+            console.log(e);
+            if(cb) cb(e);
+            process.exit(2)
+        })
+    }
 }
 
 

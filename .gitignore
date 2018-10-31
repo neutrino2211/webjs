@@ -30,3 +30,7 @@ tests/**/dist
 tests/**/node_modules
 docs/videos
 prebuild-test
+.vs
+.vscode
+.vstags
+examples

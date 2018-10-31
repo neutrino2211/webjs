@@ -22,6 +22,7 @@ if (args.length > 0) {
 else {
     console.log(chalk.red("No arguments"));
 }
+global.notCompiling = true;
 global.BIN_PATH = path.join(__dirname, "../../node_modules/.bin");
 global.RESOURCES_PATH = path.join(__dirname, "../../resources");
 global.unpackResource = function (from, to) {
