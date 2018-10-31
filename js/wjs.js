@@ -52,29 +52,18 @@ function Development(flags){
 
     global.flags = flags;
     global.port  = port;
-    // var S = server.createServer({
-    //     root: path.join(process.cwd(),SR)
-    // });
 
     var app = express();
+    var middleware = function(req,res,next){
+        console.log(`Debug [${Date()}]: ${chalk.default.blue(req.url)}`)
+        if(req.url.endsWith("/") && req.url != "/"){
+            req.url = req.url.slice(0,-1)
+        }
+        next()
+    }
+    app.use(middleware)
     app.use(express.static(SR))
     var S = app.listen(3100);
-    //declare websocket for refreshing web page.
-    var ws = new websocket.server({
-        httpServer: S
-    })
-    // utils.compile(c);
-    // var c;
-    ws.on("request", (res) => {
-        var connection = res.accept('',res.origin);
-        // connection.send("refresh")
-        c = connection;
-    });
-    // console.log(path.join(process.cwd(),AR))
-    // server.Source = path.join(process.cwd(),SR);
-
-    // S.root = path.join(process.cwd(),AR)
-    // S.listen(3100);
     global.notCompiling = true;
     utils.compile(c)
     fs.watch(path.join(process.cwd(),AR),{
@@ -357,86 +346,15 @@ function Run(operand,cwd,flags){
     }
 }
 
-// init argument block
-
-if (operation == "init"){
-    Init(operand,process.cwd(),flags)
-}
-
-
-//Update argument block
-
-else if (operation == "update"){
-    Update(flags)
-}
-
-
-//Install argument block
-
-else if(operation == "install"){
-    INSTALL(operand)
-}
-
-
-//Version argument block
-
-else if(operation == "-v"){
-    Version()
-}
-
-//Add app dependency
-else if(operation == "add"){
-    Add(operand,process.cwd())
-}
-
-//Development
-
-else if(operation == "run-dev" || operation == "development"){
-    Development(flags);
-}
-
-else if(operation == "check-update"){
-    CheckUpdate()
-}
-
-else if(operation == "publish"){
-    Publish(operand,process.cwd(),flags)
-}
-
-else if(operation == "build"){
-    utils.build();
-}
-
-else if(operation == "run"){
-    Run(operand,process.cwd(),flags);
-}
-
-else if(operation == "tasks"){
-    var p = require(path.join(__dirname,"../../package.json"));
-    var m = p["wjs:installedModules"];
-    var modules = Object.getOwnPropertyNames(m);
-    if(modules.length == 0){
-        console.log(chalk.red("No tasks installed"));
-        process.exit()
-    }
-    modules.forEach(function(name){
-        console.log(chalk.green(name)+chalk.yellow(" -> ")+chalk.blue(m[name]))
-    })
-}
-
-else if(operation == "-h" || operation == "--help" || operation == "help"){
-    if(operand == undefined){
-        utils.usage("*");
-    }else{
-        utils.usage(operand)
-    }
-}
-
-else {
-    utils.usage("*");
-}
-
 exports.init        = Init;
 exports.install     = INSTALL;
 exports.publish     = Publish;
 exports.development = Development;
+exports.operation = operation;
+exports.operand = operand;
+exports.flags = flags;
+exports.update = Update;
+exports.version = Version;
+exports.run = Run;
+exports.checkUpdate = CheckUpdate;
+exports.add = Add;
