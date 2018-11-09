@@ -5,7 +5,7 @@
 	},
 	"last-update": "updates.update-2-0-0_000",
 	"wjs:installedModules": {},
-	"version": "2.0.0",
+	"version": "2.0.0-beta.0",
 	"description": "A Native and Web App creation tool",
 	"main": "index.js",
 	"scripts": {
