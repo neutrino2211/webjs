@@ -4,7 +4,7 @@ bin
 dist
 rollback
 node_modules
-examples
+./examples
 */node_modules
 resources/android
 resources/*.zip
@@ -36,6 +36,4 @@ prebuild-test
 .vs
 .vscode
 .vstags
-examples
 .vagrant
-examples
