@@ -32,3 +32,5 @@ resources/WTS/node
 .gitignore
 *.
 tests
+.vagrant
+resources/favicon-1.ico

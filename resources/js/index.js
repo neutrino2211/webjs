@@ -1,1 +1,0 @@
-throw new Error("wjs-cli cannot be used as a node module");
