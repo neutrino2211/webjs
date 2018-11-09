@@ -93,7 +93,7 @@ exports.writePro = function(directory){
 exports.usage = function(name){
     var commands = {
         add: "wjs add <module>\n\t - Add any installed module to current project",
-        init: "wjs init <App-name> <option>\n\t - Initialize a project of the option type\n\t - options:\n\t\t --javascript\n\t\t --typescript\n\t\t --react\n\t\t --vue",
+        init: "wjs init <App-name> <option>\n\t - Initialize a project of the option type\n\t - options:\n\t\t --javascript\n\t\t --typescript\n\t\t --react\n\t\t --vue\n\t\t --task",
         update: "wjs update <version?>\n\t - If you need to install a specific version, run \n\t - wjs update --version=<update-version>",
         "check-update": "wjs check-update\n\t - Check if there are nightly updates or patches",
         install : "wjs install <module>\n\t - Install third party module",
@@ -543,20 +543,35 @@ exports.init = function(directory,flag){
         fs.writeFileSync(path.join(directory,"webpack.config.js"),config)
     }
 
-    //Include all default modules for the project
-    wjsDefaultModules.forEach((m)=>{
-        fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
-    })
+    //Include all default modules for the project if not a task runner
+    if(!flag.task){
+        wjsDefaultModules.forEach((m)=>{
+            fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
+        })
+    }
 
     //Get starter code relevant to project type
     if(flag.vue){
-        fs.copySync(path.join(resourcesPath,"wjs-vue"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-vue"),directory)
     }else if(flag.react){
-        fs.copySync(path.join(resourcesPath,"wjs-react"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-react"),directory)
     }else if(flag.javascript){
-        fs.copySync(path.join(resourcesPath,"wjs-javascript"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-javascript"),directory)
     }else if(flag.typescript){
-        fs.copySync(path.join(resourcesPath,"wjs-typescript"),path.join(directory))
+        fs.copySync(path.join(resourcesPath,"wjs-typescript"),directory)
+    }else if(flag.task){
+        fs.copySync(path.join(resourcesPath,"wjs-tasks"),directory)
+        fs.writeFileSync(
+            path.join(directory,"module.conf"),
+            "name = "+(
+                    function(){
+                        var l = directory.split(path.sep);
+                        return l[l.length-1];
+                    }()
+                )+
+            "\ntype = task\nengine = engine.js\nrequires = "+
+            require(path.join(__dirname,"../../package.json"))["last-update"]
+        );
     }else{
         exports.usage("*");
         process.exit(0)
@@ -578,8 +593,6 @@ exports.init = function(directory,flag){
     })
     var a = directory.split(path.sep);
     pjson.name = a[a.length-1]
-    var beautifiedConfig = JSON.stringify(JSON.parse(wjsManifest),undefined,"\t");
-    beautifiedConfig.compileCommand = undefined;
     //Generate standard Java code for Android project if the project is to have custom android files 
     if(flag.local === true){
         if(flag.package){
@@ -589,8 +602,13 @@ exports.init = function(directory,flag){
         }
         fs.copySync(path.join(resourcesPath,"android"),path.join(directory,"android"));
     }
-    //Write wjs configuration file
-    fs.writeFileSync(path.join(directory,"wjs-config.json"),beautifiedConfig);
+    //Write wjs configuration file if not a task
+    if(!flag.task){
+        var wjsM = JSON.parse(wjsManifest);
+        var beautifiedConfig = JSON.stringify(wjsM,undefined,"\t");
+        beautifiedConfig.compileCommand = undefined;
+        fs.writeFileSync(path.join(directory,"wjs-config.json"),beautifiedConfig);
+    }
     
 }
 
@@ -611,42 +629,28 @@ exports.checkArg = function(position){
 exports.changeDir = function(dir){
     process.chdir(dir)
 }
-exports.refresh = function(c){
-    if(c){
-        c.send("refresh")
-    }else{
-        console.log(`Open ${chalk.blue.bold("http://localhost:"+global.port)} to enable hot reload`);
-    }
-}
-
 /**
- * @argument {websocket.Socket.connnection} c
+ * @argument {Function} c
+ * @argument { {watch: Boolean?, minify: Boolean?} } o
  */
 
 exports.compile = function(cb,o){
     exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest(process.cwd())
-    // console.log(notCompiling)
-    if(global.notCompiling){
-        global.notCompiling = false;
-        var bundler = new Parcel(manifest.entry,o);
-        if(manifest["project-type"] === "react" && cb == undefined) process.env.NODE_ENV = "development";
-        bundler.bundle()
-        .then(function(){
-            console.log(chalk.green("Done"))
-            global.notCompiling = true;
-            if(cb){
-                bundler.stop()
-                cb()
-            };
-        })
-        .catch(function(e){
-            console.log("Error compiling:");
-            console.log(e);
-            if(cb) cb(e);
-            process.exit(2)
-        })
-    }
+    // process.env.NODE_ENV = o.watch?"development":"production";
+    var bundler = new Parcel(path.join(process.cwd(),manifest.entry),o);
+    bundler.bundle()
+    .then(function(){
+        if(cb){
+            cb()
+        };
+    })
+    .catch(function(e){
+        console.log("Error compiling:");
+        console.log(e);
+        if(cb) cb(e);
+        process.exit(2)
+    })
 }
 
 
@@ -774,9 +778,8 @@ exports.build = function(){
     const manifest = exports.getManifest();
     var f = exports.flags();
     var cwd = process.cwd();
-    var p = cwd.split("\\");
-    process.env.NODE_ENV = "production"
-    //If no compilation is needed proceed to building android or web
+    // process.env.NODE_ENV = "production"
+    //If no compilation is needed, proceed to building android or web
     if(f["no-compile"]){
         if(f.android){
             buildAndroid(cwd,f);
@@ -798,23 +801,4 @@ exports.build = function(){
             publicUrl: "./"
         });
     }
-}
-
-exports.compileAndRefresh = function(c){
-    console.log("Compiling....")
-    // getProjectDependencies(process.cwd())
-    var manifest = exports.getManifest();
-    exports.compile()
-    var cmp = exec(manifest.compileCommand);
-    cmp.stdout.on("end",() => {
-        console.log("App running in "+chalk.blue.bold("http://localhost:3100"))
-        exports.refresh(c)
-        // c.send("refresh")
-        // cmp.kill()
-        cmp.removeAllListeners()
-    })
-    cmp.stderr.on("data",()=>{
-        console.log("Error compiling");
-        process.exit(2)
-    })
 }

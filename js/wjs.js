@@ -5,8 +5,6 @@ console.log("WJS cli:")
 var print = console.log;
 
 //Declare variables
-var s;
-var c;
 var fs                 = require("fs-extra");
 var path               = require("path");
 var args               = process.argv.slice(2,process.argv.length);
@@ -15,9 +13,10 @@ var flags              = utils.flags(args);
 var chalk              = require("chalk");
 var Install            = require("./install");
 var firebase           = require("firebase");
-var projectDefinitions = require("./proj-def")
-var refreshMode        = "initial";
+var projectDefinitions = require("./proj-def");
 //Specify argument types
+
+var compiling = false;
 
 if(args.length > 0){
     var operation = args[0];
@@ -26,7 +25,6 @@ if(args.length > 0){
     console.log(chalk.red("No arguments"))
 }
 
-global.notCompiling = true;
 global.BIN_PATH = path.join(__dirname,"../../node_modules/.bin")
 global.RESOURCES_PATH = path.join(__dirname,"../../resources");
 global.unpackResource = function(from,to){
@@ -39,9 +37,7 @@ global.unpackTo = function(from,to){
 }
 
 function Development(flags){
-    var websocket          = require("websocket");
     var express            = require("express");
-    // console.log(operation == "run-dev" ? "run-dev command is deprecated\nUse  \"wjs development\" " : "Development")
     var manifest = utils.getManifest();
 
     var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;
@@ -51,7 +47,7 @@ function Development(flags){
     var port = 3100;
 
     global.flags = flags;
-    global.port  = port;
+    global.port  = flags.port||port;
 
     var app = express();
     var middleware = function(req,res,next){
@@ -63,13 +59,19 @@ function Development(flags){
     }
     app.use(middleware)
     app.use(express.static(SR))
-    var S = app.listen(3100);
-    global.notCompiling = true;
-    utils.compile(c)
-    fs.watch(path.join(process.cwd(),AR),{
+    app.listen(global.port);
+    console.log("App is available on http://localhost:"+global.port)
+    console.log("Watching "+manifest.entry)
+    process.env.NODE_ENV = "development"
+    fs.watch(AR,{
         recursive: true
-    }, ()=>{
-        utils.compile(c)
+    },function(c){
+        if(c=="change"&&!compiling){
+            compiling = true
+            utils.compile(function(){
+                compiling = false
+            })
+        }
     })
 
     if(flags.o||flags.open){
@@ -329,7 +331,7 @@ function Publish (operand,cwd,flags){
     // console.log(type);
 }
 
-function Run(operand,cwd,flags){
+function Run(operand,cwd,flags,test){
     try{
         utils.checkArg(1)
 
@@ -338,11 +340,20 @@ function Run(operand,cwd,flags){
         process.exit(1)
     }
     var p = require(path.join(__dirname,"../../package.json"));
-    if(p["wjs:installedModules"][operand]){
-        var m = require(p["wjs:installedModules"][operand]);
-        m(cwd,flags)
-    }else{
-        console.log(chalk.red("Can not find module ("+operand+")"))
+    if(!test){
+        if(p["wjs:installedModules"][operand]){
+            var m = require(p["wjs:installedModules"][operand]);
+            m(cwd,flags,utils)
+        }else{
+            console.log(chalk.red("Can not find module ("+operand+")"))
+        }
+    } else {
+        if(fs.existsSync(test)){
+            var m = require(test);
+            m(cwd,flags,utils)
+        }else{
+            console.log(chalk.red("Can not find module ("+operand+")"))
+        }
     }
 }
 

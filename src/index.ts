@@ -1,6 +1,6 @@
-import * as chalk from "chalk";
-import * as utils from "../js/utils"
-import * as path from "path"
+import * as utils from "../js/utils";
+import * as path from "path";
+import chalk from "chalk";
 import {
     operand, 
     operation, 
@@ -15,12 +15,15 @@ import {
     run,
     add
 } from "../js/wjs"
+import { existsSync } from "fs";
 
-var Chalk = chalk.default;
-console.log(chalk.default.green("Starting..."))
+console.log(chalk.green("Starting..."))
 
-import "../js/wjs"
-
+if (!existsSync("./wjs-config.json")){
+    console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config.json"))
+    console.log("Did you forget to run 'wjs init' ?")
+    process.exit()
+}
 // init argument block
 
 if (operation == "init"){
@@ -55,7 +58,7 @@ else if(operation == "add"){
 
 //Development
 
-else if(operation == "run-dev" || operation == "development"){
+else if(operation == "development"){
     development(flags);
 }
 
@@ -80,11 +83,11 @@ else if(operation == "tasks"){
     var m = p["wjs:installedModules"];
     var modules = Object.getOwnPropertyNames(m);
     if(modules.length == 0){
-        console.log(Chalk.red("No tasks installed"));
+        console.log(chalk.red("No tasks installed"));
         process.exit()
     }
     modules.forEach(function(name){
-        console.log(Chalk.green(name)+Chalk.yellow(" -> ")+Chalk.blue(m[name]))
+        console.log(chalk.green(name)+chalk.yellow(" -> ")+chalk.blue(m[name]))
     })
 }
 
@@ -94,6 +97,13 @@ else if(operation == "-h" || operation == "--help" || operation == "help"){
     }else{
         utils.usage(operand)
     }
+}
+
+else if(operation == "test"){
+    var cwd = process.cwd();
+    if(!existsSync(operand)) console.log(chalk.red("Can't find '"+path.dirname(operand)+"'"));
+    var conf = utils.parseConf(path.join(operand,"module.conf"))
+    run(operand,cwd,flags,path.join(cwd,operand,conf.engine));
 }
 
 else {

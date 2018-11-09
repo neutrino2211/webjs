@@ -26,6 +26,8 @@ modules
 module-dev
 .gitignore
 *.
+*.bin
+*.lock
 tests/**/.cache
 tests/**/dist
 tests/**/node_modules
