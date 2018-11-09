@@ -12,7 +12,7 @@ describe("React app",function(){
         utils.compile(function(){
             var hasDistFolder = fs.existsSync(path.join(reactTestDirectory,"dist"));
             done(!hasDistFolder)
-        })
+        },{watch: false})
     }).timeout(30000)
 
     it("should not have a compile command entry in the manifest",function(){
