@@ -37,3 +37,4 @@ prebuild-test
 .vscode
 .vstags
 examples
+.vagrant
