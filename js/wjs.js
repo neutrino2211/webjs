@@ -50,55 +50,22 @@ function Development(flags){
     global.port  = flags.port||port;
 
     var app = express();
-    var middleware = function(req,res,next){
-        console.log(`Debug [${Date()}]: ${chalk.default.blue(req.url)}`)
-        if(req.url.endsWith("/") && req.url != "/"){
-            req.url = req.url.slice(0,-1)
+    if(flags.debug){
+        var middleware = function(req,res,next){
+            console.log(`Debug [${Date()}]: ${chalk.default.blue(req.url)}`)
+            if(req.url.endsWith("/") && req.url != "/"){
+                req.url = req.url.slice(0,-1)
+            }
+            next()
         }
-        next()
+        app.use(middleware)
     }
-    app.use(middleware)
     app.use(express.static(SR))
     var l = app.listen(global.port);
-    var os = require('os');
-    var ifaces = os.networkInterfaces();
-
-    Object.keys(ifaces).forEach(function (ifname) {
-        var alias = 0;
-
-        ifaces[ifname].forEach(function (iface) {
-            if ('IPv4' !== iface.family || iface.internal !== false) {
-            // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
-            return;
-            }
-
-            if (alias >= 1) {
-            // this single interface has multiple ipv4 addresses
-            console.log(ifname + ':' + alias, iface.address);
-            } else {
-            // this interface has only one ipv4 adress
-            console.log(ifname, iface.address);
-            }
-            ++alias;
-        });
-    });
     console.log("App is available on http://localhost:"+l.address().port)
     console.log("Watching "+manifest.entry)
     process.env.NODE_ENV = "development"
-    compiling = true
-    utils.compile(function(){
-        compiling = false
-    })
-    fs.watch(AR,{
-        recursive: true
-    },function(c){
-        if(c=="change"&&!compiling){
-            compiling = true
-            utils.compile(function(){
-                compiling = false
-            })
-        }
-    })
+    utils.compile(undefined,{watch:"true",publicUrl:"./"})
 
     if(flags.o||flags.open){
         require('opn')('http://localhost:'+port);

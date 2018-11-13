@@ -778,7 +778,7 @@ exports.build = function(){
     const manifest = exports.getManifest();
     var f = exports.flags();
     var cwd = process.cwd();
-    // process.env.NODE_ENV = "production"
+    process.env.NODE_ENV = "production"
     //If no compilation is needed, proceed to building android or web
     if(f["no-compile"]){
         if(f.android){
