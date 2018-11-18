@@ -14,13 +14,12 @@ module.exports = function Install(operand){
     const modulePath = path.join(modulesPath,operand+".zip")
     const keyFilepath = path.join(__dirname,'../../gcloud.json');
     var moduleFolderPath = modulePath.slice(0,modulePath.length-4);
-    var gcs = require('@google-cloud/storage');
+    var gcs = require('@google-cloud/storage').Storage
     process.env.GOOGLE_APPLICATION_CREDENTIALS = keyFilepath
-    var storage = gcs({
+    var storage = new gcs({
         projectId: 'webjs-f76df',
         keyFileName: keyFilepath
     });
-
 
     var bucket = storage.bucket("webjs-f76df.appspot.com");
     console.log("Downloading...")
@@ -41,7 +40,7 @@ module.exports = function Install(operand){
             // console.log(path.join(moduleFolderPath,"module.conf"))
             if(fs.existsSync(path.join(moduleFolderPath,"module.conf"))){
                 var conf = parseConf(path.join(moduleFolderPath,"module.conf"));
-                var package = require(path.join(__dirname,"../package.json"));
+                var package = require(path.join(__dirname,"../../package.json"));
                 // console.log(package)
                 if(conf.requires && package["last-update"] != conf.requires){
                     var updateVersion = "update-"+package.version.replace(/\./g,"-");
@@ -52,7 +51,7 @@ module.exports = function Install(operand){
                 if(conf.type === "task"){
                     package["wjs:installedModules"][conf.name] = path.join(moduleFolderPath,conf.engine);
                     // console.log(package)
-                    fs.writeFileSync(path.join(__dirname,"../package.json"),JSON.stringify(package,undefined,"\t"));
+                    fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,undefined,"\t"));
                 }else if(conf.type === "module-java"){
                     fs.renameSync(moduleFolderPath,path.join(__dirname,"../../resources/java/modules",wjsModule));
                 }else if(conf.type === "module-js"){

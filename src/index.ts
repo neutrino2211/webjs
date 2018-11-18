@@ -18,7 +18,7 @@ import {
 import { existsSync } from "fs";
 
 console.log(chalk.green("Starting..."))
-const proj_operations = ["install","add","development","build","run"]
+const proj_operations = ["add","development","build","run"]
 
 if (!existsSync("./wjs-config.json") && proj_operations.indexOf(operation) > -1){
     console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config.json"))

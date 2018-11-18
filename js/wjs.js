@@ -236,12 +236,23 @@ function CheckUpdate(){
 function Publish (operand,cwd,flags){
     var Zip = require("adm-zip");
     var zip = new Zip();
-
+    var store = require("@google-cloud/storage").Storage
+    var bucket = new store({
+        projectId: "webjs-f76df",
+        keyFile: "./gcloud.json"
+    }).bucket("webjs-f76df.appspot.com")
+    var intoStream = require("into-stream")
+    if(!flags.type){
+        console.log(chalk.red("Type of module not specified, use the --type flag"))
+        console.log("Exiting");
+        process.exit(12)
+    }
     if(!fs.existsSync(path.join(cwd,operand))){
         print(chalk.red("Error : folder '"+chalk.yellow(operand)+"' not found"))
         process.exit()
     }
-
+    // operand = (function(){var dir = path.join(cwd,operand).split(path.sep);return dir[dir.length-1]})();
+    // print(operand)
     var term = require("terminal-kit").terminal;
     var Progress = term.progressBar({
         width: 80,
@@ -252,33 +263,30 @@ function Publish (operand,cwd,flags){
 
     Progress.update(0)
 
-    var destinationZip = path.join(cwd,operand+".zip");
-
     zip.addLocalFolder(operand);
 
-    Progress.update(10);
-    
-    zip.writeZip(destinationZip);
+    Progress.update(1);
 
-    Progress.update(20);
+    var buffer = zip.toBuffer()
 
-    var gcs = require('@google-cloud/storage');
-
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = path.join(__dirname,'../../gcloud.json');
-    var storage = gcs({
-        projectId: 'webjs-f76df',
-        keyFileName: path.join(__dirname,'../../gcloud.json')
-    });
-
-    if(!flags.type){
-        console.log(chalk.red("Type of module not specified"))
-        console.log("Exiting");
-        process.exit(12)
+    var TYPE;
+    switch (flags.type) {
+        case "task":
+            TYPE = "taskEngines"
+            break;
+        case "module":
+            TYPE = "modules"
+            break;
+        case "update":
+            TYPE = "updates"
+            break;
+        default:
+            print(chalk.default.red(`Error: "${flags.type}" is not a publishable package`))
+            process.exit(1);
+            break;
     }
-
-    var TYPE = flags.type;
-
-    if(flags.type == "update" && flags.password != ""){
+    var destPath = (function(){var dir = path.join(cwd,operand).split(path.sep);return dir[dir.length-1]})();
+    if(TYPE == "update" && flags.password != ""){
         var config = {
             apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
             authDomain: "webjs-f76df.firebaseapp.com",
@@ -291,33 +299,40 @@ function Publish (operand,cwd,flags){
         print("Authenticating\n")
         app.auth().signInWithEmailAndPassword(flags.email,flags.password)
         .then(function(){
-            var bucket = storage.bucket("webjs-f76df.appspot.com");
-            var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
-                // console.log(f)
+            var storeFileStream = bucket.file(TYPE+"/"+destPath+".zip").createWriteStream()
+            intoStream(buffer).pipe(storeFileStream).on("end",function(){
                 if(e){
                     print(chalk.red(""+e))
                     term("\n")
                     process.exit(11);
                 }else{
                     Progress.update(100)
-                    print(chalk.green("Published "+operand))
+                    print(chalk.green("Published "+destPath))
                 }
             })
+            // bucket.upload(destinationZip,{destination: },function(e,f){
+            //     // console.log(f)
+                
+            // })
         })
         .catch(function(e){
             console.log(chalk.red("Authentication"+e))
         })
     }else{
-        var bucket = storage.bucket("webjs-f76df.appspot.com");
-        var upload = bucket.upload(destinationZip,{destination: TYPE+"s/"+operand+".zip"},function(e,f){
-            // console.log(f)
+        var storeFile = bucket.file(TYPE+"/"+destPath+".zip")
+        var storeFileStream = storeFile.createWriteStream({
+            metadata: {
+                contentType: "application/zip"
+            }
+        });
+        intoStream(buffer).pipe(storeFileStream).on("end",function(){
             if(e){
                 print(chalk.red(""+e))
                 term("\n")
                 process.exit(11);
             }else{
                 Progress.update(100)
-                print(chalk.green("Published "+operand))
+                print(chalk.green("Published "+destPath))
             }
         })
     }
