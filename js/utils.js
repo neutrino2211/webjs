@@ -92,7 +92,9 @@ exports.writePro = function(directory){
 
 exports.usage = function(name){
     var commands = {
-        add: "wjs add <module>\n\t - Add any installed module to current project",
+        remove: "wjs remove <file-name>\n\t - Remove an installed wjs package",
+        publish: "wjs publish <path-to-module> --type=<task|module>\n\t - Publish a wjs package",
+        add: "wjs add <package>\n\t - Add any installed package to current project",
         init: "wjs init <App-name> <option>\n\t - Initialize a project of the option type\n\t - options:\n\t\t --javascript\n\t\t --typescript\n\t\t --react\n\t\t --vue\n\t\t --task",
         update: "wjs update <version?>\n\t - If you need to install a specific version, run \n\t - wjs update --version=<update-version>",
         "check-update": "wjs check-update\n\t - Check if there are nightly updates or patches",
@@ -514,6 +516,19 @@ function ask(t,question,cb){
         }
 
         cb(i)
+    })
+}
+
+exports._ask = function(t,q){
+    t(q)
+    return new Promise((res,rej)=>{
+        t.inputField((e,r)=>{
+            if(e){
+                rej(e)
+            } else {
+                res(r)
+            }
+        })
     })
 }
 

@@ -36,6 +36,57 @@ global.unpackTo = function(from,to){
     fs.copySync(from,path.join(__dirname,"../../",to))
 }
 
+function isDefault(o){
+    var defaults = [ 'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\app.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\definitions.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\material.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\media.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\app.ts',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\debug.ts',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\material.ts',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\app.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\debug.js',
+    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\material.js' ]
+    return (defaults.indexOf(o) > -1)
+}
+
+function remove(operand){
+    var l1 = fs.readdirSync(path.join(__dirname,"../../resources/vue-modules")).map(function(n){
+        return path.join(__dirname,"../../resources/vue-modules",n)
+    })
+    var l2 = fs.readdirSync(path.join(__dirname,"../../resources/Typescript")).map(function(n){
+        return path.join(__dirname,"../../resources/Typescript",n)
+    })
+    var l3 = fs.readdirSync(path.join(__dirname,"../../resources/WTS")).map(function(n){
+        return path.join(__dirname,"../../resources/WTS",n)
+    })
+    var l4 = fs.readdirSync(path.join(__dirname,"../../modules")).map(function(n){
+        return path.join(__dirname,"../../modules",n)
+    })
+    var l = l1.concat(l2).concat(l3).concat(l4)
+    var inPromise = false;
+    l.forEach(function(e){
+        var s = e.split(path.sep);
+        if(s[s.length-1] == operand && isDefault(e) && !inPromise){
+            inPromise = true
+            utils._ask(require("terminal-kit").terminal,"This is a default module used by wjs-cli.\nAre you sure you want to remove it? [y/n] : ")
+            .then(function(r){
+                if(r == "y"){
+                    fs.removeSync(e)
+                    print("\n"+chalk.green("Removed: "+operand))
+                } else {
+                    print("\n"+chalk.green("Good choice"))
+                }
+                process.exit()
+            })
+        } else if(s[s.length-1] == operand && !inPromise){
+            fs.removeSync(e)
+            print(chalk.green("Removed: "+operand))
+            process.exit()
+        }
+    })
+}
+
 function Development(flags){
     var express            = require("express");
     var manifest = utils.getManifest();
@@ -109,26 +160,23 @@ function Update(flags){
         }
         // console.log(snapshot.val())
         // process.exit()
-        var lastUpdate = package["last-update"].replace(/\./g,"-")
         var sorted = [package["last-update"],ver].sort();
         // print(sorted)
         if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
             console.log(chalk.green("Installing feature update "+ver.split("updates."+updateVersion+"_")[1].split("").join(".")));
-            Install(ver).Then = function(err,p){
-                if(err){
-                    console.log(""+err);
-                    console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-                    process.exit(3);
-                }else{
-                    console.log(`Update complete`)
-                    // console.log(package);
-                    if(flags.version == undefined){
-                        package["last-update"] = ver;
-                        fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,null,"\t"))
-                    }
+            Install(ver).then(function(){
+                console.log(`Update complete`)
+                // console.log(package);
+                if(flags.version == undefined){
+                    package["last-update"] = ver;
+                    fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,null,"\t"))
                 }
                 process.exit()
-            }
+            }).catch(function(err){
+                console.log(err.toString());
+                console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+                process.exit(3);
+            })
         }else{
             console.log(chalk.green("wjs is up to date"));
             process.exit()
@@ -144,16 +192,19 @@ function INSTALL(operand){
         process.exit()
     }
 
-    Install(operand).Then = function(err,p){
-        if(err){
-            console.log(chalk.red(""+err));
-            console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-            process.exit(3);
-        }else{
-            console.log(`Download complete`)
-        }
+    Install(operand).then(function(){
+        console.log(`Download complete`)
         process.exit()
-    }
+    }).catch(function(err){
+        if(err.toString().startsWith("Error: No such object")){
+            console.log(chalk.red("Error: Can't find '"+operand+"'"))
+            console.log("Check the name and try again.")
+        } else {
+            console.log(chalk.red(err.toString()));
+            console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+        }
+        process.exit(3);
+    })
 }
 
 function Version(){
@@ -184,16 +235,14 @@ function Add(operand,cwd){
         console.log("Dependency already added");
     }
     else{
-        Install(operand).Then = (err,path)=>{
-            if(err){
-                console.log(" "+err);
-                console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-                process.exit(3);
-            }else{
-                manifest.extraModules.push(operand);
-                console.log(`Dependency ${path} added"`)
-            }
-        }
+        Install(operand).then((path)=>{
+            manifest.extraModules.push(operand);
+            console.log(`Dependency ${path} added"`)
+        }).catch(function(err){
+            console.log(err.toString());
+            console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
+            process.exit(3);
+        })
     }
 
     utils.makeManifest(manifest);
@@ -377,3 +426,4 @@ exports.version = Version;
 exports.run = Run;
 exports.checkUpdate = CheckUpdate;
 exports.add = Add;
+exports.remove = remove;

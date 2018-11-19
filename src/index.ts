@@ -13,7 +13,8 @@ import {
     version,
     checkUpdate,
     run,
-    add
+    add,
+    remove
 } from "../js/wjs"
 import { existsSync } from "fs";
 
@@ -90,6 +91,10 @@ else if(operation == "tasks"){
     modules.forEach(function(name){
         console.log(chalk.green(name)+chalk.yellow(" -> ")+chalk.blue(m[name]))
     })
+}
+
+else if(operation == "remove"){
+    remove(operand)
 }
 
 else if(operation == "-h" || operation == "--help" || operation == "help"){

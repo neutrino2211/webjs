@@ -3,6 +3,7 @@ rollback
 backup
 node_modules
 module-dev
+modules/*
 examples
 src
 resources/Typescript/angular
