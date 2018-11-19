@@ -1,8 +1,17 @@
 const fs        = require("fs-extra");
 const path      = require("path");
-// const changeDir = require("./utils").changeDir;
+const chalk     = require("chalk")
+const semver    = require("semver");
 const parseConf = require("./utils").parseConf;
 const definitions = require("./proj-def");
+
+function moduleExists(n){
+    var effectiveName = n.split(".").reverse()[0]
+    return fs.existsSync(path.join(__dirname,"../../resources/java/modules",effectiveName)) ||
+            fs.existsSync(path.join(__dirname,"../../resources/WTS",effectiveName)) ||
+            fs.existsSync(path.join(__dirname,"../../resources/Typescript",effectiveName)) ||
+            fs.existsSync(path.join(__dirname,"../../resources/vue-modules",effectiveName))
+}
 
 function install(operand){
     return new Promise(function(res,rej){
@@ -41,18 +50,17 @@ function install(operand){
                     var conf = parseConf(path.join(moduleFolderPath,"module.conf"));
                     var package = require(path.join(__dirname,"../../package.json"));
                     // console.log(package)
-                    if(conf.requires && package["last-update"] != conf.requires){
-                        var updateVersion = "update-"+package.version.replace(/\./g,"-");
-                        console.log(chalk.red("Error : This download requires update version "+chalk.yellow(conf.requires.split("updates."+updateVersion+"_")[1].split("").join("."))+" already installed but you have "+package["last-update"]));
+                    if(conf.requires && semver.lt(semver.coerce(package["version"]),semver.coerce(conf.requires))){
+                        console.log(chalk.red("Error : This download requires update version "+chalk.yellow(conf.requires)+" already installed but you have "+package["last-update"]));
                         process.exit(9);
                     }
 
                     if(conf.type === "task"){
-                        package["wjs:installedModules"][conf.name] = path.join(moduleFolderPath,conf.engine);
+                        package["wjs:installedTasks"][conf.name] = path.join(moduleFolderPath,conf.engine);
                         // console.log(package)
                         fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,undefined,"\t"));
                     }else if(conf.type === "module-java"){
-                        fs.renameSync(moduleFolderPath,path.join(__dirname,"../../resources/java/modules",wjsModule));
+                        fs.renameSync(moduleFolderPath,path.join(__dirname,"../../resources/java",wjsModule));
                     }else if(conf.type === "module-js"){
                         fs.renameSync(moduleFolderPath,path.join(definitions.javascript.modulesPath,wjsModule));
                     }else if(conf.type === "module-ts"){
@@ -66,12 +74,18 @@ function install(operand){
                 console.log("Cleaning Up...");
                 fs.removeSync(modulePath);
                 console.log("Successfully installed "+operand)
-                res(modulePath);
+                res(operand);
             }
         })
     })
 }
 
 module.exports = function Install(operand){
-    return install(operand)
+    if(!moduleExists(operand)){
+        return install(operand)
+    } else {
+        return new Promise((res)=>{
+            res(operand.split(".").reverse()[0])
+        })
+    }
 }

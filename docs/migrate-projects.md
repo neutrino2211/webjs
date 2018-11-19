@@ -1,6 +1,6 @@
 # Migrating projects
 
-As of wjs-cli@1.0.0 support for javascript entry points was dropped with html files being the lingua-franca of the tool. To migrate your app simply create a file called `index.html` in your app root e.g `app` directory and copy this code into it.
+As of wjs-cli@1.0.0 support for javascript entry points was dropped with html files being the new entry points. To migrate your app simply create a file called `index.html` in your app root e.g `app` directory and copy this code into it.
 
 ```html
 <html>

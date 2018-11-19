@@ -9,9 +9,7 @@ import {
     install, 
     publish, 
     flags, 
-    update,
     version,
-    checkUpdate,
     run,
     add,
     remove
@@ -30,13 +28,6 @@ if (!existsSync("./wjs-config.json") && proj_operations.indexOf(operation) > -1)
 
 if (operation == "init"){
     init(operand,process.cwd(),flags)
-}
-
-
-//Update argument block
-
-else if (operation == "update"){
-    update(flags)
 }
 
 
@@ -64,10 +55,6 @@ else if(operation == "development"){
     development(flags);
 }
 
-else if(operation == "check-update"){
-    checkUpdate()
-}
-
 else if(operation == "publish"){
     publish(operand,process.cwd(),flags)
 }
@@ -82,7 +69,7 @@ else if(operation == "run"){
 
 else if(operation == "tasks"){
     var p = require(path.join(__dirname,"../../package.json"));
-    var m = p["wjs:installedModules"];
+    var m = p["wjs:installedTasks"];
     var modules = Object.getOwnPropertyNames(m);
     if(modules.length == 0){
         console.log(chalk.red("No tasks installed"));

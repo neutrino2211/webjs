@@ -36,21 +36,59 @@ global.unpackTo = function(from,to){
     fs.copySync(from,path.join(__dirname,"../../",to))
 }
 
+function add_dependency(m){
+    var manifest = utils.getManifest()
+    var type = manifest["project-type"];
+    print("Adding dependency ["+m.split(".").reverse()[0]+"]")
+    if(fs.existsSync(path.join(__dirname,projectDefinitions[type].modulesPath,m))){
+        // print("Not native")
+        fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
+    } else if(fs.existsSync(path.join(__dirname,"../../resources/java/modules",m.split(".").reverse()[0]))){
+        if(manifest.android && manifest.android.extraModules){
+            if(manifest.android.extraModules.indexOf(m.split(".").reverse()[0]) > -1){
+                print(chalk.green("Dependency added"))
+                process.exit()
+            } else {
+                manifest.android.extraModules.push(m.split(".").reverse()[0])
+            }
+        } else if(manifest.android) {
+            manifest.android.extraModules = []
+            manifest.android.extraModules.push(m.split(".").reverse()[0])
+            // print(chalk.green("Dependency added"))
+        } else {
+            print(chalk.red("Error: '"+m+"' is a native module and needs an android configuration to work"))
+        }
+    }
+    utils.makeManifest(manifest)
+}
+
+function isNativeModule(n){
+    return fs.existsSync(path.join(__dirname,"../../resources/java/modules",n.split(".").reverse()[0]))
+}
+
 function isDefault(o){
-    var defaults = [ 'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\app.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\definitions.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\material.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\vue-modules\\media.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\app.ts',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\debug.ts',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\Typescript\\material.ts',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\app.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\debug.js',
-    'C:\\Users\\ADMIN\\Desktop\\webjs\\resources\\WTS\\material.js' ]
-    return (defaults.indexOf(o) > -1)
+    var defaults = [ 'resources\\vue-modules\\app.js',
+    'resources\\vue-modules\\definitions.js',
+    'resources\\vue-modules\\material.js',
+    'resources\\vue-modules\\media.js',
+    'resources\\Typescript\\app.ts',
+    'resources\\Typescript\\debug.ts',
+    'resources\\Typescript\\material.ts',
+    'resources\\WTS\\app.js',
+    'resources\\WTS\\debug.js',
+    'resources\\WTS\\material.js' ]
+    defaults.forEach((j)=>{
+        if(o.endsWith(j))return true;
+    })
+    return false;
 }
 
 function remove(operand){
+    if(isNativeModule(operand)){
+        fs.removeSync(path.join(__dirname,"../../resources/java/modules",operand.split(".").reverse()[0]))
+        print("Removed: "+operand)
+        process.exit(1)
+    }
     var l1 = fs.readdirSync(path.join(__dirname,"../../resources/vue-modules")).map(function(n){
         return path.join(__dirname,"../../resources/vue-modules",n)
     })
@@ -80,11 +118,17 @@ function remove(operand){
                 process.exit()
             })
         } else if(s[s.length-1] == operand && !inPromise){
+            var conf = utils.parseConf(path.join(e,"module.conf"))
+            // print(s[s.length-1])
+            if(conf.type === "task"){
+                utils.removeTask(s[s.length-1].split(".").reverse()[0])
+            }
             fs.removeSync(e)
             print(chalk.green("Removed: "+operand))
             process.exit()
         }
     })
+    print(chalk.red("Error: Can't find "+operand))
 }
 
 function Development(flags){
@@ -135,55 +179,6 @@ function Init(operand,cwd,flags){
     utils.init(path.join(cwd,operand),flags)
 }
 
-function Update(flags){
-    var config = {
-        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
-        authDomain: "webjs-f76df.firebaseapp.com",
-        databaseURL: "https://webjs-f76df.firebaseio.com",
-        projectId: "webjs-f76df",
-        storageBucket: "webjs-f76df.appspot.com",
-        messagingSenderId: "404258524081"
-    };
-    var app = firebase.initializeApp(config);
-    var databaseRef = app.database().ref();
-    var package = require(path.join(__dirname,"../../package.json"));
-    // console.log(flags().update.slice(-4))
-    var updateVersion = "update-"+package.version.replace(/\./g,"-");
-    var latestVersion = databaseRef.child(updateVersion);
-    // console.log(latestVersion.);
-    latestVersion.on("value",function(snapshot){
-        var ver;
-        if(flags.version){
-            ver = "updates."+updateVersion+"_"+flags.version.split(".").join("");
-        }else{
-            ver = snapshot.val();
-        }
-        // console.log(snapshot.val())
-        // process.exit()
-        var sorted = [package["last-update"],ver].sort();
-        // print(sorted)
-        if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
-            console.log(chalk.green("Installing feature update "+ver.split("updates."+updateVersion+"_")[1].split("").join(".")));
-            Install(ver).then(function(){
-                console.log(`Update complete`)
-                // console.log(package);
-                if(flags.version == undefined){
-                    package["last-update"] = ver;
-                    fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(package,null,"\t"))
-                }
-                process.exit()
-            }).catch(function(err){
-                console.log(err.toString());
-                console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
-                process.exit(3);
-            })
-        }else{
-            console.log(chalk.green("wjs is up to date"));
-            process.exit()
-        }
-    })
-}
-
 function INSTALL(operand){
     try {
         utils.checkArg(1)
@@ -212,11 +207,9 @@ function Version(){
 
     var pack = JSON.parse(json);
 
-    var updateVersion = "update-"+pack.version.replace(/\./g,"-");
-
     // console.log(pack["last-update"],"updates."+updateVersion+"_");
 
-    console.log("Version : "+pack.version+"\nCurrent update : "+pack["last-update"].split("updates."+updateVersion+"_")[1].split("").join("."));
+    console.log("Version : "+pack.version);
 }
 
 function Add(operand,cwd){
@@ -227,7 +220,8 @@ function Add(operand,cwd){
     if(fs.existsSync(path.join(projectDefinitions[type].modulesPath,operand)) && manifest.extraModules.indexOf(operand) == -1){
         manifest.extraModules.push(operand);
         manifest.extraModules.forEach((m)=>{
-            fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
+            // fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
+            add_dependency(m)
         })
         console.log("Dependency added")
     }
@@ -236,8 +230,9 @@ function Add(operand,cwd){
     }
     else{
         Install(operand).then((path)=>{
-            manifest.extraModules.push(operand);
-            console.log(`Dependency ${path} added"`)
+            // manifest.extraModules.push(operand);
+            add_dependency(operand)
+            console.log(`Dependency ${path} added`)
         }).catch(function(err){
             console.log(err.toString());
             console.log("Try installing that again and if it still doesn't work, open an issue at\nhttps://github.com/neutrino2211/webjs\nand please provide the error message above.");
@@ -246,40 +241,6 @@ function Add(operand,cwd){
     }
 
     utils.makeManifest(manifest);
-}
-
-function CheckUpdate(){
-    var config = {
-        apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
-        authDomain: "webjs-f76df.firebaseapp.com",
-        databaseURL: "https://webjs-f76df.firebaseio.com",
-        projectId: "webjs-f76df",
-        storageBucket: "webjs-f76df.appspot.com",
-        messagingSenderId: "404258524081"
-    };
-    var app = firebase.initializeApp(config);
-    var databaseRef = app.database().ref();
-    var package = require(path.join(__dirname,"../package.json"));
-    var updateVersion = "update-"+package.version.replace(/\./g,"-");
-    var latestVersion = databaseRef.child("update-"+package.version.replace(/\./g,"-"));
-    // console.log(latestVersion);
-    latestVersion.on("value",function(snapshot){
-        var ver = snapshot.val();
-        // console.log(snapshot.val())
-        // process.exit()
-        // console.log(b)
-        var lastUpdate = package["last-update"].replace(/\./g,"-")
-        var sorted = [package["last-update"],ver].sort();
-        // print(sorted[0],package["last-update"],sorted)
-        if(sorted[0] == package["last-update"] && sorted[0] != sorted[1]){
-            console.log(chalk.green("FOUND UPDATE "+ver.split("updates."+updateVersion+"_")[1].split("").join(".")));
-            // console.log("Available updates\n"+chalk.green(b.join("\n")))
-            console.log("Run "+chalk.grey("wjs update ")+"to update")
-        }else{
-            console.log(chalk.green("wjs is up to date"));
-        }
-        process.exit()
-    })
 }
 
 function Publish (operand,cwd,flags){
@@ -326,66 +287,64 @@ function Publish (operand,cwd,flags){
         case "module":
             TYPE = "modules"
             break;
-        case "update":
-            TYPE = "updates"
-            break;
         default:
             print(chalk.default.red(`Error: "${flags.type}" is not a publishable package`))
             process.exit(1);
             break;
     }
     var destPath = (function(){var dir = path.join(cwd,operand).split(path.sep);return dir[dir.length-1]})();
-    if(TYPE == "update" && flags.password != ""){
-        var config = {
-            apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
-            authDomain: "webjs-f76df.firebaseapp.com",
-            databaseURL: "https://webjs-f76df.firebaseio.com",
-            projectId: "webjs-f76df",
-            storageBucket: "webjs-f76df.appspot.com",
-            messagingSenderId: "404258524081"
-        };
-        var app = firebase.initializeApp(config);
-        print("Authenticating\n")
-        app.auth().signInWithEmailAndPassword(flags.email,flags.password)
-        .then(function(){
-            var storeFileStream = bucket.file(TYPE+"/"+destPath+".zip").createWriteStream()
-            intoStream(buffer).pipe(storeFileStream).on("end",function(){
-                if(e){
-                    print(chalk.red(""+e))
-                    term("\n")
-                    process.exit(11);
-                }else{
-                    Progress.update(100)
-                    print(chalk.green("Published "+destPath))
-                }
-            })
-            // bucket.upload(destinationZip,{destination: },function(e,f){
-            //     // console.log(f)
+    // if(TYPE == "update" && flags.password != ""){
+    //     var config = {
+    //         apiKey: "AIzaSyAougIsV_kErs5sk9ZzbTZFX2EaTIlucaI",
+    //         authDomain: "webjs-f76df.firebaseapp.com",
+    //         databaseURL: "https://webjs-f76df.firebaseio.com",
+    //         projectId: "webjs-f76df",
+    //         storageBucket: "webjs-f76df.appspot.com",
+    //         messagingSenderId: "404258524081"
+    //     };
+    //     var app = firebase.initializeApp(config);
+    //     print("Authenticating\n")
+    //     app.auth().signInWithEmailAndPassword(flags.email,flags.password)
+    //     .then(function(){
+    //         var storeFileStream = bucket.file(TYPE+"/"+destPath+".zip").createWriteStream()
+    //         intoStream(buffer).pipe(storeFileStream).on("end",function(){
+    //             if(e){
+    //                 print(chalk.red(""+e))
+    //                 term("\n")
+    //                 process.exit(11);
+    //             }else{
+    //                 Progress.update(100)
+    //                 print(chalk.green("Published "+destPath))
+    //             }
+    //         })
+    //         // bucket.upload(destinationZip,{destination: },function(e,f){
+    //         //     // console.log(f)
                 
-            // })
-        })
-        .catch(function(e){
-            console.log(chalk.red("Authentication"+e))
-        })
-    }else{
-        var storeFile = bucket.file(TYPE+"/"+destPath+".zip")
-        var storeFileStream = storeFile.createWriteStream({
-            metadata: {
-                contentType: "application/zip"
-            }
-        });
-        intoStream(buffer).pipe(storeFileStream).on("end",function(){
-            if(e){
-                print(chalk.red(""+e))
-                term("\n")
-                process.exit(11);
-            }else{
-                Progress.update(100)
-                print(chalk.green("Published "+destPath))
-            }
-        })
-    }
+    //         // })
+    //     })
+    //     .catch(function(e){
+    //         console.log(chalk.red("Authentication"+e))
+    //     })
+    // }else{
+        
+    // }
     // console.log(type);
+    var storeFile = bucket.file(TYPE+"/"+destPath+".zip")
+    var storeFileStream = storeFile.createWriteStream({
+        metadata: {
+            contentType: "application/zip"
+        }
+    });
+    intoStream(buffer).pipe(storeFileStream).on("end",function(){
+        if(e){
+            print(chalk.red(""+e))
+            term("\n")
+            process.exit(11);
+        }else{
+            Progress.update(100)
+            print(chalk.green("Published "+destPath))
+        }
+    })
 }
 
 function Run(operand,cwd,flags,test){
@@ -421,9 +380,7 @@ exports.development = Development;
 exports.operation = operation;
 exports.operand = operand;
 exports.flags = flags;
-exports.update = Update;
 exports.version = Version;
 exports.run = Run;
-exports.checkUpdate = CheckUpdate;
 exports.add = Add;
 exports.remove = remove;

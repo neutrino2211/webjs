@@ -2,7 +2,7 @@
 
 ## Create folder
 
-The name of this folder has to be in a specific format. The format is update-`wjs-cli target version (replace . with -)`_`update name e.g (AndroidFSWebviewPlugin)`, so for an update named `AndroidFSPlugin` targeting wjs-cli@0.1.3 the folder name will be `update-0-1-3_AndroidFSPlugin`
+The name of this folder should not have a `.` in it
 
 ## Source file formats
 
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity{
 
 and modules for different types of projects are stored in seperate locations
 
-* `Java` modules are stored in `resources/java`
+* `Java` modules are stored in `resources/java/modules`
 * `Javascript` modules are stored in `resources/WTS`
 * `Typescript` modules are stored in `resources/Typescript`
 
@@ -140,7 +140,7 @@ current fields are:
     - `module-vue`: this specifies a vue-js module.
     - `module-java`: this specifies a java module.
 * `engine`: this is the main file for your module (Only use this for task runners)
-* `requires`: this is the minimum update version your module needs to run
+* `requires`: this is the minimum version your module needs to run
 
 ### Examples
 
@@ -149,7 +149,7 @@ current fields are:
 Configuration file.
 
 ```conf
-requires = <update-version>
+requires = <version>
 ```
 
 #### Task
@@ -161,7 +161,7 @@ name = <alias>
 type = task
 engine = <relative-path-to-file>
 #version requirements if any
-requires = <update-version?>
+requires = <version?>
 ```
 
 Engine file
@@ -173,11 +173,11 @@ Engine file
  * args is the command line arguments converted to an object e.g the arguments of
  * wjs run <your-task> --print --text="Hello World" will be {print:true,text:"Hello World"}
  */
-module.exports = function(utils,cwd,args){
+module.exports = function(cwd,args,utils){
     console.log("Hi i am running in "+cwd+" and the option print is "+args.print+" with text as "+args.text);
 }
 ```
 
 ## Package and publish
 
-Run `wjs publish <name> --type=<type>` where name is the folder the module code is in and type is the type of module (`taskEngine` for task and `module` for a module)
+Run `wjs publish <name> --type=<type>` where name is the folder the module code is in and type is the type of module (`task` for task and `module` for a module)

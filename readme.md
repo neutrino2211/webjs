@@ -6,6 +6,36 @@
 
 # Under development.
 
+```bash
+$ wjs help
+wjs remove <file-name>
+         - Remove an installed wjs package
+wjs publish <path-to-module> --type=<task|module>
+         - Publish a wjs package
+wjs add <package>
+         - Add any installed package to current project
+wjs init <App-name> <option>
+         - Initialize a project of the option type
+         - options:
+                 --javascript
+                 --typescript
+                 --react
+                 --vue
+                 --task
+wjs install <module>
+         - Install third party module
+wjs tasks
+         - List task runners installed
+wjs run <task-alias>
+         - run wjs tasks to see installed task runners
+wjs development
+         - Run the code compiler in watch mode
+wjs build <platform?>
+         - Compiles the code into a website if no target platform is specified
+         - Supported platforms
+                 -> Android
+```
+
 ## Getting started
 
 * First get node and npm
@@ -33,12 +63,6 @@ Check out [how to make a module](docs/create-modules.md)
 
 * To build the app run `wjs build` and use `wjs build --android` to build the android app, but first make sure `ANDROID_HOME` is set.
 
-For a typescript project first `npm init` the project directory then install `ts-loader` and `typescript` with `npm install typescript ts-loader`.
-
-For a vue project just `npm install` the project directory. 
-
-To check for updates run `wjs check-update` and install any updates with `wjs update`
-
 
 ### Note
 
@@ -64,7 +88,7 @@ class App {
 app.load(document.getElementById("js-main"),App);
 ```
 
-Obviously all it does is set "main" as the root innerHTML
+All it does is set "Hello world" as the root innerHTML
 
 But you can also do more, like add html templates by extending the class with the `TemplatePage` class in the app module
 
@@ -508,7 +532,7 @@ app.load(document.getElementById("js-main"),App);
 
 * Modularized source code
 
-* Added option to initialize a local (Personal) project option
+* Added option to initialize a local (Personal) android project option
 
 * Added contributing.md
 
@@ -520,10 +544,17 @@ app.load(document.getElementById("js-main"),App);
 
 * Bug fixes
 
+### wjs-cli@2.0.0
+
+* Bug fixes
+
+* Performance improvements
+
+* NPM package support
+
 ### Coming soon
 
-* More android features.
+* iOS support
 
-Use `wjs check-update` to check for version updates and bug fixes
 
 Feel free to open an issue at [the github repo](https://github.com/neutrino2211/webjs/issues)

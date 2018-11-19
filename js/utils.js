@@ -96,8 +96,6 @@ exports.usage = function(name){
         publish: "wjs publish <path-to-module> --type=<task|module>\n\t - Publish a wjs package",
         add: "wjs add <package>\n\t - Add any installed package to current project",
         init: "wjs init <App-name> <option>\n\t - Initialize a project of the option type\n\t - options:\n\t\t --javascript\n\t\t --typescript\n\t\t --react\n\t\t --vue\n\t\t --task",
-        update: "wjs update <version?>\n\t - If you need to install a specific version, run \n\t - wjs update --version=<update-version>",
-        "check-update": "wjs check-update\n\t - Check if there are nightly updates or patches",
         install : "wjs install <module>\n\t - Install third party module",
         tasks: "wjs tasks\n\t - List task runners installed",
         run: "wjs run <task-alias>\n\t - run "+chalk.green("wjs tasks")+" to see installed task runners",
@@ -169,6 +167,17 @@ exports.getProjectDependencies = function(directory){
     man.extraModules.forEach((m)=>{
         fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
     })
+}
+
+/**
+ * @argument {String} name
+ * @description Remove link to task runner
+ */
+
+exports.removeTask = function(name){
+    var pack = require(path.join(__dirname,"../../package.json"));
+    pack["wjs:installedTasks"][name] = undefined;
+    fs.writeFileSync(path.join(__dirname,"../../package.json"),JSON.stringify(pack,undefined,"\t"))
 }
 
 /**
