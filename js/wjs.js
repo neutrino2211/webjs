@@ -39,10 +39,10 @@ global.unpackTo = function(from,to){
 function add_dependency(m){
     var manifest = utils.getManifest()
     var type = manifest["project-type"];
-    print("Adding dependency ["+m.split(".").reverse()[0]+"]")
-    if(fs.existsSync(path.join(__dirname,projectDefinitions[type].modulesPath,m))){
+    print("Adding dependency ["+m+"]")
+    if(fs.existsSync(path.join(projectDefinitions[type].modulesPath,m))){
         // print("Not native")
-        fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
+        fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(process.cwd(),"webjs_modules",m));
     } else if(fs.existsSync(path.join(__dirname,"../../resources/java/modules",m.split(".").reverse()[0]))){
         if(manifest.android && manifest.android.extraModules){
             if(manifest.android.extraModules.indexOf(m.split(".").reverse()[0]) > -1){
@@ -160,7 +160,7 @@ function Development(flags){
     console.log("App is available on http://localhost:"+l.address().port)
     console.log("Watching "+manifest.entry)
     process.env.NODE_ENV = "development"
-    utils.compile(undefined,{watch:"true",publicUrl:"./"})
+    utils.compile(undefined,{watch:"true",publicUrl:"./",contentHash:false})
 
     if(flags.o||flags.open){
         require('opn')('http://localhost:'+port);
@@ -223,7 +223,7 @@ function Add(operand,cwd){
             // fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(cwd,"webjs_modules",m));
             add_dependency(m)
         })
-        console.log("Dependency added")
+        console.log(`Dependency ${operand} added`)
     }
     else if(manifest.extraModules.indexOf(operand) > -1){
         console.log("Dependency already added");

@@ -1,20 +1,22 @@
 {
-  "name": "parcel-angular-template",
-  "version": "2.0.0",
-  "description": "Angular template for parcel",
-  "main": "index.js",
+  "name": "parcel-angular-example",
+  "description": "Simple Angular example",
+  "version": "1.0.0",
+  "main": "src/index.html",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel src/index.html --open",
+    "build": "parcel build src/index.html"
+  },
   "dependencies": {
-    "@angular/common": "^6.0.0",
-    "@angular/compiler": "^6.0.0",
-    "@angular/core": "^6.0.0",
-    "@angular/forms": "^6.0.0",
-    "@angular/platform-browser": "^6.0.0",
-    "@angular/platform-browser-dynamic": "^6.0.0",
-    "@ng-bootstrap/ng-bootstrap": "^1.0.0-beta.7",
-    "core-js": "^2.5.2",
-    "rxjs": "^5.5.5",
-    "systemjs": "^0.20.19",
-    "zone.js": "^0.8.18",
-    "typescript": "^2.6.2"
+    "@angular/common": "^7.0.4",
+    "@angular/compiler": "^7.0.4",
+    "@angular/core": "^7.0.4",
+    "@angular/platform-browser": "^7.0.4",
+    "@angular/platform-browser-dynamic": "^7.0.4",
+    "core-js": "^2.5.7",
+    "rxjs": "^6.3.3",
+    "systemjs": "^2.1.1",
+    "zone.js": "^0.8.26"
   }
 }

@@ -1,7 +1,6 @@
 {
-    "compilerOptions": {
-        "module": "commonjs",
-        "removeComments": true,
-        "experimentalDecorators": true
-    }
+  "compilerOptions": {
+      "module": "commonjs",
+      "experimentalDecorators": true
+  }
 }

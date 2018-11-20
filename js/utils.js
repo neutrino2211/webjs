@@ -60,31 +60,10 @@ exports.mode = function(flags){
         return "vue";
     }else if(flags.react){
         return "react";
-    }else if(flags.flame){
-        return "flame"
     }else{
         return "javascript";
     }
 }
-
-/**
- * @argument {String} directory
- * @description Write development index.html to allow hot-reload.
- */
-
-exports.writeDev = function(directory){
-    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(resourcesPath,"dev-index.html")).toString("utf-8"))
-}
-
-/**
- * @argument {String} directory
- * @description Write production index.html which does not contain hot reload
- */
-
-exports.writePro = function(directory){
-    fs.writeFileSync(path.join(directory,"www","index.html"),fs.readFileSync(path.join(resourcesPath,"index.html")).toString("utf-8"))
-}
-
 /**
  * @argument {String} name
  * @description Print the usage of a command or print the usage of all commands if "*" is specified
@@ -549,7 +528,6 @@ exports._ask = function(t,q){
 
 exports.init = function(directory,flag){
     var type = exports.mode(flag);
-    var config = projectDefinitions[type].config;
     //If the path already exists then remove it
     if(fs.existsSync(directory)){
         fs.removeSync(directory)
@@ -557,15 +535,11 @@ exports.init = function(directory,flag){
     fs.mkdirSync(directory);
     var wjsManifest = `{
     "project-type" : "${type}",
-    "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"www"}",
+    "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"src/index.html"}",
     "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}${projectDefinitions[type].entry?'\n\t"entry":"'+projectDefinitions[type].entry+'",':""}
     "extraModules": []
 }`;
     var wjsDefaultModules = projectDefinitions[type].defaultModules;
-
-    if(config){
-        fs.writeFileSync(path.join(directory,"webpack.config.js"),config)
-    }
 
     //Include all default modules for the project if not a task runner
     if(!flag.task){
@@ -583,6 +557,8 @@ exports.init = function(directory,flag){
         fs.copySync(path.join(resourcesPath,"wjs-javascript"),directory)
     }else if(flag.typescript){
         fs.copySync(path.join(resourcesPath,"wjs-typescript"),directory)
+    }else if (flag.angular){
+        fs.copySync(path.join(resourcesPath,"wjs-angular"),directory)
     }else if(flag.task){
         fs.copySync(path.join(resourcesPath,"wjs-tasks"),directory)
         fs.writeFileSync(
@@ -822,7 +798,8 @@ exports.build = function(){
         },{
             minify: true,
             target: "browser",
-            publicUrl: "./"
+            publicUrl: "./",
+            contentHasj: false
         });
     }
 }

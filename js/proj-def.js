@@ -12,7 +12,8 @@ module.exports = {
 
     angular: {
         root: "src",
-        entry:"src/index.ts",
+        entry:"src/index.html",
+        compileCommand: false,
         modulesPath: path.join(__dirname,"../../resources","Typescript"),
         serverRoot: "dist",
         defaultModules: ["app.ts","material.ts"]
