@@ -5,7 +5,7 @@ node_modules
 module-dev
 modules/*
 examples
-src
+./src
 resources/Typescript/angular
 resources/update-*
 *.keystore
@@ -31,7 +31,6 @@ resources/WTS/pages
 resources/WTS/flame
 resources/WTS/node
 .gitignore
-*.
 tests
 .vagrant
 resources/favicon-1.ico

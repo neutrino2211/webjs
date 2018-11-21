@@ -5,9 +5,9 @@
 	},
 	"last-update": "2.0.0",
 	"wjs:installedTasks": {},
-	"version": "2.0.0-beta.1",
+	"version": "2.0.0-beta.5",
 	"description": "A Native and Web App creation tool",
-	"main": "./dist/src/index.js",
+	"main": "./index.js",
 	"scripts": {
 		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js"
 	},

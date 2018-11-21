@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as utils from "../js/utils";
 import * as path from "path";
 import chalk from "chalk";
