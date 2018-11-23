@@ -647,7 +647,7 @@ exports.compile = function(cb,o){
     })
     .catch(function(e){
         console.log("Error compiling:");
-        console.log(e);
+        // console.log(e);
         if(cb) cb(e);
         process.exit(2)
     })

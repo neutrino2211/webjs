@@ -96,9 +96,38 @@ else if(operation == "-h" || operation == "--help" || operation == "help"){
 
 else if(operation == "test"){
     var cwd = process.cwd();
-    if(!existsSync(operand)) console.log(chalk.red("Can't find '"+path.dirname(operand)+"'"));
-    var conf = utils.parseConf(path.join(operand,"module.conf"))
-    run(operand,cwd,flags,path.join(cwd,operand,conf.engine));
+    var _operand = operand||"."
+    if(!existsSync(_operand)) console.log(chalk.red("Can't find '"+path.dirname(_operand)+"'"));
+    if(existsSync(path.join(_operand,"module.conf"))){
+        var conf = utils.parseConf(path.join(_operand,"module.conf"))
+        run(_operand,cwd,flags,path.join(cwd,_operand,conf.engine));
+    } else if(existsSync(path.join(_operand,"wjs-config.json"))){
+        utils.changeDir(_operand)
+        var start = Date.now()
+        var r=255,g=255,b=255;
+        utils.quietCompile(function(e){
+            var diff = Date.now()-start;
+            if(diff > 10000){
+                b = 0
+            }
+            if(diff > 20000){
+                g = 0xaa
+            }
+            if(diff > 30000){
+                g = 0
+            }
+            if(diff <= 10000){
+                r = 0
+                b = 0
+            }
+            console.log(chalk.rgb(r,g,b)(diff/1000+"s")+": Build "+(e==undefined?chalk.green("successfull"):chalk.red("failed")))
+        },{
+            watch: false,
+            minify: true
+        })
+    } else {
+        console.log("")
+    }
 }
 
 else {
