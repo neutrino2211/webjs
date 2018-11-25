@@ -98,7 +98,7 @@ else if(operation == "test"){
     var cwd = process.cwd();
     var _operand = operand||"."
     if(!existsSync(_operand)) console.log(chalk.red("Can't find '"+path.dirname(_operand)+"'"));
-    if(existsSync(path.join(_operand,"module.conf"))){
+    if(existsSync(path.join(cwd,_operand,"module.conf"))){
         var conf = utils.parseConf(path.join(_operand,"module.conf"))
         run(_operand,cwd,flags,path.join(cwd,_operand,conf.engine));
     } else if(existsSync(path.join(_operand,"wjs-config.json"))){

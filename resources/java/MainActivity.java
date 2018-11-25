@@ -36,31 +36,41 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstance);
         final AppCompatActivity a = this;
         setContentView(R.layout.activity_main);
-
         webview = (WebView) findViewById(R.id.wv);
-        wi = new WebAppInterface(this,webview);
-        webview.getSettings().setJavaScriptEnabled(true);
-        // webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        webview.getSettings().setDomStorageEnabled(true);
-        webview.getSettings().setLoadsImagesAutomatically(true);
-        //Interface
-        webview.addJavascriptInterface(wi,"native");
-        webview.setWebChromeClient(new WebChromeClient(){
-            @Override
-            public void onPermissionRequest(PermissionRequest r){
-                r.grant(r.getResources());
-            }
-        });
-        webview.setWebViewClient(new WebViewClient(){
-            @Override 
-            public void onReceivedError(WebView wv, WebResourceRequest r, WebResourceError e){
-                wi.HandleChromeClientErrors(wv,r,e);
-            }
-        });
-        //Load
-        webview.loadUrl(WEBSITE_URL);
+        
+        if(savedInstance != null){
+            webview.restoreState(savedInstance);
+        } else {
+            wi = new WebAppInterface(this,webview);
+            webview.getSettings().setJavaScriptEnabled(true);
+            // webview.getSettings().setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            webview.getSettings().setDomStorageEnabled(true);
+            webview.getSettings().setLoadsImagesAutomatically(true);
+            //Interface
+            webview.addJavascriptInterface(wi,"native");
+            webview.setWebChromeClient(new WebChromeClient(){
+                @Override
+                public void onPermissionRequest(PermissionRequest r){
+                    r.grant(r.getResources());
+                }
+            });
+            webview.setWebViewClient(new WebViewClient(){
+                @Override 
+                public void onReceivedError(WebView wv, WebResourceRequest r, WebResourceError e){
+                    wi.HandleChromeClientErrors(wv,r,e);
+                }
+            });
+            //Load
+            webview.loadUrl(WEBSITE_URL);
+        }
 
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state){
+        super.onSaveInstanceState(state);
+        webview.saveState(state);
     }
 
     @Override 

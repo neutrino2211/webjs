@@ -3,9 +3,9 @@
 	"bin": {
 		"wjs": "./dist/src/index.js"
 	},
-	"last-update": "2.0.0",
+	"last-update": "2.0.1",
 	"wjs:installedTasks": {},
-	"version": "2.0.0",
+	"version": "2.0.1.beta-0",
 	"description": "A Native and Web App creation tool",
 	"main": "./index.js",
 	"scripts": {
