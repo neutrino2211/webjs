@@ -357,8 +357,8 @@ function Run(operand,cwd,flags,test){
     }
     var p = require(path.join(__dirname,"../../package.json"));
     if(!test){
-        if(p["wjs:installedModules"][operand]){
-            var m = require(p["wjs:installedModules"][operand]);
+        if(p["wjs:installedTasks"][operand]){
+            var m = require(p["wjs:installedTasks"][operand]);
             m(cwd,flags,utils)
         }else{
             console.log(chalk.red("Can not find module ("+operand+")"))
