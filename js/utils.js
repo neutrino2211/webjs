@@ -773,10 +773,10 @@ function buildAndroid(cwd,f){
  */
 
 exports.quietCompile = exports.compile;
-
-exports.build = function(){
+exports._buildAndroid = buildAndroid;
+exports.build = function(flags){
     const manifest = exports.getManifest();
-    var f = exports.flags();
+    var f = flags||exports.flags();
     var cwd = process.cwd();
     process.env.NODE_ENV = "production"
     //If no compilation is needed, proceed to building android or web
@@ -798,8 +798,7 @@ exports.build = function(){
         },{
             minify: true,
             target: "browser",
-            publicUrl: "./",
-            contentHasj: false
+            publicUrl: "./"
         });
     }
 }

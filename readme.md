@@ -167,6 +167,12 @@ Documentation is not complete so the [exmaples](https://github.com/neutrino2211/
 
 * NPM package support
 
+### wjs-cli@2.0.1
+
+* Bug fixes
+
+* Android bug fixes
+
 ### Coming soon
 
 * iOS support

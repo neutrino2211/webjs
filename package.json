@@ -7,11 +7,11 @@
 	"wjs:installedTasks": {
 		"android": "C:\\Users\\ADMIN\\Desktop\\webjs\\modules\\taskEngines.run-android\\engine.js"
 	},
-	"version": "2.0.1.beta-0",
+	"version": "2.0.1-beta.0",
 	"description": "A Native and Web App creation tool",
 	"main": "./index.js",
 	"scripts": {
-		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js"
+		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js && mocha angular.spec.js"
 	},
 	"keywords": [
 		"App",

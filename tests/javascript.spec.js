@@ -25,4 +25,8 @@ describe("Javascript app",function(){
     it("should have the dist folder as compiled directory",function(){
         assert(utils.getManifest().root,"dist")
     })
+
+    it("should have a package.json",function(){
+        assert(fs.existsSync(process.cwd(),"package.json"),true)
+    })
 })

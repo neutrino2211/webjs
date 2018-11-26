@@ -3,14 +3,13 @@ const path = require("path");
 const utils = require("../js/utils");
 const assert = require("assert");
 
-
-describe("Typescript app",function(){
-    this.slow(20000)
-    const tsTestDirectory = path.join(__dirname,"test-project-ts");
-    process.chdir(tsTestDirectory)
+describe("Angular app",function(){
+    this.slow(60000)
+    const ngTestDirectory = path.join(__dirname,"test-project-ng");
+    process.chdir(ngTestDirectory)
     it("should have a dist folder",function(done){
         utils.compile(function(){
-            var hasDistFolder = fs.existsSync(path.join(tsTestDirectory,"dist"));
+            var hasDistFolder = fs.existsSync(path.join(ngTestDirectory,"dist"));
             done(!hasDistFolder)
         },{watch: false})
     }).timeout(30000)
