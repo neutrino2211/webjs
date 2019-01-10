@@ -662,6 +662,13 @@ function cleanUpAndroid(){
     var assetsPath = path.join(resourcesPath,"/android/app/src/main/assets");
     fs.emptyDirSync(javaPath);
     fs.emptyDirSync(assetsPath)
+
+    var buildGradle = path.join(resourcesPath,"/android/app/src/build.gradle");
+    var manifestXML = path.join(resourcesPath,"/android/app/src/main/AndroidManifest.xml");
+    var stringsXML = path.join(resourcesPath,"/android/app/src/main/res/values/strings.xml");
+    fs.unlinkSync(stringsXML);
+    fs.unlinkSync(buildGradle);
+    fs.unlinkSync(manifestXML);
 }
 
 
