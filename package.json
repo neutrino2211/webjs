@@ -11,7 +11,7 @@
 	"description": "A Native and Web App creation tool",
 	"main": "./index.js",
 	"scripts": {
-		"test": "cd tests && mocha javascript.spec.js && mocha typescript.spec.js && mocha react.spec.js && mocha vue.spec.js && mocha angular.spec.js"
+		"test": "mocha tests/*.spec.js"
 	},
 	"keywords": [
 		"App",
