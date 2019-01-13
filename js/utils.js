@@ -535,26 +535,23 @@ exports.init = function(directory,type){
     if(fs.existsSync(directory)){
         fs.removeSync(directory)
     };
+    var _ = (type.react?"react":undefined)||
+            (type.angular?"angular":undefined)||
+            (type.vue?"vue":undefined)||
+            (type.javascript?"javascript":undefined)||
+            (type.typescript?"typescript":undefined)||
+            (type.task?"task":undefined)||
+            "javascript"
     fs.mkdirSync(directory);
     var wjsManifest = `{
-    "project-type" : "${type}",
-    "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"src/index.html"}",
-    "entry": "${projectDefinitions[type].entry}"
+    "project-type" : "${_}",
+    "root": "${projectDefinitions[_].serverRoot?projectDefinitions[_].serverRoot:"src/index.html"}",
+    "entry": "${projectDefinitions[_].entry}"
 }`;
 
     //Get starter code relevant to project type
-    if(type == "vue"){
-        fs.copySync(path.join(resourcesPath,"wjs-vue"),directory)
-    }else if(type == "react"){
-        fs.copySync(path.join(resourcesPath,"wjs-react"),directory)
-    }else if(type == "javascript"){
-        fs.copySync(path.join(resourcesPath,"wjs-javascript"),directory)
-    }else if(type == "typescript"){
-        fs.copySync(path.join(resourcesPath,"wjs-typescript"),directory)
-    }else if (type == "angular"){
-        fs.copySync(path.join(resourcesPath,"wjs-angular"),directory)
-    }else if(type == "task"){
-        fs.copySync(path.join(resourcesPath,"wjs-tasks"),directory)
+    fs.copySync(path.join(resourcesPath,"wjs-"+_),directory)
+    if(_=="task"){
         fs.writeFileSync(
             path.join(directory,"module.conf"),
             "name = "+(
@@ -566,9 +563,6 @@ exports.init = function(directory,type){
             "\ntype = task\nengine = engine.js\nrequires = "+
             require(path.join(__dirname,"../../package.json"))["last-update"]
         );
-    }else{
-        exports.usage("*");
-        process.exit(0)
     }
 
     //Prepare package.json
