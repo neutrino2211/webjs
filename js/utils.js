@@ -107,7 +107,10 @@ exports.getModules = function(){
  */
 
 exports.makeManifest = function(Manifest){
-    fs.writeFileSync(path.join(process.cwd(),"wjs-config.json"),JSON.stringify(Manifest,undefined,"\t"));
+    var pack = path.join(process.cwd(),"package.json")
+    var pjson = JSON.parse(pack)
+    pjson["wjs-config"] = Manifest
+    fs.writeFileSync(pack,JSON.stringify(pjson,undefined,"\t"));
 }
 
 /**
@@ -119,10 +122,11 @@ exports.getManifest = function(cwd){
     if(!cwd){
         cwd = process.cwd();
     }
-    if(fs.existsSync(path.join(cwd,"wjs-config.json"))){
-        return JSON.parse(fs.readFileSync(path.join(cwd,"wjs-config.json")).toString("utf-8"));   
+    if(fs.existsSync(path.join(cwd,"package.json"))){
+        return JSON.parse(fs.readFileSync(path.join(cwd,"package.json")).toString("utf-8"))["wjs-config"]
     }else{
-        return {"project-type":"javascript",compileCommand: "webpack",extraModules:[]};
+        console.log(chalk.red("Error: No wjs-config in package.json"))
+        process.exit();
     }
 }
 
@@ -526,8 +530,7 @@ exports._ask = function(t,q){
  * @description Initialize wjs project
  */
 
-exports.init = function(directory,flag){
-    var type = exports.mode(flag);
+exports.init = function(directory,type){
     //If the path already exists then remove it
     if(fs.existsSync(directory)){
         fs.removeSync(directory)
@@ -536,30 +539,21 @@ exports.init = function(directory,flag){
     var wjsManifest = `{
     "project-type" : "${type}",
     "root": "${projectDefinitions[type].serverRoot?projectDefinitions[type].serverRoot:"src/index.html"}",
-    "local": ${flag.local?true:false},${flag.package?'\n\t"custom" : true,':""}${projectDefinitions[type].entry?'\n\t"entry":"'+projectDefinitions[type].entry+'",':""}
-    "extraModules": []
+    "entry": "${projectDefinitions[type].entry}"
 }`;
-    var wjsDefaultModules = projectDefinitions[type].defaultModules;
-
-    //Include all default modules for the project if not a task runner
-    if(!flag.task){
-        wjsDefaultModules.forEach((m)=>{
-            fs.copySync(path.join(projectDefinitions[type].modulesPath,m),path.join(directory,"webjs_modules",m));
-        })
-    }
 
     //Get starter code relevant to project type
-    if(flag.vue){
+    if(type == "vue"){
         fs.copySync(path.join(resourcesPath,"wjs-vue"),directory)
-    }else if(flag.react){
+    }else if(type == "react"){
         fs.copySync(path.join(resourcesPath,"wjs-react"),directory)
-    }else if(flag.javascript){
+    }else if(type == "javascript"){
         fs.copySync(path.join(resourcesPath,"wjs-javascript"),directory)
-    }else if(flag.typescript){
+    }else if(type == "typescript"){
         fs.copySync(path.join(resourcesPath,"wjs-typescript"),directory)
-    }else if (flag.angular){
+    }else if (type == "angular"){
         fs.copySync(path.join(resourcesPath,"wjs-angular"),directory)
-    }else if(flag.task){
+    }else if(type == "task"){
         fs.copySync(path.join(resourcesPath,"wjs-tasks"),directory)
         fs.writeFileSync(
             path.join(directory,"module.conf"),
@@ -579,6 +573,9 @@ exports.init = function(directory,flag){
 
     //Prepare package.json
     var pjson = JSON.parse(fs.readFileSync(path.join(directory,"package.json")).toString())
+    var a = directory.split(path.sep);
+    pjson.name = a[a.length-1]
+    pjson["wjs-config"] = JSON.parse(wjsManifest)
     console.log(chalk.magenta("Please answer these questions to continue with the setup"))
     var t = require("terminal-kit").terminal;
     ask(t,chalk.green("Author: "),function(i){
@@ -591,25 +588,6 @@ exports.init = function(directory,flag){
             t.processExit()
         })
     })
-    var a = directory.split(path.sep);
-    pjson.name = a[a.length-1]
-    //Generate standard Java code for Android project if the project is to have custom android files 
-    if(flag.local === true){
-        if(flag.package){
-            exports.makeJavaSource(flag.package,true,directory);
-            exports.makeGradleBuild(flag.package);
-            exports.makeManifestXML(flag.package);
-        }
-        fs.copySync(path.join(resourcesPath,"android"),path.join(directory,"android"));
-    }
-    //Write wjs configuration file if not a task
-    if(!flag.task){
-        var wjsM = JSON.parse(wjsManifest);
-        var beautifiedConfig = JSON.stringify(wjsM,undefined,"\t");
-        beautifiedConfig.compileCommand = undefined;
-        fs.writeFileSync(path.join(directory,"wjs-config.json"),beautifiedConfig);
-    }
-    
 }
 
 /**
@@ -635,7 +613,6 @@ exports.changeDir = function(dir){
  */
 
 exports.compile = function(cb,o){
-    exports.getProjectDependencies(process.cwd())
     var manifest = exports.getManifest(process.cwd())
     // process.env.NODE_ENV = o.watch?"development":"production";
     var bundler = new Parcel(path.join(process.cwd(),manifest.entry),o);

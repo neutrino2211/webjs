@@ -4,30 +4,45 @@ import * as utils from "../js/utils";
 import * as path from "path";
 import chalk from "chalk";
 import {
-    operand, 
-    operation, 
     development, 
-    init, 
-    install, 
-    publish, 
-    flags, 
+    init,
     version,
-    run,
-    add,
-    remove
 } from "../js/wjs"
-import { existsSync } from "fs";
+import * as yargs from "yargs";
 
-console.log(chalk.green("Starting..."))
-const proj_operations = ["add","development","build","run"]
-
-if (!existsSync("./wjs-config.json") && proj_operations.indexOf(operation) > -1){
-    console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config.json"))
-    console.log("Did you forget to run 'wjs init' ?")
-    process.exit()
+function confirmConfig(){
+    if (utils.getManifest() == undefined){
+        console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config")+" entry in package.json")
+        console.log("Did you forget to run 'wjs init' ?")
+        process.exit()
+    }
 }
-// init argument block
 
+yargs.usage("Usage: wjs <command> [..options]")
+.command(['dev','d'],'Compile files and wait for changes',{},(args)=>{
+    confirmConfig()
+    development(args);
+})
+.example("wjs dev","Compile files and wait for changes")
+.command(['build','b'],'Build project for production',{},()=>{
+    confirmConfig()
+    utils.build();
+})
+.example("wjs build","Build project for production")
+.command(["init <name> [type]",'i <name> [type]'],"Create a new project",{},(args)=>{
+    ['react','task','vue','javascript','typescript','angular'].indexOf(<string>args.type) > 1?
+        init(args.name, process.cwd(),args.type):
+        console.log(chalk.red("Error: '"+args.type+"' is not recognized as a project type"));
+})
+.example("wjs init cool-app react","Create a project called cool-app of type react")
+.demandCommand(1, '')
+.version(version())
+.help("help")
+.alias("h","help")
+.demandCommand()
+.epilog("Copyright 2019").argv;
+/*
+// init argument block
 if (operation == "init"){
     init(operand,process.cwd(),flags)
 }
@@ -132,4 +147,4 @@ else if(operation == "test"){
 
 else {
     utils.usage("*");
-}
+}*/

@@ -1,9 +1,0 @@
-{
-	"author": "Tsowa Mainasara Al-amin",
-	"license": "MIT",
-	"name": "test-project-js",
-	"version": "0.0.1",
-	"dependencies": {
-		"cross-env": "^5.1.1"
-	}
-}
