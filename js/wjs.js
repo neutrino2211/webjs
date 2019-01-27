@@ -30,14 +30,14 @@ function Development(flags){
         }
         app.use(middleware)
     }
-    app.use(express.static(SR))
+    app.use(express.static(flags.o||flags.output||SR))
     var l = app.listen(global.port);
     console.log("App is available on http://localhost:"+l.address().port)
     console.log("Watching "+manifest.entry)
     process.env.NODE_ENV = "development"
-    utils.compile(undefined,{watch:"true",publicUrl:"./",contentHash:false})
+    utils.compile(undefined,{watch:"true",publicUrl:"./",contentHash:false,outDir:flags.o||flags.output||SR})
 
-    if(flags.o||flags.open){
+    if(flags.open){
         require('opn')('http://localhost:'+port);
     }
 }

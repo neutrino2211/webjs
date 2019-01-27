@@ -776,7 +776,8 @@ exports.build = function(flags){
         },{
             minify: true,
             target: "browser",
-            publicUrl: "./"
+            publicUrl: "./",
+            outDir: f.o||f.output||"./dist"
         });
     }
 }
