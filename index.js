@@ -1,2 +1,2 @@
-var wjs = require("./dist/src/index.js");
+var wjs = require("./dist/index.js");
 module.exports = wjs;

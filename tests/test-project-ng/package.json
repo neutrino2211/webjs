@@ -9,15 +9,20 @@
 		"build": "parcel build src/index.html"
 	},
 	"dependencies": {
-		"@angular/common": "^7.1.0",
-		"@angular/compiler": "^7.1.0",
-		"@angular/core": "^7.1.0",
-		"@angular/platform-browser": "^7.1.0",
-		"@angular/platform-browser-dynamic": "^7.1.0",
+		"@angular/common": "^7.0.4",
+		"@angular/compiler": "^7.0.4",
+		"@angular/core": "^7.0.4",
+		"@angular/platform-browser": "^7.0.4",
+		"@angular/platform-browser-dynamic": "^7.0.4",
 		"core-js": "^2.5.7",
 		"rxjs": "^6.3.3",
 		"systemjs": "^2.1.1",
 		"zone.js": "^0.8.26"
+	},
+	"wjs-config": {
+		"project-type": "angular",
+		"root": "dist",
+		"entry": "src/index.html"
 	},
 	"author": "Tsowa Mainasara Al-amin"
 }

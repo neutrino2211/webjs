@@ -1,7 +1,0 @@
-{
-	"project-type": "angular",
-	"root": "dist",
-	"local": false,
-	"entry": "src/index.html",
-	"extraModules": []
-}

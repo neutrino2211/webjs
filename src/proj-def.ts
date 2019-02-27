@@ -1,6 +1,6 @@
 var path = require("path");
 
-module.exports = {
+export const definitions = {
     typescript: {
         root: "src",
         entry:"src/index.html",
@@ -47,6 +47,5 @@ module.exports = {
         serverRoot: "dist",
         defaultModules: ["material.js","app.js"]
     },
-
-
 }
+export default definitions;

@@ -1,7 +1,0 @@
-{
-	"project-type": "typescript",
-	"root": "dist",
-	"local": false,
-	"entry": "src/index.html",
-	"extraModules": []
-}

@@ -1,23 +1,15 @@
-//Greetings
-var print = console.log;
+import * as path from "path";
+import * as chalk from "chalk";
+import * as fs from "fs-extra";
+import * as utils from "./utils";
+import projectDefinitions  from "./proj-def";
 
-//Declare variables
-var fs                 = require("fs-extra");
-var path               = require("path");
-var utils              = require('./utils');
-var chalk              = require("chalk");
-var projectDefinitions = require("./proj-def");
-
-function Development(flags){
+export function development(flags){
     var express  = require("express");
     var manifest = utils.getManifest();
 
     var SR /*server root*/  = projectDefinitions[manifest["project-type"]].serverRoot;
-
     var port = 3100;
-
-    global.flags = flags;
-    global.port  = flags.port||port;
 
     var app = express();
     if(flags.debug){
@@ -31,7 +23,7 @@ function Development(flags){
         app.use(middleware)
     }
     app.use(express.static(flags.o||flags.output||SR))
-    var l = app.listen(global.port);
+    var l = app.listen(port);
     console.log("App is available on http://localhost:"+l.address().port)
     console.log("Watching "+manifest.entry)
     process.env.NODE_ENV = "development"
@@ -42,19 +34,13 @@ function Development(flags){
     }
 }
 
-function Init(operand,cwd,type){
-    print("Initializing app in "+path.join(process.cwd(),operand))
+export function init(operand,cwd,type){
+    console.log("Initializing app in "+path.join(process.cwd(),operand))
     utils.init(path.join(cwd,operand),type)
 }
-function Version(){
+
+export function version(){
     var json = fs.readFileSync(path.join(__dirname,"../../","package.json")).toString();
-
     var pack = JSON.parse(json);
-
-    // console.log(pack["last-update"],"updates."+updateVersion+"_");
-
     return pack.version
 }
-exports.init        = Init;
-exports.development = Development;
-exports.version = Version;

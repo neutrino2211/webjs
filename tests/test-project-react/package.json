@@ -12,5 +12,10 @@
 		"html-webpack-plugin": "^2.26.0",
 		"react": "^15.4.1",
 		"react-dom": "^15.4.1"
+	},
+	"wjs-config": {
+		"project-type": "react",
+		"root": "dist",
+		"entry": "src/index.html"
 	}
 }

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
-import * as utils from "../js/utils";
+import * as utils from "./utils";
 import * as path from "path";
 import chalk from "chalk";
 import {
     development, 
     init,
     version,
-} from "../js/wjs"
+} from "./wjs"
 import * as yargs from "yargs";
 
 function confirmConfig(){

@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
-const utils = require("../js/utils");
+const utils = require("../dist/utils");
 const assert = require("assert");
 
 describe("Angular app",function(){
@@ -10,7 +10,7 @@ describe("Angular app",function(){
     it("should have a dist folder",function(done){
         utils.compile(function(){
             var hasDistFolder = fs.existsSync(path.join(ngTestDirectory,"dist"));
-            done(!hasDistFolder)
+            done(hasDistFolder)
         },{watch: false})
     }).timeout(30000)
 
