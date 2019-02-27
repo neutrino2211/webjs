@@ -10,22 +10,14 @@ import {
 } from "./wjs"
 import * as yargs from "yargs";
 
-function confirmConfig(){
-    if (utils.getManifest() == undefined){
-        console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config")+" entry in package.json")
-        console.log("Did you forget to run 'wjs init' ?")
-        process.exit()
-    }
-}
-
 yargs.usage("Usage: wjs <command> [..options]")
 .command(['dev','d'],'Compile files and wait for changes',{},(args)=>{
-    confirmConfig()
+    utils.confirmConfig()
     development(args);
 })
 .example("wjs dev","Compile files and wait for changes")
 .command(['build','b'],'Build project for production',{},(args)=>{
-    confirmConfig()
+    utils.confirmConfig()
     utils.build(args);
 })
 .example("wjs build","Build project for production")
@@ -39,14 +31,11 @@ yargs.usage("Usage: wjs <command> [..options]")
     var m = require(path.join(process.cwd(),"node_modules","wjs-task-"+(<string>args.name)));
     m(process.cwd(),args,utils)
 })
+.commandDir("./native")
 // .demandCommand(1, '')
-.command("$0",'start development server',{},(args)=>{
-    confirmConfig()
+.command("$0",'Same as '+chalk.dim('wjs dev'),{},(args)=>{
+    utils.confirmConfig()
     development(args)
-})
-.option("out-dir",{
-    alias: "o",
-    describe: "Output directory for builds"
 })
 .option("version",{
     alias: "v",

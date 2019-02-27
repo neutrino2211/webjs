@@ -74,6 +74,30 @@ export function makeManifest(Manifest){
 }
 
 /**
+ * @function confirmConfig
+ */
+
+export function confirmConfig(){
+    if (getManifest() == undefined){
+        console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config")+" entry in package.json")
+        console.log("Did you forget to run 'wjs init' ?")
+        process.exit()
+    }
+}
+
+export function confirmNative(){
+    if(!fs.existsSync("./native")){
+        console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("native")+" folder")
+        console.log("Did you forget to run 'wjs native create' ?")
+        process.exit()
+    }
+}
+
+export function changeDir(dir){
+    process.chdir(dir)
+}
+
+/**
  * 
  * @returns {{}} Object representation of manifest or the default "wjs-config.json" if the project has no manifest
  */
