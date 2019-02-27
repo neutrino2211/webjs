@@ -9,6 +9,7 @@ import * as Parcel from "parcel";
 import * as path from "path";
 import * as fs from "fs-extra";
 import chalk from "chalk";
+import { load } from "cheerio";
 import { definitions as projectDefinitions } from "./proj-def";
 
 
@@ -271,4 +272,33 @@ export function build(flags){
             outDir: f.o||f.output||"./dist"
         });
     }
+}
+
+export function makeCordovaEntry(){
+    const defaultEntry = fs.readFileSync("native/www/index.html").toString("utf-8");
+    const $ = load(defaultEntry);
+    var head = $("head").html();
+    const newHead = `<!--
+    Customize this policy to fit your own app's needs. For more guidance, see:
+        https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+    Some notes:
+        * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+        * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+        * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+            * Enable inline JS: add 'unsafe-inline' to default-src
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">`+head;
+    $("head").html(newHead);
+
+    var body = $("body").html()
+    const newBody = `<script type="text/javascript" src="cordova.js"></script>`+body;
+    $("body").html(newBody);
+    fs.writeFileSync("native/www/index.html",$.html());
+}
+
+export function cleanNative(){
+    fs.emptyDirSync("native/www")
 }

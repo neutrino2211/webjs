@@ -1,4 +1,4 @@
-import { confirmConfig, confirmNative, changeDir } from "../../utils";
+import { confirmConfig, confirmNative, changeDir, compile, makeCordovaEntry, cleanNative } from "../../utils";
 
 import {cordova} from "cordova-lib"
 
@@ -10,9 +10,19 @@ export const builder = {}
 
 export function handler(argv){
     confirmConfig();
-    confirmNative()
-    changeDir("./native")
-    run(argv)
+    confirmNative();
+    cleanNative();
+    process.env.NODE_ENV = "production"
+    compile(()=>{
+        makeCordovaEntry();
+        changeDir("./native")
+        run(argv)
+    },{
+        minify: true,
+        target: "browser",
+        publicUrl: "./",
+        outDir: "native/www"
+    })
 }
 
 async function run(args){

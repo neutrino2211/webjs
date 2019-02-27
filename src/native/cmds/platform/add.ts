@@ -20,7 +20,7 @@ export function handler(argv){
 async function add_platform(args){
     try {
         const hr = new HooksRunner(process.cwd())
-        cordova.on("log",(msg)=>{
+        cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)
         })
         await cordova.platform.add(hr,process.cwd(),[args.platform],args)
