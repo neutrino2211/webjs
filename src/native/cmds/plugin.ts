@@ -1,11 +1,11 @@
 import yargs = require("yargs");
 
-export const command = "native <command>"
+export const command = "plugin <command>"
 
-export const desc = "Run cordova commands"
+export const desc = "Manage project plugins"
 
 export function builder(yargs: yargs.Argv){
-    yargs.commandDir("./cmds")
+    yargs.commandDir("./plugins")
 }
 
 export function handler(){

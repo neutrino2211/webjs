@@ -8,6 +8,6 @@ export function builder(yargs: yargs.Argv){
     yargs.commandDir("./platform")
 }
 
-export function handler(argv){
-    console.log(argv)
+export function handler(){
+    yargs.showHelp();
 }

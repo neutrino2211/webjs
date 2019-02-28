@@ -2,7 +2,7 @@ import { confirmConfig, confirmNative, changeDir, compile, makeCordovaEntry, cle
 
 import {cordova} from "cordova-lib"
 
-export const command = "run <platform> [options]"
+export const command = "run <platform>"
 
 export const desc = "Run application"
 
@@ -27,7 +27,8 @@ export function handler(argv){
 
 async function run(args){
     try {
-        await cordova.run(args)   
+        args.platforms = [args.platform]
+        await cordova.run(args)
     } catch (error) {
         console.log(error)
         process.exit()

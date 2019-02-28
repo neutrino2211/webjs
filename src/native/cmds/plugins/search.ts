@@ -4,31 +4,27 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "update ...platforms"
+export const command = "search ...plugins"
 
-export const desc = "Update specified platforms"
+export const desc = "Search http://plugins.cordova.io for plugins matching the keywords"
 
-export function builder(){
-    return yargs.option("save",{
-        describe: "Updates the version specified in config.xml",
-    });
-}
+export const builder = {}
 
 export function handler(argv){
     confirmConfig()
     confirmNative()
     changeDir("./native")
-    update_platform(argv)
+    search_plugin(argv)
 }
 
-async function update_platform(args){
+async function search_plugin(args){
     try {
-        args.platforms = process.argv.slice(5)
+        args.plugins = process.argv.slice(5)
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)
         })
-        await cordova.platform.update(hr,process.cwd(),args.platforms,args)
+        await cordova.plugin.search(hr,args)
     } catch (error) {
         console.log(error)
         process.exit()
