@@ -4,7 +4,7 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "update ...platforms"
+export const command = "update [platforms..]"
 
 export const desc = "Update specified platforms"
 
@@ -23,7 +23,6 @@ export function handler(argv){
 
 async function update_platform(args){
     try {
-        args.platforms = process.argv.slice(5)
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)

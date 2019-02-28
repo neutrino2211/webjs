@@ -4,7 +4,7 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "search ...plugins"
+export const command = "search [plugins..]"
 
 export const desc = "Search http://plugins.cordova.io for plugins matching the keywords"
 
@@ -19,7 +19,6 @@ export function handler(argv){
 
 async function search_plugin(args){
     try {
-        args.plugins = process.argv.slice(5)
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)

@@ -4,7 +4,7 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "add ...plugins"
+export const command = "add [plugins..]"
 
 export const desc = "Add specified plugins"
 
@@ -34,7 +34,6 @@ export function handler(argv){
 
 async function add_plugin(args){
     try {
-        args.plugins = process.argv.slice(5)
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)

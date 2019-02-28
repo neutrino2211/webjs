@@ -4,7 +4,7 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "remove ...plugins"
+export const command = "remove [plugins..]"
 
 export const desc = "Remove plugin from project"
 

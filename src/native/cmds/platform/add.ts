@@ -4,7 +4,7 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "add ...platforms"
+export const command = "add [platforms..]"
 
 export const desc = "Add taget platform to the project"
 
@@ -26,7 +26,6 @@ export function handler(argv){
 
 async function add_platform(args){
     try {
-        args.platforms = process.argv.slice(5)
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)
