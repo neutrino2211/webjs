@@ -4,16 +4,13 @@ import { confirmConfig, confirmNative, changeDir } from "../../../utils";
 import { cordova } from "cordova-lib";
 import * as HooksRunner from "cordova-lib/src/hooks/HooksRunner.js"
 
-export const command = "add <platform>"
+export const command = "remove <platform>"
 
-export const desc = "Add taget platform to the project"
+export const desc = "Remove target platform to the project"
 
 export function builder(){
     return yargs.option("nosave",{
-        describe: "Do not save <platform-spec> into config.xml & package.json after installing them using <engine> tag",
-    }).option("link",{
-        describe: "When <platform-spec> is a local path, links the platform library directly instead of making a copy of it",
-        type: "string"
+        describe: "Do not delete specified platforms from config.xml & package.json after removing them",
     })
 }
 
@@ -21,16 +18,16 @@ export function handler(argv){
     confirmConfig()
     confirmNative()
     changeDir("./native")
-    add_platform(argv)
+    remove_platform(argv)
 }
 
-async function add_platform(args){
+async function remove_platform(args){
     try {
         const hr = new HooksRunner(process.cwd())
         cordova.on(args.verbose?"verbose":"log",(msg)=>{
             console.log(msg)
         })
-        await cordova.platform.add(hr,process.cwd(),[args.platform],args)
+        await cordova.platform.remove(hr,process.cwd(),[args.platform],args)
     } catch (error) {
         console.log(error)
         process.exit()
