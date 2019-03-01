@@ -58,7 +58,7 @@ export const builder = {
 }
 
 export function handler(argv){
-    confirmConfig();
+    confirmConfig(false);
     confirmNative();
     tasks.next()
     process.env.NODE_ENV = "production"
@@ -103,7 +103,7 @@ async function build(argv){
             tasks.finish()
         }
     } catch (e) {
-        console.log(e)
+        tasks.failed(e)
         process.exit()
     }
 }

@@ -24,6 +24,10 @@ export class Chain<T> {
         this.listIndex++;
     }
 
+    restart(){
+        this.listIndex = 0;
+    }
+
     finish(){
         this.fin(this.list[this.listIndex-1])
     }
@@ -48,8 +52,8 @@ export class Loader {
         this.ora.start(text)
     }
 
-    succeed(){
-        this.ora.succeed();
+    succeed(text?){
+        this.ora.succeed(text);
     }
 
     fail(){

@@ -13,7 +13,6 @@ import { load } from "cheerio";
 import { definitions as projectDefinitions } from "./proj-def";
 
 
-var resourcesPath = path.join(__dirname,"../resources");
 /**
  * @argument {Array<String>} args
  * @description Turn command line options into an object.
@@ -78,7 +77,7 @@ export function makeManifest(Manifest){
  * @function confirmConfig
  */
 
-export function confirmConfig(){
+export function confirmConfig(handle?){
     if (getManifest() == undefined){
         console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config")+" entry in package.json")
         console.log("Did you forget to run 'wjs init' ?")
@@ -166,81 +165,20 @@ export function _ask(t,q){
 }
 
 /**
- * @argument {String} directory
- * @argument {Object} flag
- * @description Initialize wjs project
- */
-
-export function init(directory,type){
-    //If the path already exists then remove it
-    if(fs.existsSync(directory)){
-        fs.removeSync(directory)
-    };
-    var _ = (type.react?"react":undefined)||
-            (type.angular?"angular":undefined)||
-            (type.vue?"vue":undefined)||
-            (type.javascript?"javascript":undefined)||
-            (type.typescript?"typescript":undefined)||
-            (type.task?"task":undefined)||
-            "javascript"
-    fs.mkdirSync(directory);
-    console.log(_)
-    var wjsManifest = `{
-    "project-type" : "${_}",
-    "root": "${projectDefinitions[_].serverRoot?projectDefinitions[_].serverRoot:"src/index.html"}",
-    "entry": "${projectDefinitions[_].entry}"
-}`;
-
-    //Get starter code relevant to project type
-    fs.copySync(path.join(resourcesPath,"wjs-"+_),directory)
-    if(_=="task"){
-        fs.writeFileSync(
-            path.join(directory,"module.conf"),
-            "name = "+(
-                    function(){
-                        var l = directory.split(path.sep);
-                        return l[l.length-1];
-                    }()
-                )+
-            "\ntype = task\nengine = engine.js\nrequires = "+
-            require(path.join(__dirname,"../package.json"))["last-update"]
-        );
-    }
-
-    //Prepare package.json
-    var pjson = JSON.parse(fs.readFileSync(path.join(directory,"package.json")).toString())
-    var a = directory.split(path.sep);
-    pjson.name = a[a.length-1]
-    pjson["wjs-config"] = JSON.parse(wjsManifest)
-    console.log(chalk.magenta("Please answer these questions to continue with the setup"))
-    var t = require("terminal-kit").terminal;
-    ask(t,chalk.green("Author: "),function(i){
-        pjson.author = i;
-        console.log()
-        ask(t,chalk.green("Version: "),function(i){
-            pjson.version = i
-            console.log("\nMaking package.json")
-            fs.writeFileSync(path.join(directory,"package.json"),JSON.stringify(pjson,undefined,"\t"))
-            t.processExit()
-        })
-    })
-}
-
-/**
  * @argument {Function} c
  * @argument { {watch: Boolean?, minify: Boolean?} } o
  */
 
-export function compile(cb,o){
+export function compile(cb,o?){
     var manifest = getManifest()
-    // process.env.NODE_ENV = o.watch?"development":"production";
+    if(typeof cb !== "function"){
+        var bundler = new Parcel(path.join(process.cwd(),manifest.entry),cb);
+        bundler.bundle()
+        return bundler
+    }
     var bundler = new Parcel(path.join(process.cwd(),manifest.entry),o);
     bundler.bundle()
-    .then(function(){
-        if(cb){
-            cb()
-        };
-    })
+    .then(cb)
     .catch(function(e){
         console.log("Error compiling:");
         // console.log(e);
