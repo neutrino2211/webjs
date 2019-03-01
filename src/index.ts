@@ -43,5 +43,4 @@ yargs.usage("Usage: wjs <command> [..options]")
 })
 .help("help")
 .alias("h","help")
-.demandCommand()
-.epilog("Copyright 2019").argv;
+.demandCommand().argv;
