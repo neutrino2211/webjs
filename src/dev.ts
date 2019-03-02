@@ -11,21 +11,28 @@ var date = new Date()
 const tasks = new Chain<Loader>((prev,loader)=>{
     date = new Date()
     if(prev){
-        prev.succeed(`[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}] Built`)
+        prev.succeed(`[${getTime()}] Built`)
     }
     loader.start()
 },(last)=>{
     date = new Date()
-    last.succeed(`[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}] Built`)
+    last.succeed(`[${getTime()}] Built`)
 },list=>list.map(l=>l.fail()))
 
 tasks.list = [
     new Loader({
-        text: `[${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}] Building wjs project`
+        text: `[${getTime()}] Building wjs project`
     })
 ]
 
-export const description = "Serve the application and refresh on code change"
+function getTime(){
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const seconds = date.getSeconds()
+    return `${hours.toString().length == 1?'0'+hours:hours}:${minutes.toString().length == 1?'0'+minutes:minutes}:${seconds.toString().length == 1?'0'+seconds:seconds}`
+}
+
+export const description = "Builds and serves the app"
 
 export const command = ["dev","d"]
 
@@ -36,7 +43,8 @@ export function builder (yargs: yargs.Argv){
         },
     
         logLevel: {
-            description: "Log level for parcel build"
+            description: "Log level for parcel build",
+            type: "number"
         }
     }).example("wjs dev","Serve the application and refresh on code change")
 }
