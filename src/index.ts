@@ -14,6 +14,15 @@ yargs.usage("Usage: wjs <command> [..options]")
 .command(<any>createCommand)
 .command(<any>cleanCommand)
 .command("$0",devCommand.description+chalk.gray(" [wjs dev]"),devCommand.builder,devCommand.handler)
+.command({
+    command: '*',
+    handler: (argv) => {      
+        if (argv._[0]) {
+            console.log('Unknown commmand', argv._[0])
+            yargs.showHelp()    
+        }
+    }
+})
 .commandDir("./native")
 .option("version",{
     alias: "v",

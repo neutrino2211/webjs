@@ -4,48 +4,40 @@ export const definitions = {
     typescript: {
         root: "src",
         entry:"src/index.html",
-        modulesPath: path.join(__dirname,"../../resources","Typescript"),
-        compileCommand: false,
         serverRoot: "dist",
-        defaultModules: ["app.ts","material.ts"]
+        testPackages: ['karma-typescript']
     },
 
     angular: {
         root: "src",
         entry:"src/index.html",
-        compileCommand: false,
-        modulesPath: path.join(__dirname,"../../resources","Typescript"),
         serverRoot: "dist",
-        defaultModules: ["app.ts","material.ts"]
     },
 
     vue: {
         root: "src",
         entry: "src/index.html",
-        compileCommand: false,
-        modulesPath: path.join(__dirname,"../../resources","vue-modules"),
-        config: false,
         serverRoot: "dist",
-        defaultModules: ["app.js"]
     },
 
     react: {
         root: "src",
         entry: "src/index.html",
-        compileCommand: false,
-        modulesPath: path.join(__dirname,"../../resources","vue-modules"),
-        config: false,
         serverRoot: "dist",
-        defaultModules: ["app.js"]
+        testPackages: []
     },
 
     javascript: {
         root: "src",
         entry: "src/index.html",
-        compileCommand: false,
-        modulesPath: path.join(__dirname,"../../resources","WTS"),
         serverRoot: "dist",
-        defaultModules: ["material.js","app.js"]
+        testPackages: []
     },
+
+    tests: {
+        jasmine: {
+            spec_dir: 'test'
+        }
+    }
 }
 export default definitions;

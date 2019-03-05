@@ -9,6 +9,21 @@
 	"wjs-config": {
 		"project-type": "javascript",
 		"root": "dist",
-		"entry": "src/index.html"
+		"entry": "src/index.html",
+		"test": {
+			"sources": [
+				"index.spec.js"
+			],
+			"config": {
+				"random": false,
+				"seed": null,
+				"spec_dir": "test"
+			},
+			"framework": "jasmine"
+		}
+	},
+	"devDependencies": {
+		"jasmine": "^3.3.1",
+		"jasmine-console-reporter": "^3.1.0"
 	}
 }

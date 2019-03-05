@@ -5,7 +5,7 @@ export const command = "native <command>"
 export const desc = "Run cordova commands"
 
 export function builder(yargs: yargs.Argv){
-    yargs.commandDir("./cmds")
+    return yargs.commandDir("./cmds")
     .option("verbose",{
         description: "Log more information.",
         alias: "vv",

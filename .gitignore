@@ -8,6 +8,9 @@ tests/**/.cache
 tests/**/dist
 tests/**/node_modules
 tests/**/native
+tests/**/package-lock.json
+tests/**/test
+tests/**/karma.conf.json
 .vs
 .vscode
 .vstags

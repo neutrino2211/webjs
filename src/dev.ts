@@ -45,6 +45,11 @@ export function builder (yargs: yargs.Argv){
         logLevel: {
             description: "Log level for parcel build",
             type: "number"
+        },
+
+        port: {
+            description: "Port to serve app",
+            type: "number"
         }
     }).example("wjs dev","Serve the application and refresh on code change")
 }
@@ -59,23 +64,26 @@ export async function handler(args: yargs.Arguments<{}>){
         const serverRoot = definitions[manifest["project-type"]].serverRoot;
         const port = args.port||process.env.PORT||3100;
         const app = express()
+        const logLevel = args.logLevel||0
+        console.log("App is available on http://localhost:"+port)
+        console.log("Watching "+manifest.entry)
         const bundler = await compile({
             target:"browser",
             publicUrl:"./",
-            logLevel: args.logLevel||0
+            logLevel: logLevel
         })
-        bundler.on("buildStart",()=>{
-            tasks.restart()
-            tasks.next()
-        })
-
-        bundler.on("buildEnd",()=>{
-            tasks.finish()
-        })
+        if(logLevel == 0){
+            bundler.on("buildStart",()=>{
+                tasks.restart()
+                tasks.next()
+            })
+    
+            bundler.on("buildEnd",()=>{
+                tasks.finish()
+            })
+        }
         app.use(express.static(serverRoot))
         app.listen(port);
-        console.log("App is available on http://localhost:"+port)
-        console.log("Watching "+manifest.entry)
         if(args.open){
             opn('http://localhost:'+port)
         }
