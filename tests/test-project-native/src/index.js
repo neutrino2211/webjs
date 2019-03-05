@@ -1,1 +1,0 @@
-document.getElementById("js-main").innerHTML = "<h1>Hello World</h1>";

@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"test": "mocha tests/*.spec.js"
+		"test": "mocha --require ts-node/register test/**/*.spec.ts"
 	},
 	"keywords": [
 		"App",
@@ -32,11 +32,6 @@
 	"author": "Tsowa Mainasara Al-amin",
 	"license": "ISC",
 	"dependencies": {
-		"@types/fs-extra": "^5.0.4",
-		"@types/mocha": "^5.2.5",
-		"@types/node": "^10.12.1",
-		"@types/ora": "^3.1.0",
-		"@types/yargs": "^12.0.5",
 		"chalk": "^2.4.1",
 		"cheerio": "^1.0.0-rc.2",
 		"cordova-lib": "^8.1.1",
@@ -55,21 +50,29 @@
 		"terminal-kit": "^1.14.3",
 		"ts-loader": "latest",
 		"types": "^0.1.1",
-		"typescript": "^2.9.2",
 		"websocket": "^1.0.25",
 		"xmldom": "^0.1.27",
 		"yargs": "^13.1.0"
 	},
 	"devDependencies": {
+		"@types/fs-extra": "^5.0.4",
+		"@types/node": "^10.12.1",
+		"@types/ora": "^3.1.0",
+		"@types/yargs": "^12.0.5",
+		"@types/chai": "^4.1.7",
 		"@types/cheerio": "^0.22.10",
 		"@types/express": "^4.16.1",
 		"@types/inquirer": "0.0.44",
 		"@types/karma": "^3.0.2",
+		"@types/mocha": "^5.2.6",
 		"adm-zip": "^0.4.11",
+		"chai": "^4.2.0",
 		"karma": "^4.0.1",
 		"karma-chrome-launcher": "^2.2.0",
 		"karma-jasmine": "^2.0.1",
 		"mocha": "^5.2.0",
+		"ts-node": "^8.0.2",
+		"typescript": "^3.3.3",
 		"typings": "^2.1.1"
 	}
 }

@@ -1,1 +1,0 @@
-document.getElementById("ts-main").innerHTML = "<h1>Hello World</h1>";
