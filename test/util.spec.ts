@@ -10,11 +10,11 @@ import { before } from "mocha";
 
 describe("Utils",()=>{
     describe("#manifest",()=>{
-        it("should return undefined",()=>{
+        it("should return undefined when package.json does not exist",()=>{
             assert.strictEqual(utils.getManifest(),undefined)
         })
 
-        it("should fail to make manifest",()=>{
+        it("should fail to make manifest when package.json does not exist",()=>{
             try {
                 utils.makeManifest({})
                 return false
@@ -60,6 +60,11 @@ describe("Utils",()=>{
             await driver.quit()
             assert.equal(text,"Hello World");
         })
+
+        after(function(){
+            fs.emptyDirSync("./.cache")
+            fs.rmdirSync("./.cache")
+        })
     })
 
     describe("#native",()=>{
@@ -81,6 +86,9 @@ describe("Utils",()=>{
         after(function(){
             fs.emptyDirSync("./native")
             fs.rmdirSync("./native");
+
+            fs.emptyDirSync("./assets/compile/dist")
+            fs.rmdirSync("./assets/compile/dist")
         })
     })
 })

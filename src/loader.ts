@@ -26,7 +26,7 @@ export class Chain<T> {
 
     repeat(){
         this.listIndex--;
-        return this;
+        return this.next()
     }
 
     next(){
