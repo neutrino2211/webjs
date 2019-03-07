@@ -55,7 +55,7 @@ const questionsList = [
 
 async function init(directory,type){
     if(fs.existsSync(directory)){
-        var {removeDir} = await inquirer.prompt({
+        var {removeDir} = await <any>inquirer.prompt({
             type: "confirm",
             name: "removeDir",
             message: `Directory '${directory}' already exists, do yo want to remove it?`,
@@ -95,7 +95,7 @@ async function init(directory,type){
 }
 
 async function continueWithQuestions(directory,_,args){
-    const {npm, testing} = await inquirer.prompt(questionsList)
+    const {npm, testing} = await <any>inquirer.prompt(questionsList)
     var wjsManifest = `{
         "project-type" : "${_}",
         "root": "${projectDefinitions[_].serverRoot?projectDefinitions[_].serverRoot:"src/index.html"}",
@@ -109,7 +109,7 @@ async function continueWithQuestions(directory,_,args){
     pjson["wjs-config"] = JSON.parse(wjsManifest)
     fs.writeFileSync(path.join(directory,"package.json"),JSON.stringify(pjson,undefined,"\t"))
     console.log(chalk.rgb(0x90,0xff,0x44)("Please answer these questions to continue with the setup"))
-    const {version ,author, license} = await inquirer.prompt([
+    const {version ,author, license} = await <any>inquirer.prompt([
         {
             type: "input",
             name: "author",

@@ -57,27 +57,26 @@ export const builder = {
     }
 }
 
-export function handler(argv){
+export async function handler(argv){
     confirmConfig(false);
     confirmNative();
     tasks.next()
-    process.env.NODE_ENV = "production"
-    compile(()=>{
-        tasks.next()
-        makeCordovaEntry();
-        if(!argv.nonative){
-            changeDir("./native")
-            build(argv)
-        } else {
-            tasks.finish()
-        }
-    },{
+    await compile({
         minify: true,
         target: "browser",
         publicUrl: "./",
         outDir: "native/www",
-        logLevel:1
+        logLevel:1,
+        watch: false
     })
+    tasks.next()
+    makeCordovaEntry();
+    if(!argv.nonative){
+        changeDir("./native")
+        build(argv)
+    } else {
+        tasks.finish()
+    }
 }
 
 async function build(argv){
