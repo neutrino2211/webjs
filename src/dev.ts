@@ -1,5 +1,5 @@
 import yargs = require("yargs");
-import { getManifest, compile, confirmConfig } from "./utils";
+import { getManifest, confirmConfig, asyncCompile } from "./utils";
 import { Chain, Loader } from "./loader";
 import definitions from "./proj-def";
 
@@ -67,10 +67,11 @@ export async function handler(args: yargs.Arguments<{}>){
         const logLevel = args.logLevel||0
         console.log("App is available on http://localhost:"+port)
         console.log("Watching "+manifest.entry)
-        const bundler = await compile({
+        const bundler = await asyncCompile({
             target:"browser",
             publicUrl:"./",
-            logLevel: logLevel
+            logLevel: logLevel,
+            watch: true
         })
         if(logLevel == 0){
             bundler.on("buildStart",()=>{

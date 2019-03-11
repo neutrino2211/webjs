@@ -8,7 +8,7 @@ import { before } from "mocha";
 
 
 
-describe("Utils",()=>{
+describe("Project utils",()=>{
     describe("#manifest",()=>{
         it("should return undefined when package.json does not exist",()=>{
             assert.strictEqual(utils.getManifest(),undefined)
