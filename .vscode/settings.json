@@ -1,4 +1,17 @@
 {
     "git.ignoreLimitWarning": true,
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "peacock.affectTitleBar": false,
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#65c89b",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#945bc4",
+        "activityBarBadge.foreground": "#e7e7e7",
+        "statusBar.background": "#42b882",
+        "statusBarItem.hoverBackground": "#359267",
+        "statusBar.foreground": "#15202b"
+    },
+    "peacock.affectActivityBar": true,
+    "peacock.affectStatusBar": true
 }

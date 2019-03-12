@@ -1,19 +1,23 @@
 import yargs = require("yargs");
 import { getManifest, compile, confirmConfig } from "./utils";
 import { Chain, Loader } from "./loader";
+import definitions from "./proj-def";
+import chalk from "chalk";
 
+const projectType = getManifest()["project-type"]
+const projectColor = <number[]>definitions[projectType].color;
 const tasks = new Chain<Loader>((prev,loader)=>{
     if(prev){
-        prev.succeed()
+        prev.succeed("Done")
     }
     loader.start()
 },(last)=>{
-    last.succeed()
+    last.succeed("Done")
 },list=>list.map(l=>l.fail()))
 
 tasks.list = [
     new Loader({
-        text: "Building wjs project"
+        text: "Building "+chalk.rgb.call(chalk,...projectColor)(projectType)+" project"
     })
 ]
 

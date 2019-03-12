@@ -66,12 +66,12 @@ export async function handler(argv){
         tasks.next()
         if(!argv.nobuild){
             await compile({
-                minify: true,
+                minify: false,
                 target: "browser",
                 publicUrl: "./",
                 outDir: "native/www",
                 logLevel:1,
-                watch: false
+                watch: true
             })
             tasks.next()
             makeCordovaEntry();
