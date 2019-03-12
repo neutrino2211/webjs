@@ -10,13 +10,10 @@ jobs:
       - checkout # check out the code in the project directory
       - run:
           command: >
-            sudo apt-get update &&
-            sudo apt-get install -y zip unzip wget &&
             sudo curl https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - &&
             sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' &&
             sudo apt-get update &&
-            sudo apt-get install -y google-chrome-stable build-essential jq git openssh-server &&
-            sudo apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+            sudo apt-get install -y google-chrome-stable build-essential jq git openssh-server
       - run:
           command: >
             sudo wget https://chromedriver.storage.googleapis.com/2.45/chromedriver_linux64.zip &&
