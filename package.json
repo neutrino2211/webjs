@@ -10,7 +10,7 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"test": "mocha --require ts-node/register test/**/*.spec.ts"
+		"test": "cd test && mocha --require ts-node/register --timeout 999999 **/*.spec.ts"
 	},
 	"keywords": [
 		"App",
