@@ -22,4 +22,5 @@ jobs:
             chmod +x /usr/bin/chromedriver &&
             rm chromedriver_linux64.zip &&
             cd $HOME/project &&
+            npm install &&
             npm test
