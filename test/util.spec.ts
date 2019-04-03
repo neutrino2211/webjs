@@ -1,3 +1,5 @@
+import "chromedriver";
+
 import * as fs from "fs-extra"
 import * as path from "path"
 import * as assert from "assert";
@@ -73,9 +75,9 @@ describe("Project utils",()=>{
             fs.copySync("./assets/compile/dist","./native/www")
         })
 
-        it("should be able to add licences, meta and cordova.js to the old entry",()=>{
+        it("should be able to add meta and cordova.js to the old entry",()=>{
             utils.makeCordovaEntry()
-            assert(fs.readFileSync("./native/www/index.html").toString('utf-8').includes(utils.apacheLicense))
+            assert(fs.readFileSync("./native/www/index.html").toString('utf-8').includes('<script type="text/javascript" src="cordova.js"></script>'))
         })
 
         it("should be able to remove native/www",()=>{

@@ -12,6 +12,5 @@ test/**/package-lock.json
 test/**/test
 test/**/karma.conf.json
 .vs
-.vscode
 .vstags
 .vagrant
