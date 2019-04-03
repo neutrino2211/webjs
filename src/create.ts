@@ -95,6 +95,7 @@ async function init(directory,type){
 }
 
 async function continueWithQuestions(directory,_,args){
+    console.log(chalk.rgb(0x90,0xff,0x44)("\nProject settings\n"))
     const {npm, testing} = await <any>inquirer.prompt(questionsList)
     var wjsManifest = `{
         "project-type" : "${_}",
@@ -108,7 +109,7 @@ async function continueWithQuestions(directory,_,args){
     pjson.name = a[a.length-1]
     pjson["wjs-config"] = JSON.parse(wjsManifest)
     fs.writeFileSync(path.join(directory,"package.json"),JSON.stringify(pjson,undefined,"\t"))
-    console.log(chalk.rgb(0x90,0xff,0x44)("Please answer these questions to continue with the setup"))
+    console.log(chalk.rgb(0x90,0xff,0x44)("\nProject Info\n"))
     const {version ,author, license} = await <any>inquirer.prompt([
         {
             type: "input",
@@ -127,6 +128,7 @@ async function continueWithQuestions(directory,_,args){
             default: "MIT"
         }
     ])
+    console.log()
     tasks.next()
     pjson.author = author
     pjson.version = version

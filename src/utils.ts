@@ -21,7 +21,7 @@ export function makeManifest(newManifest){
     fs.writeFileSync(pack,JSON.stringify(pjson,undefined,"\t"));
 }
 
-export function confirmConfig(handle?){
+export function confirmConfig(){
     if (getManifest() == undefined){
         console.log(`Project [${process.cwd()}] does not have a `+chalk.rgb(0xb9,0x30,0x22)("wjs-config")+" entry in package.json")
         console.log("Did you forget to run 'wjs init' ?")
@@ -90,13 +90,6 @@ export function compile(options){
 export function makeCordovaEntry(){
     const defaultEntry = fs.readFileSync("native/www/index.html").toString("utf-8");
     const $ = load(defaultEntry);
-    var head = $("head").html();
-    const newHead = apacheLicense+`
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">`+head;
-    $("head").html(newHead);
 
     var body = $("body").html()
     const newBody = `<script type="text/javascript" src="cordova.js"></script>`+body;
@@ -107,13 +100,6 @@ export function makeCordovaEntry(){
 export function makeCordovaEntryFromNative(){
     const defaultEntry = fs.readFileSync("www/index.html").toString("utf-8");
     const $ = load(defaultEntry);
-    var head = $("head").html();
-    const newHead = apacheLicense+`
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="msapplication-tap-highlight" content="no">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">`+head;
-    $("head").html(newHead);
 
     var body = $("body").html()
     const newBody = `<script type="text/javascript" src="cordova.js"></script>`+body;

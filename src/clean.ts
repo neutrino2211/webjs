@@ -20,8 +20,8 @@ export const command = "clean"
 export const description = "Cleans build artifacts left by parcel and cordova"
 
 export const builder = {
-    nonative: {
-        description: "Do not clean cordova build artifacts"
+    native: {
+        description: "Clean cordova build artifacts"
     }
 };
 
@@ -35,7 +35,7 @@ export async function handler(args){
         }
         tasks.finish()
 
-        if(!args.nonative){
+        if(args.native){
             await wjs_clean(args)
         }
     } catch (error) {

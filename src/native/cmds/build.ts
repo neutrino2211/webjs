@@ -58,7 +58,7 @@ export const builder = {
 }
 
 export async function handler(argv){
-    confirmConfig(false);
+    confirmConfig();
     confirmNative();
     tasks.next()
     await compile({

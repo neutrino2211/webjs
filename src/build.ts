@@ -4,8 +4,8 @@ import { Chain, Loader } from "./loader";
 import definitions from "./proj-def";
 import chalk from "chalk";
 
-const projectType = getManifest()["project-type"]
-const projectColor = <number[]>definitions[projectType].color;
+let projectType: string;
+let projectColor: number[];
 const tasks = new Chain<Loader>((prev,loader)=>{
     if(prev){
         prev.succeed("Done")
@@ -44,6 +44,8 @@ export async function handler(args: yargs.Arguments<{}>){
     try {
         confirmConfig()
         const manifest = getManifest()
+        const projectType = manifest["project-type"]
+        projectColor = definitions[projectType].color;
         tasks.next()
         await compile({
             minify:true,
