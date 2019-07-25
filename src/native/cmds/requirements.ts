@@ -1,5 +1,5 @@
 import { cordova } from "cordova-lib";
-import { changeDir } from "../../utils";
+import { changeDir, confirmNative } from "../../utils";
 import { emojify } from "node-emoji";
 import chalk from "chalk";
 
@@ -10,6 +10,7 @@ export const description = "List requirements for a platform"
 export const builder = {}
 
 export function handler(args){
+    confirmNative()
     changeDir("native")
     requirements(args.platforms)
 }
@@ -24,7 +25,7 @@ async function requirements(platforms){
             })
         })
     } catch (error) {
-        console.log(error)
+        console.log(`${error.name}: ${error.message}`)
         process.exit()
     }
 }

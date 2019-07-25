@@ -10,7 +10,8 @@
 	"scripts": {
 		"build": "tsc",
 		"watch": "tsc -w",
-		"test": "cd test && mocha --require ts-node/register --timeout 999999 **/*.spec.ts"
+		"test": "cd test && mocha --require ts-node/register --timeout 999999 **/*.spec.ts",
+		"coverage": "cd test && nyc mocha --require ts-node/register --timeout 999999 \"**/*.spec.ts\""
 	},
 	"keywords": [
 		"App",
@@ -73,6 +74,7 @@
 		"karma-chrome-launcher": "^2.2.0",
 		"karma-jasmine": "^2.0.1",
 		"mocha": "^5.2.0",
+		"nyc": "^13.3.0",
 		"selenium-webdriver": "^4.0.0-alpha.1",
 		"ts-node": "^8.0.2",
 		"typescript": "^3.3.3"

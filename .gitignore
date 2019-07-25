@@ -14,3 +14,4 @@ test/**/karma.conf.json
 .vs
 .vstags
 .vagrant
+.nyc_output
